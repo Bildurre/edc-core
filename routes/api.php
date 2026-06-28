@@ -18,6 +18,16 @@ Route::get('api/motor/ping', function () {
     ]);
 });
 
+// Locales de contenido disponibles (para los selectores del front).
+Route::get('api/locales', function () {
+    return response()->json([
+        'default' => config('motor.default_locale'),
+        'locales' => collect(config('motor.locales', []))
+            ->map(fn ($meta, $code) => ['code' => $code, 'name' => $meta['name'] ?? $code])
+            ->values(),
+    ]);
+});
+
 Route::prefix('api')->group(function () {
     // --- Público ---
     Route::post('auth/register', [AuthController::class, 'register']);

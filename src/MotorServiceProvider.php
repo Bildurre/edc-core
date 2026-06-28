@@ -25,6 +25,9 @@ class MotorServiceProvider extends ServiceProvider
         $this->loadRoutesFrom(__DIR__ . '/../routes/api.php');
 
         $router->aliasMiddleware('motor.admin', EnsureCanAccessAdmin::class);
+        // El SetLocale del motor lo registra cada juego en su bootstrap/app.php
+        // (appendToGroup 'api'), porque la config de middleware de la app es la
+        // autoridad y sobrescribe los grupos en Laravel 12.
 
         if ($this->app->runningInConsole()) {
             $this->commands([InstallCommand::class]);
