@@ -5,7 +5,9 @@
     "license": "proprietary",
     "version": "0.0.1",
     "require": {
-        "php": "^8.2"
+        "php": "^8.2",
+        "laravel/sanctum": "^4.0",
+        "spatie/laravel-permission": "^8.0"
     },
     "autoload": {
         "psr-4": {

@@ -16,4 +16,14 @@ return [
     'storage' => [
         'disk' => env('MOTOR_DISK', 'public'),
     ],
+
+    // Auth (DC-13, DC-14).
+    'auth' => [
+        // 'open' = registro público con rol user; 'invite' = registro deshabilitado.
+        'registration' => env('MOTOR_REGISTRATION', 'open'),
+        // Roles base del motor.
+        'roles' => ['admin', 'editor', 'user'],
+        // Roles con acceso al panel de administración.
+        'admin_roles' => ['admin', 'editor'],
+    ],
 ];

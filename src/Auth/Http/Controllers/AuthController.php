@@ -1,0 +1,83 @@
+<?php
+
+namespace Bgm\Core\Auth\Http\Controllers;
+
+use Bgm\Core\Auth\Http\Resources\UserResource;
+use Illuminate\Http\JsonResponse;
+use Illuminate\Http\Request;
+use Illuminate\Routing\Controller;
+use Illuminate\Support\Facades\Hash;
+use Illuminate\Validation\ValidationException;
+
+class AuthController extends Controller
+{
+    /** Modelo User del juego (configurable en config/auth.php). */
+    protected function userModel(): string
+    {
+        return config('auth.providers.users.model', \App\Models\User::class);
+    }
+
+    public function register(Request $request): JsonResponse
+    {
+        if (config('motor.auth.registration') !== 'open') {
+            abort(403, 'El registro público está deshabilitado.');
+        }
+
+        $data = $request->validate([
+            'name' => ['required', 'string', 'max:255'],
+            'email' => ['required', 'email', 'max:255', 'unique:users,email'],
+            'password' => ['required', 'string', 'min:8', 'confirmed'],
+        ]);
+
+        $model = $this->userModel();
+        $user = $model::create([
+            'name' => $data['name'],
+            'email' => $data['email'],
+            'password' => Hash::make($data['password']),
+        ]);
+        $user->assignRole('user');
+
+        $token = $user->createToken('bgm')->plainTextToken;
+
+        return response()->json([
+            'user' => new UserResource($user->load('roles')),
+            'token' => $token,
+        ], 201);
+    }
+
+    public function login(Request $request): JsonResponse
+    {
+        $data = $request->validate([
+            'email' => ['required', 'email'],
+            'password' => ['required', 'string'],
+        ]);
+
+        $model = $this->userModel();
+        $user = $model::where('email', $data['email'])->first();
+
+        if (! $user || ! Hash::check($data['password'], $user->password)) {
+            throw ValidationException::withMessages([
+                'email' => ['Credenciales incorrectas.'],
+            ]);
+        }
+
+        $token = $user->createToken('bgm')->plainTextToken;
+
+        return response()->json([
+            'user' => new UserResource($user->load('roles')),
+            'token' => $token,
+        ]);
+    }
+
+    public function logout(Request $request): JsonResponse
+    {
+        $request->user()->currentAccessToken()->delete();
+
+        return response()->json(['message' => 'Sesión cerrada.']);
+    }
+
+    public function me(Request $request): UserResource
+    {
+        return new UserResource($request->user()->load('roles'));
+    }
+}
