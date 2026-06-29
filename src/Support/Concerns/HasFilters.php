@@ -7,7 +7,7 @@ use Illuminate\Database\Eloquent\Builder;
 /**
  * Filtros de listado declarativos. La entidad declara las columnas buscables en
  * la propiedad `$searchable`. Entiende `search` (texto) y `status`
- * (published|draft). El formato casa con el FiltersBar del admin-kit.
+ * (published|draft|trashed). El formato casa con el FiltersBar del admin-kit.
  */
 trait HasFilters
 {
@@ -28,6 +28,8 @@ trait HasFilters
             $query->where('is_published', true);
         } elseif ($status === 'draft') {
             $query->where('is_published', false);
+        } elseif ($status === 'trashed') {
+            $query->onlyTrashed();
         }
 
         return $query;
