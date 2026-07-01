@@ -23,6 +23,7 @@ class MotorServiceProvider extends ServiceProvider
     public function boot(Router $router): void
     {
         $this->loadRoutesFrom(__DIR__ . '/../routes/api.php');
+        $this->loadMigrationsFrom(__DIR__ . '/../database/migrations');
 
         $router->aliasMiddleware('motor.admin', EnsureCanAccessAdmin::class);
         // El SetLocale del motor lo registra cada juego en su bootstrap/app.php

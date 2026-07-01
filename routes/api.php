@@ -2,6 +2,7 @@
 
 use Bgm\Core\Auth\Http\Controllers\AccountController;
 use Bgm\Core\Auth\Http\Controllers\AuthController;
+use Bgm\Core\Icons\Http\Controllers\IconController;
 use Illuminate\Support\Facades\Route;
 
 /*
@@ -33,6 +34,9 @@ Route::prefix('api')->group(function () {
     Route::post('auth/register', [AuthController::class, 'register']);
     Route::post('auth/login', [AuthController::class, 'login']);
 
+    // Biblioteca de iconos (para el selector del editor WYSIWYG).
+    Route::get('icons', [IconController::class, 'index']);
+
     // --- Autenticado (token Sanctum) ---
     Route::middleware('auth:sanctum')->group(function () {
         Route::post('auth/logout', [AuthController::class, 'logout']);
@@ -48,6 +52,10 @@ Route::prefix('api')->group(function () {
             Route::get('admin/ping', function () {
                 return response()->json(['ok' => true, 'area' => 'admin']);
             });
+
+            // Gestión de la biblioteca de iconos.
+            Route::post('admin/icons', [IconController::class, 'store']);
+            Route::delete('admin/icons/{icon}', [IconController::class, 'destroy']);
         });
     });
 });
