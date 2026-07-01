@@ -29,7 +29,9 @@ Route::get('api/locales', function () {
     ]);
 });
 
-Route::prefix('api')->group(function () {
+// Grupo 'api' para heredar lo que la app configura (incl. SetLocale del motor,
+// añadido en bootstrap/app.php). Sin él, estas rutas no localizan las respuestas.
+Route::prefix('api')->middleware('api')->group(function () {
     // --- Público ---
     Route::post('auth/register', [AuthController::class, 'register']);
     Route::post('auth/login', [AuthController::class, 'login']);
