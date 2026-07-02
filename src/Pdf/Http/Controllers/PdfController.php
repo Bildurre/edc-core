@@ -23,6 +23,29 @@ class PdfController extends Controller
         protected PdfService $service,
     ) {}
 
+    /**
+     * Catálogo de exports registrados por el juego, para el gestor del admin:
+     * tipo, si es global o por entidad, layout y (si aplica) las entidades
+     * dueñas disponibles.
+     */
+    public function exports(): JsonResponse
+    {
+        $locale = app()->getLocale();
+
+        $data = collect($this->exports->types())->map(function (string $type) use ($locale) {
+            $export = $this->exports->get($type);
+
+            return [
+                'type' => $type,
+                'global' => $export->sourceModel() === null,
+                'layout' => $export->layout(),
+                'sources' => $export->sources($locale),
+            ];
+        });
+
+        return response()->json(['data' => $data]);
+    }
+
     /** PDF de un export (y entidad dueña, si el export la tiene). */
     public function index(Request $request): JsonResponse
     {

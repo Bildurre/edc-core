@@ -12,6 +12,11 @@ use Illuminate\Support\Str;
  */
 abstract class PdfExport implements PdfExportContract
 {
+    public function sources(string $locale): array
+    {
+        return [];
+    }
+
     public function layout(): string
     {
         return config('motor.pdf.default_layout', 'card');

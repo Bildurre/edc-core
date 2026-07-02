@@ -62,16 +62,17 @@ return [
         // Presets de impresión (DC-07). Cada juego puede añadir o ajustar
         // (medidas en mm). Las columnas/filas se calculan del papel.
         'layouts' => [
-            // Carta 88x126 con marcas de corte: 4 por A4.
+            // Carta tamaño Magic (63x88) con marcas de corte: 9 por A4.
+            // Cada juego ajusta el tamaño de SUS cartas aquí (o añade layouts).
             'card' => [
                 'paper' => 'a4',
                 'orientation' => 'portrait',
-                'item_width' => 88,
-                'item_height' => 126,
-                'margin' => 10,
-                'gap' => 6,
+                'item_width' => 63,
+                'item_height' => 88,
+                'margin' => 6,
+                'gap' => 4,
                 'crop_marks' => true,
-                'crop_mark_length' => 4,
+                'crop_mark_length' => 3,
             ],
             // Counters 25x25: rejilla densa.
             'counter' => [

@@ -22,6 +22,13 @@ interface PdfExportContract
      */
     public function items(?Model $source, string $locale): array;
 
+    /**
+     * Entidades dueñas disponibles para el gestor del admin:
+     * [['id' => int, 'label' => string], ...]. Solo aplica a exports con
+     * sourceModel; los globales devuelven [].
+     */
+    public function sources(string $locale): array;
+
     /** Clave del layout (motor.pdf.layouts) que usa este export. */
     public function layout(): string;
 

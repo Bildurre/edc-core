@@ -109,6 +109,7 @@ Route::prefix('api')->middleware('api')->group(function () {
             // Gestor de PDF (doc 02): listar por export/entidad, generar,
             // regenerar y borrar con un clic.
             Route::prefix('admin/pdfs')->group(function () {
+                Route::get('exports', [PdfController::class, 'exports']);
                 Route::get('/', [PdfController::class, 'index']);
                 Route::post('generate', [PdfController::class, 'generate']);
                 Route::post('{pdf}/regenerate', [PdfController::class, 'regenerate'])->whereNumber('pdf');
