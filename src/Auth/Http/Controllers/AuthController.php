@@ -2,6 +2,7 @@
 
 namespace Bgm\Core\Auth\Http\Controllers;
 
+use App\Models\User;
 use Bgm\Core\Auth\Http\Resources\UserResource;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Http\Request;
@@ -14,7 +15,7 @@ class AuthController extends Controller
     /** Modelo User del juego (configurable en config/auth.php). */
     protected function userModel(): string
     {
-        return config('auth.providers.users.model', \App\Models\User::class);
+        return config('auth.providers.users.model', User::class);
     }
 
     public function register(Request $request): JsonResponse

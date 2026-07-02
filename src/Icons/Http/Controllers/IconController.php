@@ -28,7 +28,7 @@ class IconController extends Controller
             'image' => ['required', 'file', 'mimes:svg,png,jpg,jpeg,webp,gif', 'max:2048'],
         ])->validate();
 
-        $icon = new Icon();
+        $icon = new Icon;
         $icon->name = $data['name'];
         $icon->save();
         $icon->setImageFromRequest($request);

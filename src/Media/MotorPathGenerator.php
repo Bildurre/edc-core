@@ -13,17 +13,17 @@ class MotorPathGenerator implements PathGenerator
 {
     public function getPath(Media $media): string
     {
-        return $this->base($media) . '/';
+        return $this->base($media).'/';
     }
 
     public function getPathForConversions(Media $media): string
     {
-        return $this->base($media) . '/conversions/';
+        return $this->base($media).'/conversions/';
     }
 
     public function getPathForResponsiveImages(Media $media): string
     {
-        return $this->base($media) . '/responsive/';
+        return $this->base($media).'/responsive/';
     }
 
     protected function base(Media $media): string

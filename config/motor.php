@@ -1,8 +1,10 @@
 <?php
 
+use Bgm\Core\Motor;
+
 return [
     // Versión expuesta por la API (debe casar con Bgm\Core\Motor::VERSION).
-    'version' => \Bgm\Core\Motor::VERSION,
+    'version' => Motor::VERSION,
 
     // Locales de contenido del motor (DC-23). Cada juego puede ajustarlos.
     'default_locale' => 'es',
