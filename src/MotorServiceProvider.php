@@ -24,6 +24,7 @@ class MotorServiceProvider extends ServiceProvider
     {
         $this->loadRoutesFrom(__DIR__.'/../routes/api.php');
         $this->loadMigrationsFrom(__DIR__.'/../database/migrations');
+        $this->loadTranslationsFrom(__DIR__.'/../lang', 'motor');
 
         $router->aliasMiddleware('motor.admin', EnsureCanAccessAdmin::class);
         // El SetLocale del motor lo registra cada juego en su bootstrap/app.php
@@ -36,6 +37,10 @@ class MotorServiceProvider extends ServiceProvider
             $this->publishes([
                 __DIR__.'/../config/motor.php' => config_path('motor.php'),
             ], 'motor-config');
+
+            $this->publishes([
+                __DIR__.'/../lang' => lang_path('vendor/motor'),
+            ], 'motor-lang');
         }
     }
 }

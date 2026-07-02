@@ -17,7 +17,7 @@ class EnsureCanAccessAdmin
         $user = $request->user();
 
         if (! $user || ! $user->hasAnyRole(config('motor.auth.admin_roles', ['admin', 'editor']))) {
-            abort(403, 'No tienes acceso al panel de administración.');
+            abort(403, __('motor::motor.admin_forbidden'));
         }
 
         return $next($request);

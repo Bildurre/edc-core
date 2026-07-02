@@ -45,12 +45,12 @@ class AccountController extends Controller
 
         if (! Hash::check($data['current_password'], $user->password)) {
             throw ValidationException::withMessages([
-                'current_password' => ['La contraseña actual no es correcta.'],
+                'current_password' => [__('motor::motor.current_password_incorrect')],
             ]);
         }
 
         $user->update(['password' => Hash::make($data['password'])]);
 
-        return response()->json(['message' => 'Contraseña actualizada.']);
+        return response()->json(['message' => __('motor::motor.password_updated')]);
     }
 }

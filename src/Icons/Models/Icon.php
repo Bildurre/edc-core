@@ -3,7 +3,6 @@
 namespace Bgm\Core\Icons\Models;
 
 use Bgm\Core\Media\Concerns\HasImage;
-use Bgm\Core\Support\Concerns\ResolvesBySlug;
 use Illuminate\Database\Eloquent\Model;
 use Spatie\MediaLibrary\HasMedia;
 use Spatie\Sluggable\HasSlug;
@@ -17,7 +16,6 @@ class Icon extends Model implements HasMedia
 {
     use HasImage;
     use HasSlug;
-    use ResolvesBySlug;
 
     protected $table = 'icons';
 

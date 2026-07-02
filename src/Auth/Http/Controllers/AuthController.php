@@ -21,7 +21,7 @@ class AuthController extends Controller
     public function register(Request $request): JsonResponse
     {
         if (config('motor.auth.registration') !== 'open') {
-            abort(403, 'El registro público está deshabilitado.');
+            abort(403, __('motor::motor.registration_disabled'));
         }
 
         $data = $request->validate([
@@ -58,7 +58,7 @@ class AuthController extends Controller
 
         if (! $user || ! Hash::check($data['password'], $user->password)) {
             throw ValidationException::withMessages([
-                'email' => ['Credenciales incorrectas.'],
+                'email' => [__('motor::motor.invalid_credentials')],
             ]);
         }
 
@@ -74,7 +74,7 @@ class AuthController extends Controller
     {
         $request->user()->currentAccessToken()->delete();
 
-        return response()->json(['message' => 'Sesión cerrada.']);
+        return response()->json(['message' => __('motor::motor.logged_out')]);
     }
 
     public function me(Request $request): UserResource
