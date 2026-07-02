@@ -11,6 +11,11 @@ use InvalidArgumentException;
  *     Pdfs::register('house-schemes', HouseSchemesExport::class);
  *
  * La clave es el `type` del GeneratedPdf y de la API (/admin/pdfs).
+ *
+ * Los presets de impresión propios del juego (medidas en mm) se declaran ahí
+ * mismo, sin publicar la config entera:
+ *
+ *     Pdfs::layout('token-40', ['item_width' => 40, 'item_height' => 40]);
  */
 class PdfExportRegistry
 {
@@ -27,6 +32,21 @@ class PdfExportRegistry
         }
 
         $this->exports[$type] = $exportClass;
+    }
+
+    /**
+     * Declara (o ajusta) un preset de impresión en motor.pdf.layouts. Basta
+     * con las claves que cambian: el resto usa los valores por defecto de
+     * PrintLayout (paper a4, portrait, crop_marks...).
+     *
+     * @param  array<string, mixed>  $preset
+     */
+    public function layout(string $key, array $preset): void
+    {
+        config()->set(
+            "motor.pdf.layouts.{$key}",
+            array_merge(config("motor.pdf.layouts.{$key}", []), $preset),
+        );
     }
 
     public function has(string $type): bool
