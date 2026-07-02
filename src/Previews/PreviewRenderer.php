@@ -15,6 +15,10 @@ class PreviewRenderer
     public function capture(string $url, int $width, int $height, string $savePath): void
     {
         $shot = Browsershot::url($url)
+            // Headless moderno: usa el binario 'chrome' que descarga puppeteer
+            // con npm install. Sin esto, Browsershot pide 'chrome-headless-shell',
+            // que puppeteer NO baja por defecto ("Could not find chrome-headless-shell").
+            ->newHeadless()
             ->windowSize($width, $height)
             ->deviceScaleFactor((int) config('motor.previews.scale', 2))
             ->hideBackground() // PNG con fondo transparente si el componente no pinta fondo
