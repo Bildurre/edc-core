@@ -4,7 +4,9 @@ namespace Bgm\Core;
 
 use Bgm\Core\Auth\Http\Middleware\EnsureCanAccessAdmin;
 use Bgm\Core\Console\InstallCommand;
+use Bgm\Core\Console\PdfCleanupCommand;
 use Bgm\Core\Console\PreviewManageCommand;
+use Bgm\Core\Pdf\PdfExportRegistry;
 use Bgm\Core\Previews\PreviewRegistry;
 use Illuminate\Routing\Router;
 use Illuminate\Support\ServiceProvider;
@@ -21,6 +23,9 @@ class MotorServiceProvider extends ServiceProvider
         // Registro de entidades renderizables (doc 01): único por app; cada
         // juego registra las suyas vía la facade Previews en su provider.
         $this->app->singleton(PreviewRegistry::class);
+
+        // Registro de exports de PDF (doc 02): facade Pdfs.
+        $this->app->singleton(PdfExportRegistry::class);
     }
 
     /**
@@ -31,6 +36,7 @@ class MotorServiceProvider extends ServiceProvider
         $this->loadRoutesFrom(__DIR__.'/../routes/api.php');
         $this->loadMigrationsFrom(__DIR__.'/../database/migrations');
         $this->loadTranslationsFrom(__DIR__.'/../lang', 'motor');
+        $this->loadViewsFrom(__DIR__.'/../resources/views', 'motor');
 
         $router->aliasMiddleware('motor.admin', EnsureCanAccessAdmin::class);
         // El SetLocale del motor lo registra cada juego en su bootstrap/app.php
@@ -38,7 +44,7 @@ class MotorServiceProvider extends ServiceProvider
         // autoridad y sobrescribe los grupos en Laravel 12.
 
         if ($this->app->runningInConsole()) {
-            $this->commands([InstallCommand::class, PreviewManageCommand::class]);
+            $this->commands([InstallCommand::class, PreviewManageCommand::class, PdfCleanupCommand::class]);
 
             $this->publishes([
                 __DIR__.'/../config/motor.php' => config_path('motor.php'),

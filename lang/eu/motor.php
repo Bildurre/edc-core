@@ -15,4 +15,7 @@ return [
     'renders_queued' => '{0} Ez dago zer ilaran jarri: dena sortuta dago.|{1} Render 1 ilaran.|[2,*] :count render ilaran.',
     'orphans_found' => '{0} Umezurtzik ez.|{1} Fitxategi umezurtz 1 aurkitu da.|[2,*] :count fitxategi umezurtz aurkitu dira.',
     'orphans_deleted' => '{0} Umezurtzik ez.|{1} Fitxategi umezurtz 1 ezabatu da.|[2,*] :count fitxategi umezurtz ezabatu dira.',
+    'pdfs_queued' => 'PDF sortzea ilaran jarri da.',
+    'pdf_deleted' => 'PDFa ezabatu da.',
+    'collection_empty' => 'Bilduma hutsik dago.',
 ];

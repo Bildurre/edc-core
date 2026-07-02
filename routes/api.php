@@ -4,6 +4,8 @@ use Bgm\Core\Auth\Http\Controllers\AccountController;
 use Bgm\Core\Auth\Http\Controllers\AuthController;
 use Bgm\Core\Auth\Http\Controllers\EmailVerificationController;
 use Bgm\Core\Icons\Http\Controllers\IconController;
+use Bgm\Core\Pdf\Http\Controllers\PdfCollectionController;
+use Bgm\Core\Pdf\Http\Controllers\PdfController;
 use Bgm\Core\Previews\Http\Controllers\PreviewController;
 use Bgm\Core\Previews\Http\Controllers\RenderDataController;
 use Illuminate\Support\Facades\Route;
@@ -52,6 +54,10 @@ Route::prefix('api')->middleware('api')->group(function () {
     Route::get('render/{entity}/{id}', [RenderDataController::class, 'show'])
         ->whereNumber('id');
 
+    // Descarga de PDF: permanentes públicos (expositor); temporales, solo el
+    // dueño o un admin (lo comprueba el controlador).
+    Route::get('pdfs/{pdf}/download', [PdfController::class, 'download']);
+
     // --- Autenticado (token Sanctum) ---
     Route::middleware('auth:sanctum')->group(function () {
         Route::post('auth/logout', [AuthController::class, 'logout']);
@@ -64,6 +70,16 @@ Route::prefix('api')->middleware('api')->group(function () {
         Route::get('account', [AccountController::class, 'show']);
         Route::put('account', [AccountController::class, 'update']);
         Route::put('account/password', [AccountController::class, 'updatePassword']);
+
+        // Colección temporal "para imprimir" (doc 02).
+        Route::prefix('pdf-collection')->group(function () {
+            Route::get('/', [PdfCollectionController::class, 'index']);
+            Route::post('items', [PdfCollectionController::class, 'store']);
+            Route::delete('items/{item}', [PdfCollectionController::class, 'destroy'])->whereNumber('item');
+            Route::delete('/', [PdfCollectionController::class, 'clear']);
+            Route::post('generate', [PdfCollectionController::class, 'generate']);
+            Route::get('pdfs/{pdf}', [PdfCollectionController::class, 'show'])->whereNumber('pdf');
+        });
 
         // --- Solo admin/editor ---
         Route::middleware('motor.admin')->group(function () {
@@ -88,6 +104,15 @@ Route::prefix('api')->middleware('api')->group(function () {
                 Route::post('{entity}/{id}/regenerate', [PreviewController::class, 'regenerate'])
                     ->whereNumber('id');
                 Route::delete('{entity}/{id}', [PreviewController::class, 'destroy'])->whereNumber('id');
+            });
+
+            // Gestor de PDF (doc 02): listar por export/entidad, generar,
+            // regenerar y borrar con un clic.
+            Route::prefix('admin/pdfs')->group(function () {
+                Route::get('/', [PdfController::class, 'index']);
+                Route::post('generate', [PdfController::class, 'generate']);
+                Route::post('{pdf}/regenerate', [PdfController::class, 'regenerate'])->whereNumber('pdf');
+                Route::delete('{pdf}', [PdfController::class, 'destroy'])->whereNumber('pdf');
             });
         });
     });

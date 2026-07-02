@@ -15,4 +15,7 @@ return [
     'renders_queued' => '{0} Nada que encolar: todo está generado.|{1} 1 render encolado.|[2,*] :count renders encolados.',
     'orphans_found' => '{0} Sin huérfanos.|{1} 1 fichero huérfano encontrado.|[2,*] :count ficheros huérfanos encontrados.',
     'orphans_deleted' => '{0} Sin huérfanos.|{1} 1 fichero huérfano eliminado.|[2,*] :count ficheros huérfanos eliminados.',
+    'pdfs_queued' => 'Generación de PDF encolada.',
+    'pdf_deleted' => 'PDF borrado.',
+    'collection_empty' => 'La colección está vacía.',
 ];

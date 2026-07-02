@@ -50,6 +50,43 @@ return [
         'node_binary' => env('MOTOR_NODE_BINARY'),
     ],
 
+    // Generación de PDF (doc 02, DC-06, DC-07).
+    'pdf' => [
+        // Disco y carpeta donde se guardan los PDF generados.
+        'disk' => env('MOTOR_PDF_DISK', env('MOTOR_DISK', 'public')),
+        'path' => 'pdfs',
+        // Horas de vida de los PDF temporales (colecciones a la carta).
+        'temporary_ttl' => env('MOTOR_PDF_TTL', 24),
+        // Layout por defecto si el export no declara uno.
+        'default_layout' => 'card',
+        // Presets de impresión (DC-07). Cada juego puede añadir o ajustar
+        // (medidas en mm). Las columnas/filas se calculan del papel.
+        'layouts' => [
+            // Carta 88x126 con marcas de corte: 4 por A4.
+            'card' => [
+                'paper' => 'a4',
+                'orientation' => 'portrait',
+                'item_width' => 88,
+                'item_height' => 126,
+                'margin' => 10,
+                'gap' => 6,
+                'crop_marks' => true,
+                'crop_mark_length' => 4,
+            ],
+            // Counters 25x25: rejilla densa.
+            'counter' => [
+                'paper' => 'a4',
+                'orientation' => 'portrait',
+                'item_width' => 25,
+                'item_height' => 25,
+                'margin' => 10,
+                'gap' => 4,
+                'crop_marks' => true,
+                'crop_mark_length' => 2,
+            ],
+        ],
+    ],
+
     // Auth (DC-13, DC-14).
     'auth' => [
         // 'open' = registro público con rol user; 'invite' = registro deshabilitado.
