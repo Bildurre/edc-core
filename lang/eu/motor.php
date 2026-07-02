@@ -11,4 +11,8 @@ return [
     'already_verified' => 'Zure emaila dagoeneko egiaztatuta dago.',
     'verification_not_supported' => 'Joko honek ez du email-egiaztapenik erabiltzen.',
     'previews_queued' => 'Aurrebisten birsortzea ilaran jarri da.',
+    'previews_deleted' => 'Aurrebistak ezabatu dira.',
+    'renders_queued' => '{0} Ez dago zer ilaran jarri: dena sortuta dago.|{1} Render 1 ilaran.|[2,*] :count render ilaran.',
+    'orphans_found' => '{0} Umezurtzik ez.|{1} Fitxategi umezurtz 1 aurkitu da.|[2,*] :count fitxategi umezurtz aurkitu dira.',
+    'orphans_deleted' => '{0} Umezurtzik ez.|{1} Fitxategi umezurtz 1 ezabatu da.|[2,*] :count fitxategi umezurtz ezabatu dira.',
 ];

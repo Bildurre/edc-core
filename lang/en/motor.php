@@ -11,4 +11,8 @@ return [
     'already_verified' => 'Your email is already verified.',
     'verification_not_supported' => 'This game does not use email verification.',
     'previews_queued' => 'Preview regeneration queued.',
+    'previews_deleted' => 'Previews deleted.',
+    'renders_queued' => '{0} Nothing to queue: everything is generated.|{1} 1 render queued.|[2,*] :count renders queued.',
+    'orphans_found' => '{0} No orphans.|{1} 1 orphan file found.|[2,*] :count orphan files found.',
+    'orphans_deleted' => '{0} No orphans.|{1} 1 orphan file deleted.|[2,*] :count orphan files deleted.',
 ];

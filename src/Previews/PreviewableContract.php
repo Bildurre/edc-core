@@ -12,6 +12,9 @@ interface PreviewableContract
     /** Tamaño del componente visual en píxeles CSS: ['width' => int, 'height' => int]. */
     public function previewSize(): array;
 
+    /** Etiqueta legible de la entidad para los listados del gestor de previews. */
+    public function previewLabel(string $locale): string;
+
     /**
      * Campos cuyo cambio invalida la preview (declarativo). Los cambios en
      * otros campos (p. ej. is_published) no regeneran nada.

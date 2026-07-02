@@ -78,6 +78,55 @@ class PreviewService
     }
 
     /**
+     * Encola (o ejecuta, con $sync) los renders de TODAS las entidades de un
+     * tipo. Con $onlyMissing solo los locales que faltan. Devuelve cuántos
+     * renders se han encolado.
+     */
+    public function queueType(
+        string $key,
+        bool $onlyMissing = false,
+        ?array $locales = null,
+        bool $sync = false,
+    ): int {
+        $locales ??= array_keys(config('motor.locales', []));
+        $queued = 0;
+
+        foreach ($this->registry->modelFor($key)::query()->cursor() as $entity) {
+            $pending = $onlyMissing
+                ? array_values(array_filter($locales, fn ($l) => ! $entity->hasPreview($l)))
+                : $locales;
+
+            if ($pending === []) {
+                continue;
+            }
+
+            $entity->regeneratePreviews($pending, sync: $sync);
+            $queued += count($pending);
+        }
+
+        return $queued;
+    }
+
+    /** Borra las previews de TODAS las entidades de un tipo (incl. papelera). */
+    public function deleteType(string $key): int
+    {
+        $model = $this->registry->modelFor($key);
+        $query = $model::query();
+
+        if (method_exists($model, 'bootSoftDeletes')) {
+            $query->withTrashed();
+        }
+
+        $count = 0;
+        foreach ($query->cursor() as $entity) {
+            $entity->deletePreviews();
+            $count++;
+        }
+
+        return $count;
+    }
+
+    /**
      * Elimina ficheros de previews que ya no referencia ninguna entidad
      * (huérfanos). Devuelve las rutas afectadas; con $dryRun solo las lista.
      *

@@ -75,11 +75,20 @@ Route::prefix('api')->middleware('api')->group(function () {
             Route::post('admin/icons', [IconController::class, 'store']);
             Route::delete('admin/icons/{icon}', [IconController::class, 'destroy']);
 
-            // Previews PNG: consultar y regenerar en cola desde el admin.
-            Route::get('admin/previews/{entity}/{id}', [PreviewController::class, 'show'])
-                ->whereNumber('id');
-            Route::post('admin/previews/{entity}/{id}/regenerate', [PreviewController::class, 'regenerate'])
-                ->whereNumber('id');
+            // Gestor de previews PNG (estado, lotes por tipo, individuales,
+            // limpieza de huérfanos). Las rutas estáticas van antes que {id}.
+            Route::prefix('admin/previews')->group(function () {
+                Route::get('/', [PreviewController::class, 'index']);
+                Route::post('clean', [PreviewController::class, 'clean']);
+                Route::get('{entity}/items', [PreviewController::class, 'items']);
+                Route::post('{entity}/generate', [PreviewController::class, 'generateType']);
+                Route::post('{entity}/regenerate', [PreviewController::class, 'regenerateType']);
+                Route::delete('{entity}', [PreviewController::class, 'destroyType']);
+                Route::get('{entity}/{id}', [PreviewController::class, 'show'])->whereNumber('id');
+                Route::post('{entity}/{id}/regenerate', [PreviewController::class, 'regenerate'])
+                    ->whereNumber('id');
+                Route::delete('{entity}/{id}', [PreviewController::class, 'destroy'])->whereNumber('id');
+            });
         });
     });
 });
