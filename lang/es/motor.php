@@ -10,4 +10,5 @@ return [
     'verification_sent' => 'Te hemos enviado un correo de verificación.',
     'already_verified' => 'Tu email ya está verificado.',
     'verification_not_supported' => 'Este juego no usa verificación de email.',
+    'previews_queued' => 'Regeneración de previews encolada.',
 ];

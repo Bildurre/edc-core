@@ -27,6 +27,29 @@ return [
         'verified_path' => env('MOTOR_VERIFIED_PATH', '/cuenta?verified=1'),
     ],
 
+    // Render de componentes a PNG (doc 01, DC-04, DC-05).
+    'previews' => [
+        // Apagado global (p. ej. en tests o entornos sin Chromium): las
+        // entidades no encolan regeneraciones al crearse/editarse.
+        'enabled' => env('MOTOR_PREVIEWS', true),
+        // Disco y carpeta donde se guardan los PNG generados.
+        'disk' => env('MOTOR_PREVIEWS_DISK', env('MOTOR_DISK', 'public')),
+        'path' => 'previews',
+        // deviceScaleFactor de la captura (calidad vs peso; afecta al PDF).
+        'scale' => env('MOTOR_PREVIEWS_SCALE', 2),
+        // Segundos máximos por captura.
+        'timeout' => env('MOTOR_PREVIEWS_TIMEOUT', 60),
+        // Vida (segundos) del token de servicio que autoriza a la ruta
+        // /_render a pedir los datos por la API (DC-04).
+        'token_ttl' => 300,
+        // Base de la SPA que sirve la ruta /_render (por defecto, la app).
+        'render_url' => env('MOTOR_RENDER_URL'),
+        // Binarios: si no se indican, Browsershot usa el Chromium de puppeteer
+        // y el node del PATH. En el droplet se fija chrome_path (DC-22).
+        'chrome_path' => env('MOTOR_CHROME_PATH'),
+        'node_binary' => env('MOTOR_NODE_BINARY'),
+    ],
+
     // Auth (DC-13, DC-14).
     'auth' => [
         // 'open' = registro público con rol user; 'invite' = registro deshabilitado.

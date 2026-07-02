@@ -4,6 +4,8 @@ use Bgm\Core\Auth\Http\Controllers\AccountController;
 use Bgm\Core\Auth\Http\Controllers\AuthController;
 use Bgm\Core\Auth\Http\Controllers\EmailVerificationController;
 use Bgm\Core\Icons\Http\Controllers\IconController;
+use Bgm\Core\Previews\Http\Controllers\PreviewController;
+use Bgm\Core\Previews\Http\Controllers\RenderDataController;
 use Illuminate\Support\Facades\Route;
 
 /*
@@ -46,6 +48,10 @@ Route::prefix('api')->middleware('api')->group(function () {
     // Biblioteca de iconos (para el selector del editor WYSIWYG).
     Route::get('icons', [IconController::class, 'index']);
 
+    // Datos para la ruta /_render de la SPA: exige token de servicio (DC-04).
+    Route::get('render/{entity}/{id}', [RenderDataController::class, 'show'])
+        ->whereNumber('id');
+
     // --- Autenticado (token Sanctum) ---
     Route::middleware('auth:sanctum')->group(function () {
         Route::post('auth/logout', [AuthController::class, 'logout']);
@@ -68,6 +74,12 @@ Route::prefix('api')->middleware('api')->group(function () {
             // Gestión de la biblioteca de iconos.
             Route::post('admin/icons', [IconController::class, 'store']);
             Route::delete('admin/icons/{icon}', [IconController::class, 'destroy']);
+
+            // Previews PNG: consultar y regenerar en cola desde el admin.
+            Route::get('admin/previews/{entity}/{id}', [PreviewController::class, 'show'])
+                ->whereNumber('id');
+            Route::post('admin/previews/{entity}/{id}/regenerate', [PreviewController::class, 'regenerate'])
+                ->whereNumber('id');
         });
     });
 });

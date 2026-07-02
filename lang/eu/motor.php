@@ -10,4 +10,5 @@ return [
     'verification_sent' => 'Egiaztapen-mezu bat bidali dizugu.',
     'already_verified' => 'Zure emaila dagoeneko egiaztatuta dago.',
     'verification_not_supported' => 'Joko honek ez du email-egiaztapenik erabiltzen.',
+    'previews_queued' => 'Aurrebisten birsortzea ilaran jarri da.',
 ];

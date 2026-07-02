@@ -4,6 +4,8 @@ namespace Bgm\Core;
 
 use Bgm\Core\Auth\Http\Middleware\EnsureCanAccessAdmin;
 use Bgm\Core\Console\InstallCommand;
+use Bgm\Core\Console\PreviewManageCommand;
+use Bgm\Core\Previews\PreviewRegistry;
 use Illuminate\Routing\Router;
 use Illuminate\Support\ServiceProvider;
 
@@ -15,6 +17,10 @@ class MotorServiceProvider extends ServiceProvider
     public function register(): void
     {
         $this->mergeConfigFrom(__DIR__.'/../config/motor.php', 'motor');
+
+        // Registro de entidades renderizables (doc 01): único por app; cada
+        // juego registra las suyas vía la facade Previews en su provider.
+        $this->app->singleton(PreviewRegistry::class);
     }
 
     /**
@@ -32,7 +38,7 @@ class MotorServiceProvider extends ServiceProvider
         // autoridad y sobrescribe los grupos en Laravel 12.
 
         if ($this->app->runningInConsole()) {
-            $this->commands([InstallCommand::class]);
+            $this->commands([InstallCommand::class, PreviewManageCommand::class]);
 
             $this->publishes([
                 __DIR__.'/../config/motor.php' => config_path('motor.php'),
