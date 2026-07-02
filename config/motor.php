@@ -19,6 +19,14 @@ return [
         'disk' => env('MOTOR_DISK', 'public'),
     ],
 
+    // URLs de los frontends del juego (las SPA viven en otros orígenes).
+    'frontend' => [
+        // Web pública ('app'): destino de redirecciones (p. ej. verificar email).
+        'app_url' => env('MOTOR_APP_URL', 'http://localhost:5173'),
+        // Ruta (dentro de la app) a la que se llega tras verificar el email.
+        'verified_path' => env('MOTOR_VERIFIED_PATH', '/cuenta?verified=1'),
+    ],
+
     // Auth (DC-13, DC-14).
     'auth' => [
         // 'open' = registro público con rol user; 'invite' = registro deshabilitado.

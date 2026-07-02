@@ -15,6 +15,7 @@ class UserResource extends JsonResource
             'email' => $this->email,
             'roles' => $this->getRoleNames(),
             'can_access_admin' => $this->canAccessAdmin(),
+            'email_verified' => $this->email_verified_at !== null,
         ];
     }
 }

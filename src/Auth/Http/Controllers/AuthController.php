@@ -4,6 +4,7 @@ namespace Bgm\Core\Auth\Http\Controllers;
 
 use App\Models\User;
 use Bgm\Core\Auth\Http\Resources\UserResource;
+use Illuminate\Auth\Events\Registered;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Http\Request;
 use Illuminate\Routing\Controller;
@@ -37,6 +38,10 @@ class AuthController extends Controller
             'password' => Hash::make($data['password']),
         ]);
         $user->assignRole('user');
+
+        // Si el User del juego implementa MustVerifyEmail, Laravel envía el
+        // correo de verificación al escuchar este evento (DC-14).
+        event(new Registered($user));
 
         $token = $user->createToken('bgm')->plainTextToken;
 

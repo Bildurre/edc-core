@@ -2,6 +2,7 @@
 
 use Bgm\Core\Auth\Http\Controllers\AccountController;
 use Bgm\Core\Auth\Http\Controllers\AuthController;
+use Bgm\Core\Auth\Http\Controllers\EmailVerificationController;
 use Bgm\Core\Icons\Http\Controllers\IconController;
 use Illuminate\Support\Facades\Route;
 
@@ -36,6 +37,12 @@ Route::prefix('api')->middleware('api')->group(function () {
     Route::post('auth/register', [AuthController::class, 'register']);
     Route::post('auth/login', [AuthController::class, 'login']);
 
+    // Verificación de email (DC-14): enlace firmado que llega por correo. El
+    // nombre 'verification.verify' es el que espera la notificación de Laravel.
+    Route::get('auth/verify-email/{id}/{hash}', [EmailVerificationController::class, 'verify'])
+        ->middleware(['signed', 'throttle:6,1'])
+        ->name('verification.verify');
+
     // Biblioteca de iconos (para el selector del editor WYSIWYG).
     Route::get('icons', [IconController::class, 'index']);
 
@@ -43,6 +50,9 @@ Route::prefix('api')->middleware('api')->group(function () {
     Route::middleware('auth:sanctum')->group(function () {
         Route::post('auth/logout', [AuthController::class, 'logout']);
         Route::get('auth/me', [AuthController::class, 'me']);
+        Route::post('auth/email/verification-notification', [
+            EmailVerificationController::class, 'resend',
+        ])->middleware('throttle:6,1');
 
         // Panel de usuario (base; cada juego lo amplía).
         Route::get('account', [AccountController::class, 'show']);

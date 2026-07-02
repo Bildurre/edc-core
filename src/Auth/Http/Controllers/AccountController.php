@@ -3,6 +3,7 @@
 namespace Bgm\Core\Auth\Http\Controllers;
 
 use Bgm\Core\Auth\Http\Resources\UserResource;
+use Illuminate\Contracts\Auth\MustVerifyEmail;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Http\Request;
 use Illuminate\Routing\Controller;
@@ -29,7 +30,18 @@ class AccountController extends Controller
             'email' => ['required', 'email', 'max:255', 'unique:users,email,'.$user->id],
         ]);
 
-        $user->update($data);
+        // Cambiar el email invalida la verificación anterior (DC-14): se
+        // vuelve a "sin verificar" y se envía un correo al email nuevo.
+        $emailChanged = $data['email'] !== $user->email;
+        if ($emailChanged && $user instanceof MustVerifyEmail) {
+            $data['email_verified_at'] = null;
+        }
+
+        $user->forceFill($data)->save();
+
+        if ($emailChanged && $user instanceof MustVerifyEmail) {
+            $user->sendEmailVerificationNotification();
+        }
 
         return new UserResource($user->load('roles'));
     }
