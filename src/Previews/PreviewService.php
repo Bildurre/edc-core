@@ -176,11 +176,19 @@ class PreviewService
         foreach ($this->registry->all() as $key => $modelClass) {
             $total = 0;
             $complete = 0;
+            $byLocale = array_fill_keys($locales, 0);
 
             foreach ($modelClass::query()->get() as $entity) {
                 $total++;
-                $missing = array_filter($locales, fn ($l) => ! $entity->hasPreview($l, $key));
-                if ($missing === []) {
+                $missing = 0;
+                foreach ($locales as $l) {
+                    if ($entity->hasPreview($l, $key)) {
+                        $byLocale[$l]++;
+                    } else {
+                        $missing++;
+                    }
+                }
+                if ($missing === 0) {
                     $complete++;
                 }
             }
@@ -190,6 +198,7 @@ class PreviewService
                 'total' => $total,
                 'complete' => $complete,
                 'pending' => $total - $complete,
+                'locales' => $byLocale, // generadas por locale
             ];
         }
 

@@ -32,6 +32,7 @@ class PreviewController extends Controller
                 'total' => $info['total'],
                 'complete' => $info['complete'],
                 'pending' => $info['pending'],
+                'locales' => $info['locales'],
             ];
         }
 
@@ -46,9 +47,17 @@ class PreviewController extends Controller
         $locales = array_keys(config('motor.locales', []));
         $locale = app()->getLocale();
 
-        $page = $this->registry->modelFor($entity)::query()
-            ->orderByDesc('id')
-            ->paginate(24);
+        $model = $this->registry->modelFor($entity);
+        $query = $model::query();
+
+        // Buscador del selector del panel: usa las columnas $searchable de la
+        // entidad (HasFilters) si el modelo lo trae.
+        $q = trim((string) $request->query('q', ''));
+        if ($q !== '' && method_exists($model, 'scopeFilter')) {
+            $query->filter(['search' => $q]);
+        }
+
+        $page = $query->orderByDesc('id')->paginate(24);
 
         return response()->json([
             'data' => collect($page->items())->map(fn ($item) => [
