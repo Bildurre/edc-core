@@ -71,6 +71,23 @@ abstract class BlockType
     }
 
     /**
+     * Campo estándar "posición de la imagen": columnas (izquierda/derecha),
+     * arriba/abajo, o flotada con el texto rodeándola (clear-*). Cualquier
+     * tipo con un campo image puede reutilizarlo.
+     */
+    public static function imagePositionField(): Field
+    {
+        return Field::select('image_position', [
+            'top' => 'Arriba',
+            'left' => 'Izquierda',
+            'right' => 'Derecha',
+            'bottom' => 'Abajo',
+            'clear-left' => 'Izquierda (el texto la rodea)',
+            'clear-right' => 'Derecha (el texto la rodea)',
+        ])->label('Posición de la imagen')->default('top');
+    }
+
+    /**
      * Esquema completo: campos del tipo + comunes.
      *
      * @return Field[]

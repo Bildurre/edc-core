@@ -5,7 +5,7 @@ namespace Bgm\Core\Content\BlockTypes;
 use Bgm\Core\Content\BlockType;
 use Bgm\Core\Content\Fields\Field;
 
-/** Cita destacada con autor. */
+/** Cita destacada con autor, con retrato opcional. */
 class QuoteBlock extends BlockType
 {
     public static string $key = 'quote';
@@ -19,6 +19,7 @@ class QuoteBlock extends BlockType
         return [
             Field::richtext('quote')->label('Cita')->translatable()->required(),
             Field::text('author')->label('Autor')->translatable(),
+            Field::image('image')->label('Imagen (retrato del autor)'),
         ];
     }
 }

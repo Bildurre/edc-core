@@ -25,6 +25,8 @@ class CtaBlock extends BlockType
                 'primary' => 'Primario',
                 'secondary' => 'Secundario',
             ])->label('Estilo del botón'),
+            Field::image('image')->label('Imagen'),
+            static::imagePositionField(),
         ];
     }
 }
