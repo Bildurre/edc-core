@@ -13,6 +13,12 @@ use InvalidArgumentException;
  *
  * La clave es el segmento de URL de la ruta de render (/_render/character/1)
  * y la carpeta de almacenamiento (previews/character/...).
+ *
+ * Un modelo puede registrarse con MÁS de una clave para tener varias
+ * previews (la primera registrada es la por defecto):
+ *
+ *     Previews::register('house', House::class);         // token 40 mm
+ *     Previews::register('house-counter', House::class); // contador 25 mm
  */
 class PreviewRegistry
 {
@@ -58,11 +64,21 @@ class PreviewRegistry
         return $this->entities[$key];
     }
 
-    /** Clave registrada para un modelo (o null si no está registrado). */
+    /** Clave POR DEFECTO de un modelo: la primera registrada (o null). */
     public function keyFor(Model $model): ?string
     {
         $key = array_search($model::class, $this->entities, true);
 
         return $key === false ? null : $key;
+    }
+
+    /**
+     * Todas las claves registradas para un modelo (sus previews).
+     *
+     * @return string[]
+     */
+    public function keysFor(Model $model): array
+    {
+        return array_keys($this->entities, $model::class, true);
     }
 }

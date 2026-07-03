@@ -21,10 +21,13 @@ class PreviewService
         protected RenderToken $tokens,
     ) {}
 
-    /** Genera (o regenera) el PNG de una entidad para un locale. */
-    public function generate(Model&PreviewableContract $entity, string $locale): string
+    /**
+     * Genera (o regenera) el PNG de una entidad para un locale. $type es la
+     * clave de preview (un modelo puede tener varias); null = la por defecto.
+     */
+    public function generate(Model&PreviewableContract $entity, string $locale, ?string $type = null): string
     {
-        $key = $this->registry->keyFor($entity);
+        $key = $type ?? $this->registry->keyFor($entity);
 
         if ($key === null) {
             throw new InvalidArgumentException(
@@ -32,7 +35,15 @@ class PreviewService
             );
         }
 
-        $size = $entity->previewSize();
+        $expected = $this->registry->has($key) ? $this->registry->modelFor($key) : null;
+
+        if ($expected === null || ! $entity instanceof $expected) {
+            throw new InvalidArgumentException(
+                "La preview '{$key}' no corresponde a ".$entity::class.'.'
+            );
+        }
+
+        $size = $entity->previewSize($key);
         $url = $this->renderUrl($key, $entity->getKey(), $locale);
 
         // Captura a un temporal y después al disco de previews.
@@ -48,31 +59,35 @@ class PreviewService
         }
 
         // Borra el PNG anterior del locale (nombre versionado => URL nueva).
-        $previous = $entity->previewPath($locale);
+        $previous = $entity->previewPath($locale, $key);
         if ($previous && $previous !== $path) {
             $this->disk()->delete($previous);
         }
 
         // Actualiza el modelo sin disparar eventos (no re-invalidar).
         $images = $entity->preview_image ?? [];
-        $images[$locale] = $path;
+        $images[$key][$locale] = $path;
         $entity->preview_image = $images;
         $entity->saveQuietly();
 
         return $path;
     }
 
-    /** Borra todos los PNG de la entidad y limpia la columna. */
-    public function deleteFor(Model $entity): void
+    /**
+     * Borra los PNG de la entidad y limpia la columna. Con $type solo esa
+     * preview; sin él, todas las del modelo.
+     */
+    public function deleteFor(Model $entity, ?string $type = null): void
     {
-        $key = $this->registry->keyFor($entity);
+        $keys = $type !== null ? [$type] : $this->registry->keysFor($entity);
 
-        if ($key !== null) {
+        foreach ($keys as $key) {
             $this->disk()->deleteDirectory($this->basePath()."/{$key}/{$entity->getKey()}");
         }
 
         if ($entity->exists && $entity->preview_image !== null) {
-            $entity->preview_image = null;
+            $images = $type !== null ? array_diff_key($entity->preview_image, [$type => true]) : [];
+            $entity->preview_image = $images === [] ? null : $images;
             $entity->saveQuietly();
         }
     }
@@ -93,14 +108,14 @@ class PreviewService
 
         foreach ($this->registry->modelFor($key)::query()->cursor() as $entity) {
             $pending = $onlyMissing
-                ? array_values(array_filter($locales, fn ($l) => ! $entity->hasPreview($l)))
+                ? array_values(array_filter($locales, fn ($l) => ! $entity->hasPreview($l, $key)))
                 : $locales;
 
             if ($pending === []) {
                 continue;
             }
 
-            $entity->regeneratePreviews($pending, sync: $sync);
+            $entity->regeneratePreviews($pending, sync: $sync, types: [$key]);
             $queued += count($pending);
         }
 
@@ -119,7 +134,7 @@ class PreviewService
 
         $count = 0;
         foreach ($query->cursor() as $entity) {
-            $entity->deletePreviews();
+            $entity->deletePreviews($key);
             $count++;
         }
 
@@ -164,7 +179,7 @@ class PreviewService
 
             foreach ($modelClass::query()->get() as $entity) {
                 $total++;
-                $missing = array_filter($locales, fn ($l) => ! $entity->hasPreview($l));
+                $missing = array_filter($locales, fn ($l) => ! $entity->hasPreview($l, $key));
                 if ($missing === []) {
                     $complete++;
                 }
@@ -213,7 +228,7 @@ class PreviewService
 
         return $query->whereNotNull('preview_image')
             ->pluck('preview_image')
-            ->flatMap(fn ($images) => array_values($images ?? []))
+            ->flatMap(fn ($images) => collect($images ?? [])->flatten()->all())
             ->all();
     }
 

@@ -17,6 +17,8 @@ class PrintableItem
         public readonly int $copies,
         /** Entidad renderizable pendiente de resolver a PNG (por locale). */
         public readonly ?Model $previewable = null,
+        /** Clave de preview a usar (un modelo puede tener varias); null = la por defecto. */
+        public readonly ?string $previewType = null,
     ) {}
 
     /** Ítem a partir de una imagen concreta (ruta absoluta o URL). */
@@ -27,10 +29,13 @@ class PrintableItem
 
     /**
      * Ítem a partir de una entidad renderizable (doc 01): el job usará su
-     * preview PNG del locale del PDF, generándola si no existe.
+     * preview PNG del locale del PDF, generándola si no existe. Con $preview
+     * el export elige cuál de las previews del modelo imprime:
+     *
+     *     PrintableItem::preview($casa, copies: 9, preview: 'house-counter')
      */
-    public static function preview(Model&PreviewableContract $entity, int $copies = 1): self
+    public static function preview(Model&PreviewableContract $entity, int $copies = 1, ?string $preview = null): self
     {
-        return new self(null, max(1, $copies), $entity);
+        return new self(null, max(1, $copies), $entity, $preview);
     }
 }

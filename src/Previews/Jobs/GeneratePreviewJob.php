@@ -28,11 +28,13 @@ class GeneratePreviewJob implements ShouldBeUnique, ShouldQueue
         public string $modelClass,
         public int|string $modelId,
         public string $locale,
+        /** Clave de preview (un modelo puede tener varias); null = la por defecto. */
+        public ?string $type = null,
     ) {}
 
     public function uniqueId(): string
     {
-        return "{$this->modelClass}:{$this->modelId}:{$this->locale}";
+        return "{$this->modelClass}:{$this->modelId}:{$this->locale}:".($this->type ?? 'default');
     }
 
     public function handle(PreviewService $service): void
@@ -47,6 +49,8 @@ class GeneratePreviewJob implements ShouldBeUnique, ShouldQueue
             return;
         }
 
-        $service->generate($entity, $this->locale);
+        // isset: un job encolado con una versión anterior (sin $type) se
+        // deserializa con la propiedad sin inicializar; usa la por defecto.
+        $service->generate($entity, $this->locale, isset($this->type) ? $this->type : null);
     }
 }

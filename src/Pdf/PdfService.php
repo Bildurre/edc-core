@@ -10,7 +10,6 @@ use Illuminate\Database\Eloquent\Model;
 use Illuminate\Foundation\Auth\User;
 use Illuminate\Support\Facades\Storage;
 use InvalidArgumentException;
-use RuntimeException;
 
 /**
  * Punto único de generación de PDF (doc 02). Regenerar = volver a llamar:
@@ -146,7 +145,7 @@ class PdfService
         $slots = $this->composer->expand($items, fn (PrintableItem $item) => $this->resolveImage($item, $pdf->locale));
 
         if ($slots === []) {
-            throw new RuntimeException('El PDF no tiene ítems imprimibles.');
+            throw new PdfCompositionException(__('motor::motor.pdf_no_items'));
         }
 
         $layout = PrintLayout::fromConfig($pdf->layout);
@@ -182,7 +181,8 @@ class PdfService
             foreach ($pdf->payload ?? [] as $row) {
                 $model = $this->previewables->modelFor($row['entity'])::query()->find($row['id']);
                 if ($model !== null) {
-                    $items[] = PrintableItem::preview($model, (int) ($row['copies'] ?? 1));
+                    // La clave elegida por el usuario ES la preview a imprimir.
+                    $items[] = PrintableItem::preview($model, (int) ($row['copies'] ?? 1), preview: $row['entity']);
                 }
             }
 
@@ -203,14 +203,14 @@ class PdfService
 
         $entity = $item->previewable;
 
-        if (! $entity->hasPreview($locale)) {
+        if (! $entity->hasPreview($locale, $item->previewType)) {
             // El PDF necesita el PNG sí o sí: se genera en el momento.
-            $this->previews->generate($entity, $locale);
+            $this->previews->generate($entity, $locale, $item->previewType);
             $entity->refresh();
         }
 
         $disk = config('motor.previews.disk');
-        $path = $entity->previewPath($locale);
+        $path = $entity->previewPath($locale, $item->previewType);
 
         // DomPDF prefiere rutas locales; para discos remotos, la URL.
         return config("filesystems.disks.{$disk}.driver") === 'local'

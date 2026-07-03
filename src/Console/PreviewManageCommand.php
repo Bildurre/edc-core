@@ -56,16 +56,18 @@ class PreviewManageCommand extends Command
         $locales = $this->locales();
         $dispatched = 0;
 
-        foreach ($this->entities($registry) as $entity) {
+        // Por clave de preview: --type=house solo toca ESA preview aunque el
+        // modelo tenga otras (p. ej. house-counter).
+        foreach ($this->entities($registry) as [$key, $entity]) {
             $pending = $onlyMissing
-                ? array_values(array_filter($locales, fn ($l) => ! $entity->hasPreview($l)))
+                ? array_values(array_filter($locales, fn ($l) => ! $entity->hasPreview($l, $key)))
                 : $locales;
 
             if ($pending === []) {
                 continue;
             }
 
-            $entity->regeneratePreviews($pending, sync: (bool) $this->option('sync'));
+            $entity->regeneratePreviews($pending, sync: (bool) $this->option('sync'), types: [$key]);
             $dispatched += count($pending);
         }
 
@@ -82,8 +84,8 @@ class PreviewManageCommand extends Command
         }
 
         $count = 0;
-        foreach ($this->entities($registry, withTrashed: true) as $entity) {
-            $entity->deletePreviews();
+        foreach ($this->entities($registry, withTrashed: true) as [$key, $entity]) {
+            $entity->deletePreviews($key);
             $count++;
         }
 
@@ -106,7 +108,7 @@ class PreviewManageCommand extends Command
         return self::SUCCESS;
     }
 
-    /** Entidades a procesar según --type y --id. */
+    /** Pares [clave, entidad] a procesar según --type y --id. */
     protected function entities(PreviewRegistry $registry, bool $withTrashed = false): iterable
     {
         $keys = $this->option('type') ? [$this->option('type')] : $registry->keys();
@@ -124,7 +126,7 @@ class PreviewManageCommand extends Command
             }
 
             foreach ($query->cursor() as $entity) {
-                yield $entity;
+                yield [$key, $entity];
             }
         }
     }

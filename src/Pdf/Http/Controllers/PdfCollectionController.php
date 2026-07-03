@@ -40,7 +40,7 @@ class PdfCollectionController extends Controller
                     'entity_id' => $item->entity_id,
                     'copies' => $item->copies,
                     'label' => $model?->previewLabel($locale),
-                    'preview' => $model?->previewUrl($locale),
+                    'preview' => $model?->previewUrl($locale, $item->entity),
                     'missing' => $model === null,
                 ];
             });

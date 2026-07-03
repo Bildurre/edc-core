@@ -3,6 +3,7 @@
 namespace Bgm\Core\Pdf\Jobs;
 
 use Bgm\Core\Pdf\Models\GeneratedPdf;
+use Bgm\Core\Pdf\PdfCompositionException;
 use Bgm\Core\Pdf\PdfService;
 use Illuminate\Bus\Queueable;
 use Illuminate\Contracts\Queue\ShouldBeUnique;
@@ -13,7 +14,9 @@ use Throwable;
 
 /**
  * Ensambla un GeneratedPdf en cola. Si falla, el registro queda en 'failed'
- * con el error legible (visible en el PdfManager del admin).
+ * con un error APTO para el admin: solo los PdfCompositionException exponen
+ * su mensaje; cualquier otra excepción (SQL, ficheros...) se guarda como
+ * error genérico y el detalle completo va a los logs al relanzarse.
  */
 class GeneratePdfJob implements ShouldBeUnique, ShouldQueue
 {
@@ -45,7 +48,9 @@ class GeneratePdfJob implements ShouldBeUnique, ShouldQueue
         } catch (Throwable $e) {
             $pdf->update([
                 'status' => GeneratedPdf::STATUS_FAILED,
-                'error' => $e->getMessage(),
+                'error' => $e instanceof PdfCompositionException
+                    ? $e->getMessage()
+                    : __('motor::motor.pdf_error_internal'),
             ]);
 
             throw $e;

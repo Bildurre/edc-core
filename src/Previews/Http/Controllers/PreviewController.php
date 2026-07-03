@@ -55,7 +55,7 @@ class PreviewController extends Controller
                 'id' => $item->getKey(),
                 'label' => $item->previewLabel($locale),
                 'previews' => collect($locales)
-                    ->mapWithKeys(fn ($l) => [$l => $item->previewUrl($l)])
+                    ->mapWithKeys(fn ($l) => [$l => $item->previewUrl($l, $entity)])
                     ->all(),
             ]),
             'meta' => [
@@ -67,7 +67,7 @@ class PreviewController extends Controller
         ]);
     }
 
-    /** Encola los renders que FALTAN de un tipo (opcional ?locale). */
+    /** Encola los renders que FALTAN de un tipo (opcional locale en el cuerpo). */
     public function generateType(Request $request, string $entity): JsonResponse
     {
         abort_unless($this->registry->has($entity), 404);
@@ -80,7 +80,7 @@ class PreviewController extends Controller
         ], 202);
     }
 
-    /** Encola la regeneración de TODO un tipo (opcional ?locale). */
+    /** Encola la regeneración de TODO un tipo (opcional locale en el cuerpo). */
     public function regenerateType(Request $request, string $entity): JsonResponse
     {
         abort_unless($this->registry->has($entity), 404);
@@ -123,23 +123,23 @@ class PreviewController extends Controller
     {
         $model = $this->find($entity, $id);
 
-        return response()->json(['data' => $model->previewUrls()]);
+        return response()->json(['data' => $model->previewUrls($entity)]);
     }
 
-    /** Encola la regeneración de una entidad (opcional ?locale). */
+    /** Encola la regeneración de una entidad (opcional locale en el cuerpo). */
     public function regenerate(Request $request, string $entity, int $id): JsonResponse
     {
         $model = $this->find($entity, $id);
 
-        $model->regeneratePreviews($this->locales($request));
+        $model->regeneratePreviews($this->locales($request), types: [$entity]);
 
         return response()->json(['message' => __('motor::motor.previews_queued')], 202);
     }
 
-    /** Borra los PNG de una entidad concreta. */
+    /** Borra los PNG de una entidad concreta (solo esta preview). */
     public function destroy(string $entity, int $id): JsonResponse
     {
-        $this->find($entity, $id)->deletePreviews();
+        $this->find($entity, $id)->deletePreviews($entity);
 
         return response()->json(['message' => __('motor::motor.previews_deleted')]);
     }
@@ -151,9 +151,15 @@ class PreviewController extends Controller
         return $this->registry->modelFor($entity)::query()->findOrFail($id);
     }
 
-    /** ?locale=xx limita la acción a un locale; si no, todos. */
+    /**
+     * Un `locale` EN EL CUERPO limita la acción a ese locale; si no, todos.
+     * Ojo: solo el cuerpo — el ?locale de la query es el locale de contenido
+     * que el admin añade a TODAS las peticiones (no un limitador).
+     */
     protected function locales(Request $request): ?array
     {
-        return $request->filled('locale') ? [$request->string('locale')->toString()] : null;
+        $locale = $request->json('locale', $request->post('locale'));
+
+        return is_string($locale) && $locale !== '' ? [$locale] : null;
     }
 }

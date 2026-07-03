@@ -30,8 +30,8 @@ class RenderDataController extends Controller
         return response()->json([
             'entity' => $entity,
             'locale' => $locale,
-            'size' => $model->previewSize(),
-            'data' => $model->renderData($locale),
+            'size' => $model->previewSize($entity),
+            'data' => $model->renderData($locale, $entity),
         ]);
     }
 }

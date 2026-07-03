@@ -17,5 +17,7 @@ return [
     'orphans_deleted' => '{0} Umezurtzik ez.|{1} Fitxategi umezurtz 1 ezabatu da.|[2,*] :count fitxategi umezurtz ezabatu dira.',
     'pdfs_queued' => 'PDF sortzea ilaran jarri da.',
     'pdf_deleted' => 'PDFa ezabatu da.',
+    'pdf_no_items' => 'PDFak ez du elementu inprimagarririk.',
+    'pdf_error_internal' => 'Barne-errorea PDFa sortzean. Begiratu zerbitzariaren logak.',
     'collection_empty' => 'Bilduma hutsik dago.',
 ];

@@ -17,5 +17,7 @@ return [
     'orphans_deleted' => '{0} Sin huérfanos.|{1} 1 fichero huérfano eliminado.|[2,*] :count ficheros huérfanos eliminados.',
     'pdfs_queued' => 'Generación de PDF encolada.',
     'pdf_deleted' => 'PDF borrado.',
+    'pdf_no_items' => 'El PDF no tiene ítems imprimibles.',
+    'pdf_error_internal' => 'Error interno al generar el PDF. Revisa los logs del servidor.',
     'collection_empty' => 'La colección está vacía.',
 ];

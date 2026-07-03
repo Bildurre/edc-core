@@ -75,7 +75,6 @@ class PdfController extends Controller
         $data = $request->validate([
             'type' => ['required', 'string'],
             'source_id' => ['nullable', 'integer'],
-            'locale' => ['nullable', 'string'],
             'layout' => ['nullable', 'string'],
         ]);
 
@@ -89,9 +88,14 @@ class PdfController extends Controller
             $source = $export->sourceModel()::query()->findOrFail($data['source_id']);
         }
 
-        $locales = isset($data['locale'])
-            ? [$data['locale']]
-            : array_keys(config('motor.locales', []));
+        // Por defecto se generan TODOS los locales. Un `locale` en el CUERPO
+        // limita a uno; el ?locale de la query no cuenta (es el locale de
+        // contenido que el admin añade a todas sus peticiones).
+        $available = array_keys(config('motor.locales', []));
+        $locale = $request->json('locale', $request->post('locale'));
+        abort_unless($locale === null || in_array($locale, $available, true), 422, 'locale desconocido');
+
+        $locales = $locale !== null ? [$locale] : $available;
 
         $pdfs = collect($locales)->map(
             fn ($locale) => $this->service->generate($data['type'], $source, $locale, $data['layout'] ?? null)
