@@ -13,6 +13,7 @@ use Bgm\Core\Content\BlockTypes\IndexBlock;
 use Bgm\Core\Content\BlockTypes\QuoteBlock;
 use Bgm\Core\Content\BlockTypes\TextBlock;
 use Bgm\Core\Content\BlockTypes\TextCardBlock;
+use Bgm\Core\Content\PagePdfExport;
 use Bgm\Core\Pdf\PdfExportRegistry;
 use Bgm\Core\Previews\PreviewRegistry;
 use Illuminate\Routing\Router;
@@ -51,6 +52,9 @@ class MotorServiceProvider extends ServiceProvider
      */
     public function boot(Router $router): void
     {
+        // PDF de páginas imprimibles del CRM (doc 03 + doc 02).
+        $this->app->make(PdfExportRegistry::class)->register('pages', PagePdfExport::class);
+
         $this->loadRoutesFrom(__DIR__.'/../routes/api.php');
         $this->loadMigrationsFrom(__DIR__.'/../database/migrations');
         $this->loadTranslationsFrom(__DIR__.'/../lang', 'motor');

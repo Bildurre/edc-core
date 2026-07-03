@@ -144,12 +144,14 @@ class PdfService
 
         $slots = $this->composer->expand($items, fn (PrintableItem $item) => $this->resolveImage($item, $pdf->locale));
 
-        if ($slots === []) {
-            throw new PdfCompositionException(__('motor::motor.pdf_no_items'));
-        }
-
         $layout = PrintLayout::fromConfig($pdf->layout);
         $view = $pdf->type === self::COLLECTION_TYPE ? null : $this->exports->get($pdf->type)->view();
+
+        // La rejilla genérica necesita ítems; una vista propia puede
+        // renderizar sin ellos (p. ej. el PDF de una página del CRM).
+        if ($slots === [] && $view === null) {
+            throw new PdfCompositionException(__('motor::motor.pdf_no_items'));
+        }
 
         $previous = $pdf->path;
         $path = $this->composer->compose($pdf, $slots, $layout, $view);
