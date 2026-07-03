@@ -9,6 +9,7 @@ use Bgm\Core\Console\PreviewManageCommand;
 use Bgm\Core\Content\BlockTypeRegistry;
 use Bgm\Core\Content\BlockTypes\CtaBlock;
 use Bgm\Core\Content\BlockTypes\HeaderBlock;
+use Bgm\Core\Content\BlockTypes\IndexBlock;
 use Bgm\Core\Content\BlockTypes\QuoteBlock;
 use Bgm\Core\Content\BlockTypes\TextBlock;
 use Bgm\Core\Content\BlockTypes\TextCardBlock;
@@ -37,7 +38,7 @@ class MotorServiceProvider extends ServiceProvider
         // motor aporta los de presentación; cada juego añade los suyos.
         $this->app->singleton(BlockTypeRegistry::class, function () {
             $registry = new BlockTypeRegistry;
-            foreach ([HeaderBlock::class, TextBlock::class, TextCardBlock::class, QuoteBlock::class, CtaBlock::class] as $type) {
+            foreach ([HeaderBlock::class, TextBlock::class, TextCardBlock::class, QuoteBlock::class, CtaBlock::class, IndexBlock::class] as $type) {
                 $registry->register($type);
             }
 
