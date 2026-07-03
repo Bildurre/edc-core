@@ -6,6 +6,12 @@ use Bgm\Core\Auth\Http\Middleware\EnsureCanAccessAdmin;
 use Bgm\Core\Console\InstallCommand;
 use Bgm\Core\Console\PdfCleanupCommand;
 use Bgm\Core\Console\PreviewManageCommand;
+use Bgm\Core\Content\BlockTypeRegistry;
+use Bgm\Core\Content\BlockTypes\CtaBlock;
+use Bgm\Core\Content\BlockTypes\HeaderBlock;
+use Bgm\Core\Content\BlockTypes\QuoteBlock;
+use Bgm\Core\Content\BlockTypes\TextBlock;
+use Bgm\Core\Content\BlockTypes\TextCardBlock;
 use Bgm\Core\Pdf\PdfExportRegistry;
 use Bgm\Core\Previews\PreviewRegistry;
 use Illuminate\Routing\Router;
@@ -26,6 +32,17 @@ class MotorServiceProvider extends ServiceProvider
 
         // Registro de exports de PDF (doc 02): facade Pdfs.
         $this->app->singleton(PdfExportRegistry::class);
+
+        // Registro de tipos de bloque del CRM (doc 03): facade Blocks. El
+        // motor aporta los de presentación; cada juego añade los suyos.
+        $this->app->singleton(BlockTypeRegistry::class, function () {
+            $registry = new BlockTypeRegistry;
+            foreach ([HeaderBlock::class, TextBlock::class, TextCardBlock::class, QuoteBlock::class, CtaBlock::class] as $type) {
+                $registry->register($type);
+            }
+
+            return $registry;
+        });
     }
 
     /**

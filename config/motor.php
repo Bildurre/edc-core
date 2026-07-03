@@ -89,6 +89,19 @@ return [
         ],
     ],
 
+    // CRM de páginas y bloques (doc 03).
+    'content' => [
+        // Segundos de caché del payload público por (página, locale) — DC-10:
+        // los cambios de página/bloques la invalidan al momento; el TTL corto
+        // cubre los cambios en entidades que consultan los bloques-con-datos.
+        'cache_ttl' => env('MOTOR_CONTENT_CACHE_TTL', 300),
+        // Plantillas de página disponibles (clave => etiqueta). Cada juego
+        // añade las suyas; la SPA decide qué hace con cada clave.
+        'templates' => [
+            'default' => 'Por defecto',
+        ],
+    ],
+
     // Auth (DC-13, DC-14).
     'auth' => [
         // 'open' = registro público con rol user; 'invite' = registro deshabilitado.

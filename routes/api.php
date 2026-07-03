@@ -3,6 +3,11 @@
 use Bgm\Core\Auth\Http\Controllers\AccountController;
 use Bgm\Core\Auth\Http\Controllers\AuthController;
 use Bgm\Core\Auth\Http\Controllers\EmailVerificationController;
+use Bgm\Core\Content\Http\Controllers\BlockController;
+use Bgm\Core\Content\Http\Controllers\BlockTypeController;
+use Bgm\Core\Content\Http\Controllers\ContentUploadController;
+use Bgm\Core\Content\Http\Controllers\PageController;
+use Bgm\Core\Content\Http\Controllers\PublicPageController;
 use Bgm\Core\Icons\Http\Controllers\IconController;
 use Bgm\Core\Pdf\Http\Controllers\PdfCollectionController;
 use Bgm\Core\Pdf\Http\Controllers\PdfController;
@@ -58,6 +63,13 @@ Route::prefix('api')->middleware('api')->group(function () {
     // dueño o un admin (lo comprueba el controlador).
     Route::get('pdfs/{pdf}/download', [PdfController::class, 'download']);
 
+    // Render público del CRM (doc 03): navegación, home y página por slug
+    // traducible (resuelto en cualquier locale; la SPA redirige a la canónica).
+    Route::get('pages/nav', [PublicPageController::class, 'nav']);
+    Route::get('pages/home', [PublicPageController::class, 'home']);
+    Route::get('pages/{slug}', [PublicPageController::class, 'show'])
+        ->where('slug', '[a-z0-9\-]+');
+
     // --- Autenticado (token Sanctum) ---
     Route::middleware('auth:sanctum')->group(function () {
         Route::post('auth/logout', [AuthController::class, 'logout']);
@@ -90,6 +102,27 @@ Route::prefix('api')->middleware('api')->group(function () {
             // Gestión de la biblioteca de iconos.
             Route::post('admin/icons', [IconController::class, 'store']);
             Route::delete('admin/icons/{icon}', [IconController::class, 'destroy']);
+
+            // CRM de páginas y bloques (doc 03). Las estáticas antes que {page}.
+            Route::get('admin/block-types', [BlockTypeController::class, 'index']);
+            Route::post('admin/content/uploads', [ContentUploadController::class, 'store']);
+            Route::prefix('admin/pages')->group(function () {
+                Route::get('/', [PageController::class, 'index']);
+                Route::post('/', [PageController::class, 'store']);
+                Route::post('reorder', [PageController::class, 'reorder']);
+                Route::post('{id}/restore', [PageController::class, 'restore'])->whereNumber('id');
+                Route::delete('{id}/force', [PageController::class, 'forceDestroy'])->whereNumber('id');
+                Route::post('{page}/set-home', [PageController::class, 'setHome'])->whereNumber('page');
+                Route::get('{page}', [PageController::class, 'show'])->whereNumber('page');
+                Route::put('{page}', [PageController::class, 'update'])->whereNumber('page');
+                Route::delete('{page}', [PageController::class, 'destroy'])->whereNumber('page');
+                // Bloques de una página.
+                Route::get('{page}/blocks', [BlockController::class, 'index'])->whereNumber('page');
+                Route::post('{page}/blocks', [BlockController::class, 'store'])->whereNumber('page');
+                Route::post('{page}/blocks/reorder', [BlockController::class, 'reorder'])->whereNumber('page');
+            });
+            Route::put('admin/blocks/{block}', [BlockController::class, 'update'])->whereNumber('block');
+            Route::delete('admin/blocks/{block}', [BlockController::class, 'destroy'])->whereNumber('block');
 
             // Gestor de previews PNG (estado, lotes por tipo, individuales,
             // limpieza de huérfanos). Las rutas estáticas van antes que {id}.
