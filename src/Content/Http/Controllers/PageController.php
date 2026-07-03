@@ -93,8 +93,9 @@ class PageController extends Controller
         $templates = array_keys(config('motor.content.templates', ['default' => 'Default']));
 
         $rules = [
-            'title' => ['required', 'array'],
-            "title.{$default}" => ['required', 'string', 'max:255'],
+            // 'sometimes': las acciones rápidas del panel mandan solo flags.
+            'title' => ['sometimes', 'required', 'array'],
+            "title.{$default}" => ['required_with:title', 'string', 'max:255'],
             'description' => ['nullable', 'array'],
             'meta_title' => ['nullable', 'array'],
             'meta_description' => ['nullable', 'array'],

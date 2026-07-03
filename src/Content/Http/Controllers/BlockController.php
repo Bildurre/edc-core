@@ -46,11 +46,14 @@ class BlockController extends Controller
 
     public function update(Request $request, Block $block)
     {
-        $data = $request->validate([
-            'is_printable' => ['boolean'],
-            'is_indexable' => ['boolean'],
-            ...$this->registry->get($block->type)->rules(),
-        ]);
+        // Sin `settings` en la petición solo se tocan los flags (acciones
+        // rápidas del panel): no se exige el esquema completo.
+        $rules = ['is_printable' => ['boolean'], 'is_indexable' => ['boolean']];
+        if ($request->has('settings')) {
+            $rules += $this->registry->get($block->type)->rules();
+        }
+
+        $data = $request->validate($rules);
 
         $this->service->update($block, $data);
 
