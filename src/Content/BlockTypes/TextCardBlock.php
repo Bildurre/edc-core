@@ -20,7 +20,7 @@ class TextCardBlock extends BlockType
             Field::text('label')->label('Etiqueta')->translatable(),
             Field::text('title')->label('Título')->translatable(),
             Field::richtext('body')->label('Texto')->translatable()->required(),
-            Field::image('image')->label('Imagen'),
+            Field::image('image')->label('Imagen')->translatable(),
             static::imagePositionField(),
         ];
     }

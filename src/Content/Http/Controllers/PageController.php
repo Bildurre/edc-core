@@ -16,6 +16,16 @@ class PageController extends Controller
 {
     public function __construct(protected PageService $service) {}
 
+    /** Catálogo de plantillas de página (config + las del juego). */
+    public function templates()
+    {
+        $templates = collect(config('motor.content.templates', ['default' => 'Default']))
+            ->map(fn ($label, $key) => ['key' => $key, 'label' => $label])
+            ->values();
+
+        return response()->json(['data' => $templates]);
+    }
+
     /** Todas las páginas (pocas por naturaleza), ordenadas para pintar árbol. */
     public function index(Request $request)
     {

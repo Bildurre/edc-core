@@ -19,7 +19,7 @@ class HeaderBlock extends BlockType
         return [
             Field::text('title')->label('Título')->translatable()->required(),
             Field::text('subtitle')->label('Subtítulo')->translatable(),
-            Field::image('image')->label('Imagen (banner)'),
+            Field::image('image')->label('Imagen (banner)')->translatable(),
         ];
     }
 }

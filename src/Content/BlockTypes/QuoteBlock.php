@@ -19,7 +19,7 @@ class QuoteBlock extends BlockType
         return [
             Field::richtext('quote')->label('Cita')->translatable()->required(),
             Field::text('author')->label('Autor')->translatable(),
-            Field::image('image')->label('Imagen (retrato del autor)'),
+            Field::image('image')->label('Imagen (retrato del autor)')->translatable(),
         ];
     }
 }

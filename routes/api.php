@@ -109,6 +109,7 @@ Route::prefix('api')->middleware('api')->group(function () {
             Route::prefix('admin/pages')->group(function () {
                 Route::get('/', [PageController::class, 'index']);
                 Route::post('/', [PageController::class, 'store']);
+                Route::get('templates', [PageController::class, 'templates']);
                 Route::post('reorder', [PageController::class, 'reorder']);
                 Route::post('{id}/restore', [PageController::class, 'restore'])->whereNumber('id');
                 Route::delete('{id}/force', [PageController::class, 'forceDestroy'])->whereNumber('id');
