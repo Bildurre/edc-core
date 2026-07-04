@@ -10,6 +10,7 @@ use Bgm\Core\Content\Http\Controllers\BlockTypeController;
 use Bgm\Core\Content\Http\Controllers\ContentUploadController;
 use Bgm\Core\Content\Http\Controllers\PageController;
 use Bgm\Core\Content\Http\Controllers\PublicPageController;
+use Bgm\Core\Content\Http\Controllers\SitemapController;
 use Bgm\Core\Icons\Http\Controllers\IconController;
 use Bgm\Core\Pdf\Http\Controllers\PdfCollectionController;
 use Bgm\Core\Pdf\Http\Controllers\PdfController;
@@ -31,6 +32,11 @@ Route::get('api/motor/ping', function () {
         'locales' => array_keys(config('motor.locales', [])),
     ]);
 });
+
+// Sitemap de la web pública (doc 10, DC-18): páginas del CRM + entidades
+// registradas por el juego (facade Sitemap). Vive fuera de /api porque los
+// buscadores lo esperan en la raíz del dominio de la API o proxied.
+Route::get('sitemap.xml', SitemapController::class);
 
 // Locales de contenido disponibles (para los selectores del front).
 Route::get('api/locales', function () {

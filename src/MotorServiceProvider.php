@@ -14,7 +14,9 @@ use Bgm\Core\Content\BlockTypes\IndexBlock;
 use Bgm\Core\Content\BlockTypes\QuoteBlock;
 use Bgm\Core\Content\BlockTypes\TextBlock;
 use Bgm\Core\Content\BlockTypes\TextCardBlock;
+use Bgm\Core\Content\Models\Page;
 use Bgm\Core\Content\PagePdfExport;
+use Bgm\Core\Content\SitemapRegistry;
 use Bgm\Core\Pdf\PdfExportRegistry;
 use Bgm\Core\Previews\PreviewRegistry;
 use Illuminate\Routing\Router;
@@ -35,6 +37,10 @@ class MotorServiceProvider extends ServiceProvider
 
         // Registro de exports de PDF (doc 02): facade Pdfs.
         $this->app->singleton(PdfExportRegistry::class);
+
+        // Registro de URLs del sitemap (doc 10): facade Sitemap. El motor
+        // aporta las páginas del CRM; cada juego añade sus entidades.
+        $this->app->singleton(SitemapRegistry::class);
 
         // Registro de tipos de bloque del CRM (doc 03): facade Blocks. El
         // motor aporta los de presentación; cada juego añade los suyos.
@@ -58,6 +64,19 @@ class MotorServiceProvider extends ServiceProvider
 
         // Copias de seguridad (doc 06): config de spatie derivada de motor.backup.
         MotorBackup::applyConfig();
+
+        // Sitemap (doc 10): las páginas publicadas del CRM, con la home en la
+        // raíz de cada locale. Los juegos añaden sus entidades con Sitemap::add.
+        $this->app->make(SitemapRegistry::class)->add(function () {
+            return Page::query()->published()->get()
+                ->map(fn (Page $page) => [
+                    'slugs' => collect($page->getTranslations('slug'))
+                        ->map(fn (string $slug) => $page->is_home ? '' : $slug)
+                        ->all(),
+                    'updated_at' => $page->updated_at?->toDateString(),
+                ])
+                ->all();
+        });
 
         $this->loadRoutesFrom(__DIR__.'/../routes/api.php');
         $this->loadMigrationsFrom(__DIR__.'/../database/migrations');
