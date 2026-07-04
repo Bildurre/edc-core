@@ -96,7 +96,7 @@ class PageService
             }
         }
 
-        foreach (['parent_id', 'order', 'template', 'is_published', 'is_printable'] as $field) {
+        foreach (['parent_id', 'order', 'template', 'background_image', 'is_published', 'is_printable'] as $field) {
             if (array_key_exists($field, $data)) {
                 $page->{$field} = $data[$field];
             }

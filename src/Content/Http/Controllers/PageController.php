@@ -112,6 +112,7 @@ class PageController extends Controller
             'parent_id' => ['nullable', 'integer', 'exists:pages,id'],
             'order' => ['nullable', 'integer'],
             'template' => ['nullable', 'string', 'in:'.implode(',', $templates)],
+            'background_image' => ['nullable', 'string', 'max:2048'],
             'is_published' => ['boolean'],
             'is_printable' => ['boolean'],
         ];

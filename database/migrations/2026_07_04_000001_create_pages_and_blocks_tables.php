@@ -22,6 +22,9 @@ return new class extends Migration
             $table->json('description')->nullable();
             $table->json('slug');
             $table->string('template')->default('default');
+            // Imagen de fondo decorativa (URL): capa fija tras el contenido,
+            // atenuada según el tema (patrón CDL).
+            $table->string('background_image')->nullable();
             $table->boolean('is_published')->default(false);
             $table->boolean('is_home')->default(false);
             $table->boolean('is_printable')->default(false);

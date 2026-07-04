@@ -19,6 +19,7 @@ class PageResource extends JsonResource
             'parent_id' => $this->parent_id,
             'order' => $this->order,
             'template' => $this->template,
+            'background_image' => $this->background_image,
             'is_published' => $this->is_published,
             'is_home' => $this->is_home,
             'is_printable' => $this->is_printable,

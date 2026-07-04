@@ -31,7 +31,7 @@ class Page extends Model
 
     protected $fillable = [
         'title', 'description', 'slug', 'parent_id', 'order', 'template',
-        'is_published', 'is_printable', 'meta_title', 'meta_description',
+        'background_image', 'is_published', 'is_printable', 'meta_title', 'meta_description',
     ];
 
     public array $translatable = ['title', 'description', 'slug', 'meta_title', 'meta_description'];

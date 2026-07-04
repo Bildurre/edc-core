@@ -52,6 +52,7 @@ class PageRenderer
             'id' => $page->id,
             'title' => $page->getTranslation('title', $locale),
             'template' => $page->template,
+            'background_image' => $page->background_image,
             'is_home' => $page->is_home,
             'is_printable' => $page->is_printable,
             'meta' => [
