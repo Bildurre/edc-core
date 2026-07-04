@@ -102,6 +102,20 @@ return [
         ],
     ],
 
+    // Configuración de la web pública (doc 10): catálogo de fuentes que
+    // ofrece la página de Configuración del admin (clave => pila CSS). Son
+    // pilas del sistema (sin peticiones externas); un juego puede añadir una
+    // webfont propia registrando aquí su clave y cargando la fuente en su SPA.
+    'site' => [
+        'fonts' => [
+            'system' => "system-ui, -apple-system, 'Segoe UI', Roboto, Helvetica, Arial, sans-serif",
+            'serif' => "Georgia, 'Iowan Old Style', 'Times New Roman', serif",
+            'humanist' => "Verdana, 'Segoe UI', Tahoma, sans-serif",
+            'rounded' => "ui-rounded, 'Hiragino Maru Gothic ProN', Quicksand, Comfortaa, system-ui, sans-serif",
+            'mono' => 'ui-monospace, SFMono-Regular, Menlo, Consolas, monospace',
+        ],
+    ],
+
     // Auth (DC-13, DC-14).
     'auth' => [
         // 'open' = registro público con rol user; 'invite' = registro deshabilitado.

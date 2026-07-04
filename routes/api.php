@@ -13,6 +13,7 @@ use Bgm\Core\Pdf\Http\Controllers\PdfCollectionController;
 use Bgm\Core\Pdf\Http\Controllers\PdfController;
 use Bgm\Core\Previews\Http\Controllers\PreviewController;
 use Bgm\Core\Previews\Http\Controllers\RenderDataController;
+use Bgm\Core\Site\Http\Controllers\SiteSettingsController;
 use Illuminate\Support\Facades\Route;
 
 /*
@@ -63,6 +64,10 @@ Route::prefix('api')->middleware('api')->group(function () {
     // dueño o un admin (lo comprueba el controlador).
     Route::get('pdfs/{pdf}/download', [PdfController::class, 'download']);
 
+    // Configuración de la web (doc 10): la SPA la aplica al arrancar
+    // (título, favicon, fuentes, acento fijo o aleatorio…).
+    Route::get('site', [SiteSettingsController::class, 'show']);
+
     // Render público del CRM (doc 03): navegación, home y página por slug
     // traducible (resuelto en cualquier locale; la SPA redirige a la canónica).
     Route::get('pages/nav', [PublicPageController::class, 'nav']);
@@ -102,6 +107,10 @@ Route::prefix('api')->middleware('api')->group(function () {
             // Gestión de la biblioteca de iconos.
             Route::post('admin/icons', [IconController::class, 'store']);
             Route::delete('admin/icons/{icon}', [IconController::class, 'destroy']);
+
+            // Configuración de la web (doc 10).
+            Route::get('admin/settings/site', [SiteSettingsController::class, 'edit']);
+            Route::put('admin/settings/site', [SiteSettingsController::class, 'update']);
 
             // CRM de páginas y bloques (doc 03). Las estáticas antes que {page}.
             Route::get('admin/block-types', [BlockTypeController::class, 'index']);
