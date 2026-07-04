@@ -124,5 +124,16 @@ return [
         'roles' => ['admin', 'editor', 'user'],
         // Roles con acceso al panel de administración.
         'admin_roles' => ['admin', 'editor'],
+        // Permisos del motor: separan qué ve cada rol DENTRO del admin. Las
+        // rutas se protegen con el middleware can: (los permisos de Spatie
+        // entran por el Gate). El juego puede añadir permisos o redefinir el
+        // reparto.
+        'permissions' => ['manage-game', 'manage-web', 'manage-users'],
+        'role_permissions' => [
+            'admin' => ['manage-game', 'manage-web', 'manage-users'],
+            // Los editores solo gestionan el JUEGO (modelos, iconos, PNG,
+            // PDF); ni la web (páginas/configuración) ni los usuarios.
+            'editor' => ['manage-game'],
+        ],
     ],
 ];

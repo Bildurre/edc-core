@@ -2,29 +2,29 @@
 
 namespace Bgm\Core\Console;
 
+use Bgm\Core\Auth\MotorAuth;
 use Illuminate\Console\Command;
-use Spatie\Permission\Models\Role;
-use Spatie\Permission\PermissionRegistrar;
 
 /**
- * Prepara el motor en una instalación nueva: crea los roles base.
- * Idempotente: se puede ejecutar varias veces sin duplicar.
+ * Prepara el motor en una instalación nueva: crea los roles base y los
+ * permisos con su reparto (doc 05). Idempotente: se puede ejecutar varias
+ * veces sin duplicar.
  */
 class InstallCommand extends Command
 {
     protected $signature = 'motor:install';
 
-    protected $description = 'Prepara el motor: crea los roles base (admin, editor, user).';
+    protected $description = 'Prepara el motor: roles base (admin, editor, user) y permisos.';
 
     public function handle(): int
     {
-        // La caché de Spatie puede sobrevivir a un migrate:fresh (p. ej. con
-        // CACHE_STORE=file) y romper los chequeos de rol: fuera siempre.
-        app(PermissionRegistrar::class)->forgetCachedPermissions();
+        // MotorAuth limpia también la caché de Spatie (puede sobrevivir a un
+        // migrate:fresh, p. ej. con CACHE_STORE=file, y romper los chequeos).
+        MotorAuth::syncRolesAndPermissions();
 
-        foreach (config('motor.auth.roles', ['admin', 'editor', 'user']) as $role) {
-            Role::findOrCreate($role, 'web');
-            $this->line("  Rol asegurado: {$role}");
+        foreach (config('motor.auth.roles', []) as $role) {
+            $permissions = implode(', ', config("motor.auth.role_permissions.{$role}", [])) ?: '—';
+            $this->line("  Rol asegurado: {$role} ({$permissions})");
         }
 
         $this->info('Motor instalado.');

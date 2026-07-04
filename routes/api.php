@@ -3,6 +3,7 @@
 use Bgm\Core\Auth\Http\Controllers\AccountController;
 use Bgm\Core\Auth\Http\Controllers\AuthController;
 use Bgm\Core\Auth\Http\Controllers\EmailVerificationController;
+use Bgm\Core\Auth\Http\Controllers\UserController;
 use Bgm\Core\Content\Http\Controllers\BlockController;
 use Bgm\Core\Content\Http\Controllers\BlockTypeController;
 use Bgm\Core\Content\Http\Controllers\ContentUploadController;
@@ -107,19 +108,32 @@ Route::prefix('api')->middleware('api')->group(function () {
                 return response()->json(['ok' => true, 'area' => 'admin']);
             });
 
-            // Gestión de la biblioteca de iconos.
-            Route::post('admin/icons', [IconController::class, 'store']);
-            Route::delete('admin/icons/{icon}', [IconController::class, 'destroy']);
+            // Gestión de la biblioteca de iconos (assets del juego).
+            Route::middleware('can:manage-game')->group(function () {
+                Route::post('admin/icons', [IconController::class, 'store']);
+                Route::delete('admin/icons/{icon}', [IconController::class, 'destroy']);
+            });
 
-            // Configuración de la web (doc 10).
-            Route::get('admin/settings/site', [SiteSettingsController::class, 'edit']);
-            Route::put('admin/settings/site', [SiteSettingsController::class, 'update']);
-            Route::post('admin/settings/fonts', [SiteSettingsController::class, 'storeFont']);
+            // Gestión de usuarios (doc 05): solo manage-users.
+            Route::prefix('admin/users')->middleware('can:manage-users')->group(function () {
+                Route::get('/', [UserController::class, 'index']);
+                Route::post('/', [UserController::class, 'store']);
+                Route::put('{id}', [UserController::class, 'update'])->whereNumber('id');
+                Route::delete('{id}', [UserController::class, 'destroy'])->whereNumber('id');
+            });
+
+            // Configuración de la web (doc 10) y CRM (doc 03): son "la web",
+            // solo manage-web (los editores no entran).
+            Route::middleware('can:manage-web')->group(function () {
+                Route::get('admin/settings/site', [SiteSettingsController::class, 'edit']);
+                Route::put('admin/settings/site', [SiteSettingsController::class, 'update']);
+                Route::post('admin/settings/fonts', [SiteSettingsController::class, 'storeFont']);
+            });
 
             // CRM de páginas y bloques (doc 03). Las estáticas antes que {page}.
-            Route::get('admin/block-types', [BlockTypeController::class, 'index']);
-            Route::post('admin/content/uploads', [ContentUploadController::class, 'store']);
-            Route::prefix('admin/pages')->group(function () {
+            Route::get('admin/block-types', [BlockTypeController::class, 'index'])->middleware('can:manage-web');
+            Route::post('admin/content/uploads', [ContentUploadController::class, 'store'])->middleware('can:manage-web');
+            Route::prefix('admin/pages')->middleware('can:manage-web')->group(function () {
                 Route::get('/', [PageController::class, 'index']);
                 Route::post('/', [PageController::class, 'store']);
                 Route::get('templates', [PageController::class, 'templates']);
@@ -135,12 +149,14 @@ Route::prefix('api')->middleware('api')->group(function () {
                 Route::post('{page}/blocks', [BlockController::class, 'store'])->whereNumber('page');
                 Route::post('{page}/blocks/reorder', [BlockController::class, 'reorder'])->whereNumber('page');
             });
-            Route::put('admin/blocks/{block}', [BlockController::class, 'update'])->whereNumber('block');
-            Route::delete('admin/blocks/{block}', [BlockController::class, 'destroy'])->whereNumber('block');
+            Route::middleware('can:manage-web')->group(function () {
+                Route::put('admin/blocks/{block}', [BlockController::class, 'update'])->whereNumber('block');
+                Route::delete('admin/blocks/{block}', [BlockController::class, 'destroy'])->whereNumber('block');
+            });
 
             // Gestor de previews PNG (estado, lotes por tipo, individuales,
             // limpieza de huérfanos). Las rutas estáticas van antes que {id}.
-            Route::prefix('admin/previews')->group(function () {
+            Route::prefix('admin/previews')->middleware('can:manage-game')->group(function () {
                 Route::get('/', [PreviewController::class, 'index']);
                 Route::post('clean', [PreviewController::class, 'clean']);
                 Route::get('{entity}/items', [PreviewController::class, 'items']);
@@ -155,7 +171,7 @@ Route::prefix('api')->middleware('api')->group(function () {
 
             // Gestor de PDF (doc 02): listar por export/entidad, generar,
             // regenerar y borrar con un clic.
-            Route::prefix('admin/pdfs')->group(function () {
+            Route::prefix('admin/pdfs')->middleware('can:manage-game')->group(function () {
                 Route::get('exports', [PdfController::class, 'exports']);
                 Route::get('/', [PdfController::class, 'index']);
                 Route::post('generate', [PdfController::class, 'generate']);

@@ -20,4 +20,5 @@ return [
     'pdf_no_items' => 'The PDF has no printable items.',
     'pdf_error_internal' => 'Internal error while generating the PDF. Check the server logs.',
     'collection_empty' => 'The collection is empty.',
+    'users_cannot_delete_self' => 'You cannot delete your own user.',
 ];

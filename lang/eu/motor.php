@@ -20,4 +20,5 @@ return [
     'pdf_no_items' => 'PDFak ez du elementu inprimagarririk.',
     'pdf_error_internal' => 'Barne-errorea PDFa sortzean. Begiratu zerbitzariaren logak.',
     'collection_empty' => 'Bilduma hutsik dago.',
+    'users_cannot_delete_self' => 'Ezin duzu zure erabiltzailea ezabatu.',
 ];
