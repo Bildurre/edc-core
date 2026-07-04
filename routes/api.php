@@ -119,6 +119,7 @@ Route::prefix('api')->middleware('api')->group(function () {
                 Route::get('/', [UserController::class, 'index']);
                 Route::post('/', [UserController::class, 'store']);
                 Route::put('{id}', [UserController::class, 'update'])->whereNumber('id');
+                Route::post('{id}/toggle-verified', [UserController::class, 'toggleVerified'])->whereNumber('id');
                 Route::delete('{id}', [UserController::class, 'destroy'])->whereNumber('id');
             });
 

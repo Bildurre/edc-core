@@ -66,6 +66,16 @@ class UserController extends Controller
         return new UserResource($user->load('roles'));
     }
 
+    /** Acción rápida: marca o desmarca el email como verificado. */
+    public function toggleVerified(int $id)
+    {
+        $user = $this->model()::query()->findOrFail($id);
+        $user->email_verified_at = $user->email_verified_at ? null : now();
+        $user->save();
+
+        return new UserResource($user->load('roles'));
+    }
+
     public function destroy(Request $request, int $id)
     {
         abort_if($id === $request->user()->id, 422, __('motor::motor.users_cannot_delete_self'));
