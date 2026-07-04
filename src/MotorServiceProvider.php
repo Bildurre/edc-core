@@ -3,6 +3,7 @@
 namespace Bgm\Core;
 
 use Bgm\Core\Auth\Http\Middleware\EnsureCanAccessAdmin;
+use Bgm\Core\Backup\MotorBackup;
 use Bgm\Core\Console\InstallCommand;
 use Bgm\Core\Console\PdfCleanupCommand;
 use Bgm\Core\Console\PreviewManageCommand;
@@ -54,6 +55,9 @@ class MotorServiceProvider extends ServiceProvider
     {
         // PDF de páginas imprimibles del CRM (doc 03 + doc 02).
         $this->app->make(PdfExportRegistry::class)->register('pages', PagePdfExport::class);
+
+        // Copias de seguridad (doc 06): config de spatie derivada de motor.backup.
+        MotorBackup::applyConfig();
 
         $this->loadRoutesFrom(__DIR__.'/../routes/api.php');
         $this->loadMigrationsFrom(__DIR__.'/../database/migrations');

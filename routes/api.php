@@ -4,6 +4,7 @@ use Bgm\Core\Auth\Http\Controllers\AccountController;
 use Bgm\Core\Auth\Http\Controllers\AuthController;
 use Bgm\Core\Auth\Http\Controllers\EmailVerificationController;
 use Bgm\Core\Auth\Http\Controllers\UserController;
+use Bgm\Core\Backup\Http\Controllers\BackupController;
 use Bgm\Core\Content\Http\Controllers\BlockController;
 use Bgm\Core\Content\Http\Controllers\BlockTypeController;
 use Bgm\Core\Content\Http\Controllers\ContentUploadController;
@@ -129,6 +130,16 @@ Route::prefix('api')->middleware('api')->group(function () {
                 Route::get('admin/settings/site', [SiteSettingsController::class, 'edit']);
                 Route::put('admin/settings/site', [SiteSettingsController::class, 'update']);
                 Route::post('admin/settings/fonts', [SiteSettingsController::class, 'storeFont']);
+            });
+
+            // Copias de seguridad (doc 06): listar, crear, descargar, borrar.
+            Route::prefix('admin/backups')->middleware('can:manage-web')->group(function () {
+                Route::get('/', [BackupController::class, 'index']);
+                Route::post('/', [BackupController::class, 'store']);
+                Route::get('{file}/download', [BackupController::class, 'download'])
+                    ->where('file', '[A-Za-z0-9._\-]+');
+                Route::delete('{file}', [BackupController::class, 'destroy'])
+                    ->where('file', '[A-Za-z0-9._\-]+');
             });
 
             // CRM de páginas y bloques (doc 03). Las estáticas antes que {page}.

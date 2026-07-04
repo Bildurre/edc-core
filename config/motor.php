@@ -116,6 +116,18 @@ return [
         ],
     ],
 
+    // Copias de seguridad de la BBDD (doc 06, DC-16): spatie/laravel-backup
+    // con la config derivada de aquí (ver Bgm\Core\Backup\MotorBackup).
+    'backup' => [
+        // Disco donde se guardan los zips. Si el juego no lo define en
+        // filesystems, el motor crea uno local en storage/app/backups.
+        'disk' => env('MOTOR_BACKUP_DISK', 'backups'),
+        // Retención: días que se conservan todas las copias (backup:clean).
+        'keep_days' => env('MOTOR_BACKUP_KEEP_DAYS', 14),
+        // Incluir la carpeta de media (storage/app/public) en el zip.
+        'include_media' => env('MOTOR_BACKUP_MEDIA', true),
+    ],
+
     // Auth (DC-13, DC-14).
     'auth' => [
         // 'open' = registro público con rol user; 'invite' = registro deshabilitado.
