@@ -65,8 +65,11 @@ Route::prefix('api')->middleware('api')->group(function () {
     Route::get('pdfs/{pdf}/download', [PdfController::class, 'download']);
 
     // Configuración de la web (doc 10): la SPA la aplica al arrancar
-    // (título, favicon, fuentes, acento fijo o aleatorio…).
+    // (título, favicon, fuentes, acento fijo o aleatorio…). Los ficheros de
+    // fuente se sirven por aquí para heredar el CORS del grupo api.
     Route::get('site', [SiteSettingsController::class, 'show']);
+    Route::get('site/fonts/{path}', [SiteSettingsController::class, 'font'])
+        ->where('path', '[A-Za-z0-9/._\-]+');
 
     // Render público del CRM (doc 03): navegación, home y página por slug
     // traducible (resuelto en cualquier locale; la SPA redirige a la canónica).
@@ -111,6 +114,7 @@ Route::prefix('api')->middleware('api')->group(function () {
             // Configuración de la web (doc 10).
             Route::get('admin/settings/site', [SiteSettingsController::class, 'edit']);
             Route::put('admin/settings/site', [SiteSettingsController::class, 'update']);
+            Route::post('admin/settings/fonts', [SiteSettingsController::class, 'storeFont']);
 
             // CRM de páginas y bloques (doc 03). Las estáticas antes que {page}.
             Route::get('admin/block-types', [BlockTypeController::class, 'index']);
