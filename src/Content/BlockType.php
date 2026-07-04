@@ -53,7 +53,8 @@ abstract class BlockType
 
     /**
      * Campos comunes a TODOS los bloques (los aplica el envoltorio genérico
-     * del render): alineación del texto y color de fondo.
+     * del render): alineación del texto, anchura del contenido y color de
+     * fondo.
      *
      * @return Field[]
      */
@@ -66,6 +67,13 @@ abstract class BlockType
                 'right' => 'Derecha',
                 'justify' => 'Justificado',
             ])->label('Alineación'),
+            // Anchura del contenido del bloque: coherencia entre bloques y
+            // entre páginas (la columna de lectura la decide cada bloque).
+            Field::select('width', [
+                'wide' => 'Ancho',
+                'full' => 'Ancho completo',
+                'narrow' => 'Estrecho',
+            ])->label('Anchura del contenido'),
             Field::color('background')->label('Color de fondo'),
         ];
     }
