@@ -51,6 +51,9 @@ Primera versión etiquetada (Fases 0–7 del plan).
   traducciones JSON es/eu del motor).
 - **Nav pública con hijas**: `GET /api/pages/nav` incluye las páginas hijas
   publicadas (submenú del nav, patrón CDL).
+- **Colección en la cuenta**: al autenticarse con cabecera de invitado, los
+  items y PDF temporales del token se ADOPTAN al usuario (merge; a igual
+  item, gana el de más copias).
 - **Handoff web <-> admin**: `POST /auth/handoff` (código de un solo uso,
   60 s) + `POST /auth/handoff/consume` (canje público por token propio):
   los enlaces cruzados entre las SPA mantienen la sesión sin exponer el

@@ -141,6 +141,8 @@ class PdfCollectionController extends Controller
     /**
      * Dueño de la colección: el usuario del token Sanctum si lo hay; si no,
      * el token de invitado de la cabecera (obligatorio y con pinta de uuid).
+     * Con usuario Y cabecera de invitado, lo del invitado se ADOPTA: la
+     * colección vive en la cuenta, no en el navegador.
      *
      * @return array{0: ?User, 1: ?string}
      */
@@ -150,6 +152,8 @@ class PdfCollectionController extends Controller
         // ruta es pública y el guard se resuelve bajo demanda.
         $user = $request->user() ?? $request->user('sanctum');
         if ($user) {
+            $this->adoptGuest($user, (string) $request->header('X-Collection-Token', ''));
+
             return [$user, null];
         }
 
@@ -157,6 +161,40 @@ class PdfCollectionController extends Controller
         abort_unless((bool) preg_match('/^[A-Za-z0-9\-]{16,64}$/', $token), 401, __('motor::motor.collection_token_missing'));
 
         return [null, $token];
+    }
+
+    /**
+     * Adopta lo acumulado como invitado al autenticarse: los items pasan a
+     * la cuenta (si ya existía el mismo, gana el de MÁS copias) y los PDF
+     * temporales del token quedan a nombre del usuario.
+     */
+    protected function adoptGuest(User $user, string $token): void
+    {
+        if ($token === '' || ! preg_match('/^[A-Za-z0-9\-]{16,64}$/', $token)) {
+            return;
+        }
+
+        PdfCollectionItem::query()
+            ->where('guest_token', $token)
+            ->get()
+            ->each(function (PdfCollectionItem $item) use ($user) {
+                $mine = PdfCollectionItem::query()
+                    ->where('user_id', $user->getKey())
+                    ->where('entity', $item->entity)
+                    ->where('entity_id', $item->entity_id)
+                    ->first();
+
+                if ($mine) {
+                    $mine->update(['copies' => max($mine->copies, $item->copies)]);
+                    $item->delete();
+                } else {
+                    $item->update(['user_id' => $user->getKey(), 'guest_token' => null]);
+                }
+            });
+
+        GeneratedPdf::query()
+            ->where('guest_token', $token)
+            ->update(['owner_id' => $user->getKey(), 'guest_token' => null]);
     }
 
     /** Restringe una query a lo del dueño actual (usuario o invitado). */
