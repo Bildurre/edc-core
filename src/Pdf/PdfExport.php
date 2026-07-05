@@ -24,13 +24,37 @@ abstract class PdfExport implements PdfExportContract
 
     public function filename(?Model $source, string $locale): string
     {
+        // El NOMBRE del elemento, nunca su id (la unicidad del fichero la da
+        // el sufijo aleatorio del path al generar).
         $parts = array_filter([
-            $source ? Str::kebab(class_basename($source)) : null,
-            $source?->getKey(),
+            $source ? Str::slug($this->sourceLabel($source, $locale)) : null,
             $locale,
         ]);
 
         return implode('-', $parts) ?: $locale;
+    }
+
+    /** Nombre legible del elemento dueño (para el fichero). */
+    protected function sourceLabel(Model $source, string $locale): string
+    {
+        if (method_exists($source, 'previewLabel')) {
+            return (string) $source->previewLabel($locale);
+        }
+
+        foreach (['name', 'title'] as $field) {
+            if (method_exists($source, 'getTranslation')) {
+                $value = rescue(fn () => $source->getTranslation($field, $locale), null, report: false);
+                if (is_string($value) && $value !== '') {
+                    return $value;
+                }
+            }
+            $value = $source->getAttribute($field);
+            if (is_string($value) && $value !== '') {
+                return $value;
+            }
+        }
+
+        return Str::kebab(class_basename($source));
     }
 
     public function view(): ?string

@@ -9,6 +9,7 @@ use Bgm\Core\Previews\PreviewService;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Foundation\Auth\User;
 use Illuminate\Support\Facades\Storage;
+use Illuminate\Support\Str;
 use InvalidArgumentException;
 
 /**
@@ -95,7 +96,8 @@ class PdfService
             'guest_token' => $owner ? null : $guestToken,
             'locale' => $locale,
             'layout' => $layout ?? config('motor.pdf.default_layout', 'card'),
-            'filename' => self::COLLECTION_TYPE.'-'.($owner?->getKey() ?? 'guest')."-{$locale}",
+            // Nombre legible, nunca el id (el path lleva sufijo aleatorio).
+            'filename' => self::COLLECTION_TYPE.'-'.Str::slug($owner?->name ?? 'invitado')."-{$locale}",
             'status' => GeneratedPdf::STATUS_PENDING,
             'payload' => array_values($items),
             'is_permanent' => false,

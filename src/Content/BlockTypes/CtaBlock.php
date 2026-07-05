@@ -22,8 +22,8 @@ class CtaBlock extends BlockType
             Field::text('button_text')->label('Texto del botón')->translatable()->required(),
             Field::text('button_url')->label('Enlace del botón')->translatable()->required(),
             Field::select('button_variant', [
-                'primary' => 'Primario',
-                'secondary' => 'Secundario',
+                'primary' => 'Normal (fondo de acento)',
+                'secondary' => 'Inverso (fondo del fondo)',
             ])->label('Estilo del botón'),
             Field::image('image')->label('Imagen')->translatable(),
             static::imagePositionField(),
