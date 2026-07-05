@@ -51,6 +51,11 @@ Primera versión etiquetada (Fases 0–7 del plan).
   traducciones JSON es/eu del motor).
 - **Nav pública con hijas**: `GET /api/pages/nav` incluye las páginas hijas
   publicadas (submenú del nav, patrón CDL).
+- **Handoff web <-> admin**: `POST /auth/handoff` (código de un solo uso,
+  60 s) + `POST /auth/handoff/consume` (canje público por token propio):
+  los enlaces cruzados entre las SPA mantienen la sesión sin exponer el
+  token en la URL. Las escrituras oportunistas (p. ej. `users.locale`) van
+  con `rescue()`: una migración pendiente no tumba el login.
 - **Acciones "de todas" en PDF** (espejo de previews): `generate-missing`,
   `regenerate-all` y `DELETE ?type=` + `stats` por idioma en el catálogo.
 - **Iconos**: edición (renombrar / sustituir imagen) además de alta y borrado.

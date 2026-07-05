@@ -8,7 +8,9 @@ use Illuminate\Auth\Events\Registered;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Http\Request;
 use Illuminate\Routing\Controller;
+use Illuminate\Support\Facades\Cache;
 use Illuminate\Support\Facades\Hash;
+use Illuminate\Support\Str;
 use Illuminate\Validation\ValidationException;
 
 class AuthController extends Controller
@@ -42,8 +44,10 @@ class AuthController extends Controller
         $user->assignRole('user');
 
         // El idioma con el que se registró: sus correos (verificación,
-        // reset…) saldrán en ese locale (preferredLocale).
-        $user->forceFill(['locale' => app()->getLocale()])->save();
+        // reset…) saldrán en ese locale (preferredLocale). Con rescue: si la
+        // instalación aún no migró la columna, el registro NO se rompe (el
+        // detalle queda en los logs, nunca en la respuesta).
+        rescue(fn () => $user->forceFill(['locale' => app()->getLocale()])->save());
 
         // Si el User del juego implementa MustVerifyEmail, Laravel envía el
         // correo de verificación al escuchar este evento (DC-14).
@@ -74,9 +78,11 @@ class AuthController extends Controller
         }
 
         // El idioma preferido sigue al último login: los correos posteriores
-        // (reset de contraseña…) salen en el idioma en que usa la web.
+        // (reset de contraseña…) salen en el idioma en que usa la web. Con
+        // rescue: una migración pendiente jamás debe tumbar el login (el
+        // detalle va a los logs, no al frontend).
         if ($user->locale !== app()->getLocale()) {
-            $user->forceFill(['locale' => app()->getLocale()])->save();
+            rescue(fn () => $user->forceFill(['locale' => app()->getLocale()])->save());
         }
 
         $token = $user->createToken('bgm')->plainTextToken;
@@ -97,5 +103,37 @@ class AuthController extends Controller
     public function me(Request $request): UserResource
     {
         return new UserResource($request->user()->load('roles'));
+    }
+
+    /**
+     * Traspaso de sesión entre las SPA (web <-> admin, orígenes distintos):
+     * el origen pide un código de UN SOLO USO (60 s) y lo añade al enlace;
+     * el destino lo canjea por un token PROPIO al cargar. El token Sanctum
+     * nunca viaja en la URL.
+     */
+    public function handoff(Request $request): JsonResponse
+    {
+        $code = Str::random(48);
+        Cache::put("motor.handoff.{$code}", $request->user()->getKey(), now()->addSeconds(60));
+
+        return response()->json(['code' => $code]);
+    }
+
+    /** Canjea el código (Cache::pull: un solo uso) por un token nuevo. */
+    public function consumeHandoff(Request $request): JsonResponse
+    {
+        $data = $request->validate(['code' => ['required', 'string']]);
+
+        $userId = Cache::pull("motor.handoff.{$data['code']}");
+        abort_unless($userId !== null, 401);
+
+        $model = $this->userModel();
+        $user = $model::query()->findOrFail($userId);
+        $token = $user->createToken('bgm')->plainTextToken;
+
+        return response()->json([
+            'user' => new UserResource($user->load('roles')),
+            'token' => $token,
+        ]);
     }
 }

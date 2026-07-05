@@ -55,6 +55,10 @@ Route::prefix('api')->middleware('api')->group(function () {
     // --- Público ---
     Route::post('auth/register', [AuthController::class, 'register']);
     Route::post('auth/login', [AuthController::class, 'login']);
+    // Canje del código de traspaso web <-> admin (público: el código ES la
+    // credencial, de un solo uso y 60 s de vida).
+    Route::post('auth/handoff/consume', [AuthController::class, 'consumeHandoff'])
+        ->middleware('throttle:10,1');
 
     // Recuperación de contraseña (doc 05): el enlace del correo lleva a la
     // SPA (motor.frontend.reset_path) con token + email.
@@ -111,6 +115,9 @@ Route::prefix('api')->middleware('api')->group(function () {
     Route::middleware('auth:sanctum')->group(function () {
         Route::post('auth/logout', [AuthController::class, 'logout']);
         Route::get('auth/me', [AuthController::class, 'me']);
+        // Código de traspaso hacia la otra SPA (web <-> admin).
+        Route::post('auth/handoff', [AuthController::class, 'handoff'])
+            ->middleware('throttle:10,1');
         Route::post('auth/email/verification-notification', [
             EmailVerificationController::class, 'resend',
         ])->middleware('throttle:6,1');
