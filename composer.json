@@ -3,7 +3,7 @@
     "description": "Boardgame Motor \u2014 n\u00facleo backend (Laravel) reutilizable",
     "type": "library",
     "license": "proprietary",
-    "version": "0.0.1",
+    "version": "0.1.0",
     "require": {
         "php": "^8.2",
         "laravel/sanctum": "^4.0",
