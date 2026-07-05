@@ -118,22 +118,47 @@ abstract class BlockType
         return $rules;
     }
 
-    /** Sanea los campos richtext (DC-09) antes de guardar. */
+    /** Sanea los campos richtext (DC-09) antes de guardar, anidados incluidos. */
     public function sanitizeSettings(array $settings): array
+    {
+        return $this->sanitizeFields($this->allFields(), $settings);
+    }
+
+    /** @param  Field[]  $fields */
+    protected function sanitizeFields(array $fields, array $settings): array
     {
         $sanitizer = app(HtmlSanitizer::class);
 
-        foreach ($this->allFields() as $field) {
-            if ($field->type !== 'richtext' || ! isset($settings[$field->key])) {
+        foreach ($fields as $field) {
+            if (! isset($settings[$field->key])) {
+                continue;
+            }
+            $value = $settings[$field->key];
+
+            // Anidados: recursión sobre el objeto (group) o cada fila (repeater).
+            if ($field->type === 'group' && is_array($value)) {
+                $settings[$field->key] = $this->sanitizeFields($field->fields, $value);
+
+                continue;
+            }
+            if ($field->type === 'repeater' && is_array($value)) {
+                $settings[$field->key] = array_map(
+                    fn ($row) => is_array($row) ? $this->sanitizeFields($field->fields, $row) : $row,
+                    array_values($value),
+                );
+
                 continue;
             }
 
-            if ($field->translatable && is_array($settings[$field->key])) {
-                foreach ($settings[$field->key] as $locale => $html) {
+            if ($field->type !== 'richtext') {
+                continue;
+            }
+            if ($field->translatable && is_array($value)) {
+                foreach ($value as $locale => $html) {
                     $settings[$field->key][$locale] = $sanitizer->clean($html);
                 }
-            } elseif (is_string($settings[$field->key])) {
-                $settings[$field->key] = $sanitizer->clean($settings[$field->key]);
+            } elseif (is_string($value)) {
+                $settings[$field->key] = $sanitizer->clean($value);
             }
         }
 
@@ -143,16 +168,36 @@ abstract class BlockType
     /**
      * Valores localizados para el render público: los campos traducibles
      * eligen el locale pedido (con fallback al default) y el resto rellena
-     * su default si falta.
+     * su default si falta. Los anidados (group/repeater) se localizan por
+     * dentro.
      */
     public function localizeSettings(?array $settings, string $locale): array
     {
-        $settings ??= [];
+        return $this->localizeFields($this->allFields(), $settings ?? [], $locale);
+    }
+
+    /** @param  Field[]  $fields */
+    protected function localizeFields(array $fields, array $settings, string $locale): array
+    {
         $default = config('motor.default_locale', 'es');
         $out = [];
 
-        foreach ($this->allFields() as $field) {
+        foreach ($fields as $field) {
             $value = $settings[$field->key] ?? null;
+
+            if ($field->type === 'group') {
+                $out[$field->key] = $this->localizeFields($field->fields, is_array($value) ? $value : [], $locale);
+
+                continue;
+            }
+            if ($field->type === 'repeater') {
+                $out[$field->key] = array_map(
+                    fn ($row) => $this->localizeFields($field->fields, is_array($row) ? $row : [], $locale),
+                    is_array($value) ? array_values($value) : [],
+                );
+
+                continue;
+            }
 
             if ($field->translatable && is_array($value)) {
                 $value = $value[$locale] ?? $value[$default] ?? null;
