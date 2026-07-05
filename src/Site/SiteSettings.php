@@ -37,6 +37,8 @@ class SiteSettings
             'accent_colors' => [],   // candidatos del modo aleatorio
             'font_headings' => 'system',
             'font_body' => 'system',
+            // Fuente "especial": acentos puntuales (por ahora, el bloque cita).
+            'font_special' => 'system',
             'custom_fonts' => [],    // [{key, name, file}] subidas por el admin
             'footer_text' => [],     // {locale: texto del pie}
         ];

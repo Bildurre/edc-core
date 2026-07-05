@@ -52,6 +52,7 @@ class SiteSettingsController extends Controller
             'accent_colors.*' => ['string', $hex],
             'font_headings' => ['sometimes', 'in:'.$fontKeys],
             'font_body' => ['sometimes', 'in:'.$fontKeys],
+            'font_special' => ['sometimes', 'in:'.$fontKeys],
             'custom_fonts' => ['sometimes', 'array', 'max:12'],
             'custom_fonts.*.key' => ['required', 'string', 'max:80'],
             'custom_fonts.*.name' => ['required', 'string', 'max:80'],
