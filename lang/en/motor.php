@@ -20,6 +20,8 @@ return [
     'pdf_no_items' => 'The PDF has no printable items.',
     'pdf_error_internal' => 'Internal error while generating the PDF. Check the server logs.',
     'collection_empty' => 'The collection is empty.',
+    'password_reset_sent' => 'If the email exists, we have sent you a link to reset the password.',
+    'password_reset_done' => 'Password reset: you can log in now.',
     'collection_token_missing' => 'Missing collection token (guest) or session.',
     'users_cannot_delete_self' => 'You cannot delete your own user.',
 ];

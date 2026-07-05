@@ -25,6 +25,9 @@ return [
         'app_url' => env('MOTOR_APP_URL', 'http://localhost:5173'),
         // Ruta (dentro de la app) a la que se llega tras verificar el email.
         'verified_path' => env('MOTOR_VERIFIED_PATH', '/cuenta?verified=1'),
+        // Ruta (dentro de la app) del formulario de restablecer contraseña:
+        // el enlace del correo añade ?token=…&email=… (doc 05).
+        'reset_path' => env('MOTOR_RESET_PATH', '/restablecer'),
     ],
 
     // Render de componentes a PNG (doc 01, DC-04, DC-05).

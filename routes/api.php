@@ -3,6 +3,7 @@
 use Bgm\Core\Auth\Http\Controllers\AccountController;
 use Bgm\Core\Auth\Http\Controllers\AuthController;
 use Bgm\Core\Auth\Http\Controllers\EmailVerificationController;
+use Bgm\Core\Auth\Http\Controllers\PasswordResetController;
 use Bgm\Core\Auth\Http\Controllers\UserController;
 use Bgm\Core\Backup\Http\Controllers\BackupController;
 use Bgm\Core\Content\Http\Controllers\BlockController;
@@ -54,6 +55,13 @@ Route::prefix('api')->middleware('api')->group(function () {
     // --- Público ---
     Route::post('auth/register', [AuthController::class, 'register']);
     Route::post('auth/login', [AuthController::class, 'login']);
+
+    // Recuperación de contraseña (doc 05): el enlace del correo lleva a la
+    // SPA (motor.frontend.reset_path) con token + email.
+    Route::post('auth/forgot-password', [PasswordResetController::class, 'forgot'])
+        ->middleware('throttle:6,1');
+    Route::post('auth/reset-password', [PasswordResetController::class, 'reset'])
+        ->middleware('throttle:6,1');
 
     // Verificación de email (DC-14): enlace firmado que llega por correo. El
     // nombre 'verification.verify' es el que espera la notificación de Laravel.

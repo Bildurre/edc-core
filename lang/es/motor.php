@@ -20,6 +20,8 @@ return [
     'pdf_no_items' => 'El PDF no tiene ítems imprimibles.',
     'pdf_error_internal' => 'Error interno al generar el PDF. Revisa los logs del servidor.',
     'collection_empty' => 'La colección está vacía.',
+    'password_reset_sent' => 'Si el email existe, te hemos enviado un enlace para restablecer la contraseña.',
+    'password_reset_done' => 'Contraseña restablecida: ya puedes entrar.',
     'collection_token_missing' => 'Falta el token de la colección (invitado) o la sesión.',
     'users_cannot_delete_self' => 'No puedes borrar tu propio usuario.',
 ];

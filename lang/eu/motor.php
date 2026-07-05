@@ -20,6 +20,8 @@ return [
     'pdf_no_items' => 'PDFak ez du elementu inprimagarririk.',
     'pdf_error_internal' => 'Barne-errorea PDFa sortzean. Begiratu zerbitzariaren logak.',
     'collection_empty' => 'Bilduma hutsik dago.',
+    'password_reset_sent' => 'Emaila existitzen bada, pasahitza berrezartzeko esteka bidali dizugu.',
+    'password_reset_done' => 'Pasahitza berrezarrita: sartu zaitezke.',
     'collection_token_missing' => 'Bildumaren tokena (gonbidatua) edo saioa falta da.',
     'users_cannot_delete_self' => 'Ezin duzu zure erabiltzailea ezabatu.',
 ];

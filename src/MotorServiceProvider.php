@@ -19,6 +19,7 @@ use Bgm\Core\Content\PagePdfExport;
 use Bgm\Core\Content\SitemapRegistry;
 use Bgm\Core\Pdf\PdfExportRegistry;
 use Bgm\Core\Previews\PreviewRegistry;
+use Illuminate\Auth\Notifications\ResetPassword;
 use Illuminate\Console\Scheduling\Schedule;
 use Illuminate\Routing\Router;
 use Illuminate\Support\ServiceProvider;
@@ -90,6 +91,15 @@ class MotorServiceProvider extends ServiceProvider
         $this->loadViewsFrom(__DIR__.'/../resources/views', 'motor');
 
         $router->aliasMiddleware('motor.admin', EnsureCanAccessAdmin::class);
+
+        // Recuperación de contraseña (doc 05): el enlace del correo apunta a
+        // la SPA pública, con token + email en la query.
+        ResetPassword::createUrlUsing(function ($user, string $token) {
+            $base = rtrim(config('motor.frontend.app_url', config('app.url')), '/');
+            $path = config('motor.frontend.reset_path', '/restablecer');
+
+            return $base.$path.'?token='.$token.'&email='.urlencode($user->getEmailForPasswordReset());
+        });
         // El SetLocale del motor lo registra cada juego en su bootstrap/app.php
         // (appendToGroup 'api'), porque la config de middleware de la app es la
         // autoridad y sobrescribe los grupos en Laravel 12.
