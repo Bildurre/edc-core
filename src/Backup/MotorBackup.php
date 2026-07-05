@@ -51,6 +51,14 @@ class MotorBackup
         }
 
         $name = Str::slug(config('app.name', 'motor'));
+        $settings = app(BackupSettings::class)->get();
+
+        // Salud del monitor acorde a la copia automática configurada: con
+        // frecuencia semanal, una copia de 3 días es normal; desactivada,
+        // no alarma mientras haya alguna dentro de la retención.
+        $maxAgeDays = ! ($settings['auto'] ?? true)
+            ? (int) $settings['keep_days'] + 1
+            : (($settings['frequency'] ?? 'daily') === 'weekly' ? 8 : 2);
 
         config([
             'backup.backup.name' => $name,
@@ -58,7 +66,7 @@ class MotorBackup
             'backup.backup.source.databases' => $databases,
             'backup.backup.destination.disks' => [$disk],
             // Retención: la gobierna el admin (con motor.backup.keep_days de base).
-            'backup.cleanup.default_strategy.keep_all_backups_for_days' => (int) app(BackupSettings::class)->get()['keep_days'],
+            'backup.cleanup.default_strategy.keep_all_backups_for_days' => (int) $settings['keep_days'],
             // Sin notificaciones por correo: el gestor del admin ya avisa.
             'backup.notifications.notifications' => [],
             // backup:list / backup:monitor miran este destino.
@@ -66,7 +74,7 @@ class MotorBackup
                 'name' => $name,
                 'disks' => [$disk],
                 'health_checks' => [
-                    MaximumAgeInDays::class => 1,
+                    MaximumAgeInDays::class => $maxAgeDays,
                     MaximumStorageInMegabytes::class => 5000,
                 ],
             ]],
