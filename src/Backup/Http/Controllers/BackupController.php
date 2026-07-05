@@ -3,6 +3,7 @@
 namespace Bgm\Core\Backup\Http\Controllers;
 
 use Bgm\Core\Backup\BackupSettings;
+use Bgm\Core\Backup\Jobs\RunBackupJob;
 use Illuminate\Http\Request;
 use Illuminate\Routing\Controller;
 use Illuminate\Support\Facades\Artisan;
@@ -29,6 +30,14 @@ class BackupController extends Controller
 
     public function store()
     {
+        // BBDD grandes (DC-16): en cola; la vista sondea el listado hasta
+        // que aparece la copia nueva.
+        if (config('motor.backup.queue')) {
+            RunBackupJob::dispatch();
+
+            return response()->json(['data' => $this->list(), 'queued' => true], 202);
+        }
+
         // --disable-notifications: el propio admin ya informa del resultado.
         $exit = Artisan::call('backup:run', ['--disable-notifications' => true]);
 
