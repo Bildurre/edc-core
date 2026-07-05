@@ -18,7 +18,10 @@ class PublicPageController extends Controller
 {
     public function __construct(protected PageRenderer $renderer) {}
 
-    /** Menú público: páginas raíz publicadas con título y slug por locale. */
+    /**
+     * Menú público: páginas raíz publicadas con título y slug por locale, y
+     * sus hijas publicadas (el nav las despliega como submenú, patrón CDL).
+     */
     public function nav(): JsonResponse
     {
         $ttl = (int) config('motor.content.cache_ttl', 300);
@@ -28,12 +31,18 @@ class PublicPageController extends Controller
                 ->published()
                 ->root()
                 ->orderBy('order')
+                ->with(['children' => fn ($q) => $q->published()->orderBy('order')])
                 ->get()
                 ->map(fn (Page $page) => [
                     'id' => $page->id,
                     'title' => $page->getTranslations('title'),
                     'slugs' => $page->getTranslations('slug'),
                     'is_home' => $page->is_home,
+                    'children' => $page->children->map(fn (Page $child) => [
+                        'id' => $child->id,
+                        'title' => $child->getTranslations('title'),
+                        'slugs' => $child->getTranslations('slug'),
+                    ])->all(),
                 ])
                 ->all();
         });

@@ -129,6 +129,7 @@ Route::prefix('api')->middleware('api')->group(function () {
             // Gestión de la biblioteca de iconos (assets del juego).
             Route::middleware('can:manage-game')->group(function () {
                 Route::post('admin/icons', [IconController::class, 'store']);
+                Route::post('admin/icons/{icon}', [IconController::class, 'update'])->whereNumber('icon');
                 Route::delete('admin/icons/{icon}', [IconController::class, 'destroy']);
             });
 
@@ -206,6 +207,10 @@ Route::prefix('api')->middleware('api')->group(function () {
                 Route::get('exports', [PdfController::class, 'exports']);
                 Route::get('/', [PdfController::class, 'index']);
                 Route::post('generate', [PdfController::class, 'generate']);
+                // Acciones "de todas" del export (espejo de las previews).
+                Route::post('generate-missing', [PdfController::class, 'generateMissing']);
+                Route::post('regenerate-all', [PdfController::class, 'regenerateAll']);
+                Route::delete('/', [PdfController::class, 'destroyType']);
                 Route::post('{pdf}/regenerate', [PdfController::class, 'regenerate'])->whereNumber('pdf');
                 Route::delete('{pdf}', [PdfController::class, 'destroy'])->whereNumber('pdf');
             });

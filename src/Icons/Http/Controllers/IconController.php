@@ -36,6 +36,27 @@ class IconController extends Controller
         return (new IconResource($icon))->response()->setStatusCode(201);
     }
 
+    /**
+     * Edición: renombrar y, opcionalmente, sustituir la imagen. Llega por
+     * POST (multipart no viaja en PUT nativo de PHP).
+     */
+    public function update(Request $request, Icon $icon)
+    {
+        $data = Validator::make($request->all(), [
+            'name' => ['required', 'string', 'max:255'],
+            'image' => ['nullable', 'file', 'mimes:svg,png,jpg,jpeg,webp,gif', 'max:2048'],
+        ])->validate();
+
+        $icon->name = $data['name'];
+        $icon->save();
+
+        if ($request->hasFile('image')) {
+            $icon->setImageFromRequest($request);
+        }
+
+        return new IconResource($icon->refresh());
+    }
+
     public function destroy(Icon $icon)
     {
         $icon->clearMediaCollection('image');

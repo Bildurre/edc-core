@@ -6,6 +6,7 @@ use Bgm\Core\Pdf\Http\Resources\GeneratedPdfResource;
 use Bgm\Core\Pdf\Models\GeneratedPdf;
 use Bgm\Core\Pdf\PdfExportRegistry;
 use Bgm\Core\Pdf\PdfService;
+use Illuminate\Database\Eloquent\Model;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Http\Request;
 use Illuminate\Routing\Controller;
@@ -25,21 +26,39 @@ class PdfController extends Controller
 
     /**
      * Catálogo de exports registrados por el juego, para el gestor del admin:
-     * tipo, si es global o por entidad, layout y (si aplica) las entidades
-     * dueñas disponibles.
+     * tipo, si es global o por entidad, layout, (si aplica) las entidades
+     * dueñas disponibles y las estadísticas por idioma (total de piezas
+     * esperadas y cuántas están listas — mismo resumen que las previews).
      */
     public function exports(): JsonResponse
     {
         $locale = app()->getLocale();
+        $locales = array_keys(config('motor.locales', []));
 
-        $data = collect($this->exports->types())->map(function (string $type) use ($locale) {
+        $data = collect($this->exports->types())->map(function (string $type) use ($locale, $locales) {
             $export = $this->exports->get($type);
+            $sources = $export->sourceModel() !== null ? $export->sources($locale) : [];
+            $total = $export->sourceModel() !== null ? count($sources) : 1;
+
+            // Listos por idioma (los permanentes del export).
+            $ready = GeneratedPdf::query()
+                ->where('type', $type)
+                ->where('status', GeneratedPdf::STATUS_READY)
+                ->selectRaw('locale, count(*) as n')
+                ->groupBy('locale')
+                ->pluck('n', 'locale');
 
             return [
                 'type' => $type,
                 'global' => $export->sourceModel() === null,
                 'layout' => $export->layout(),
-                'sources' => $export->sources($locale),
+                'sources' => $sources,
+                'stats' => [
+                    'total' => $total,
+                    'locales' => collect($locales)->mapWithKeys(
+                        fn ($code) => [$code => min((int) ($ready[$code] ?? 0), $total)]
+                    ),
+                ],
             ];
         });
 
@@ -105,6 +124,89 @@ class PdfController extends Controller
             ->additional(['message' => __('motor::motor.pdfs_queued')])
             ->response()
             ->setStatusCode(202);
+    }
+
+    /**
+     * Genera SOLO lo que falta del export: combos (entidad, idioma) sin PDF
+     * o cuyo último intento falló. Espejo de "generar faltantes" de previews.
+     */
+    public function generateMissing(Request $request): JsonResponse
+    {
+        $data = $request->validate(['type' => ['required', 'string']]);
+        abort_unless($this->exports->has($data['type']), 404);
+
+        $existing = GeneratedPdf::query()
+            ->where('type', $data['type'])
+            ->where('status', '!=', GeneratedPdf::STATUS_FAILED)
+            ->get()
+            ->keyBy(fn (GeneratedPdf $pdf) => ($pdf->source_id ?? 'global').':'.$pdf->locale);
+
+        $queued = 0;
+        foreach ($this->combos($data['type']) as [$source, $locale]) {
+            if ($existing->has(($source?->getKey() ?? 'global').':'.$locale)) {
+                continue;
+            }
+            $this->service->generate($data['type'], $source, $locale);
+            $queued++;
+        }
+
+        return response()->json(['message' => __('motor::motor.pdfs_queued'), 'queued' => $queued], 202);
+    }
+
+    /** Regenera TODOS los PDF del export (todas las entidades y todos los idiomas). */
+    public function regenerateAll(Request $request): JsonResponse
+    {
+        $data = $request->validate(['type' => ['required', 'string']]);
+        abort_unless($this->exports->has($data['type']), 404);
+
+        $queued = 0;
+        foreach ($this->combos($data['type']) as [$source, $locale]) {
+            $this->service->generate($data['type'], $source, $locale);
+            $queued++;
+        }
+
+        return response()->json(['message' => __('motor::motor.pdfs_queued'), 'queued' => $queued], 202);
+    }
+
+    /** Borra TODOS los PDF del export (fichero incluido). */
+    public function destroyType(Request $request): JsonResponse
+    {
+        $data = $request->validate(['type' => ['required', 'string']]);
+        abort_unless($this->exports->has($data['type']), 404);
+
+        GeneratedPdf::query()
+            ->where('type', $data['type'])
+            ->get()
+            ->each(fn (GeneratedPdf $pdf) => $this->service->delete($pdf));
+
+        return response()->json(['message' => __('motor::motor.pdf_deleted')]);
+    }
+
+    /**
+     * Combos (entidad dueña o null, idioma) que un export debería tener:
+     * el producto de sus fuentes por los locales configurados.
+     *
+     * @return array<int, array{0: Model|null, 1: string}>
+     */
+    protected function combos(string $type): array
+    {
+        $export = $this->exports->get($type);
+        $locales = array_keys(config('motor.locales', []));
+
+        $sources = collect([null]);
+        if ($export->sourceModel() !== null) {
+            $ids = collect($export->sources(app()->getLocale()))->pluck('id');
+            $sources = $export->sourceModel()::query()->findMany($ids)->values();
+        }
+
+        $combos = [];
+        foreach ($sources as $source) {
+            foreach ($locales as $locale) {
+                $combos[] = [$source, $locale];
+            }
+        }
+
+        return $combos;
     }
 
     public function regenerate(GeneratedPdf $pdf): JsonResponse

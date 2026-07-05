@@ -1,0 +1,16 @@
+{
+    "Verify your email address": "Egiaztatu zure helbide elektronikoa",
+    "Please click the button below to verify your email address.": "Sakatu beheko botoia zure helbide elektronikoa egiaztatzeko.",
+    "Verify Email Address": "Egiaztatu helbide elektronikoa",
+    "If you did not create an account, no further action is required.": "Ez baduzu konturik sortu, ez duzu ezer gehiago egin behar.",
+    "Reset your password": "Berrezarri zure pasahitza",
+    "You are receiving this email because we received a password reset request for your account.": "Mezu hau jaso duzu zure konturako pasahitza berrezartzeko eskaera bat jaso dugulako.",
+    "Reset Password": "Berrezarri pasahitza",
+    "This password reset link will expire in :count minutes.": "Berrezartzeko esteka honek :count minutu barru iraungiko du.",
+    "If you did not request a password reset, no further action is required.": "Ez baduzu pasahitza berrezartzea eskatu, ez duzu ezer gehiago egin behar.",
+    "Hello!": "Kaixo!",
+    "Whoops!": "Ene!",
+    "Regards,": "Agur bero bat,",
+    "If you're having trouble clicking the \":actionText\" button, copy and paste the URL below\ninto your web browser:": "\":actionText\" botoia sakatzeko arazoak badituzu, kopiatu eta itsatsi URL hau\nzure nabigatzailean:",
+    "All rights reserved.": "Eskubide guztiak erreserbatuta."
+}

@@ -29,6 +29,8 @@ class AuthController extends Controller
             'name' => ['required', 'string', 'max:255'],
             'email' => ['required', 'email', 'max:255', 'unique:users,email'],
             'password' => ['required', 'string', 'min:8', 'confirmed'],
+            // Protección de datos: el registro exige aceptación explícita.
+            'privacy' => ['accepted'],
         ]);
 
         $model = $this->userModel();
@@ -38,6 +40,10 @@ class AuthController extends Controller
             'password' => Hash::make($data['password']),
         ]);
         $user->assignRole('user');
+
+        // El idioma con el que se registró: sus correos (verificación,
+        // reset…) saldrán en ese locale (preferredLocale).
+        $user->forceFill(['locale' => app()->getLocale()])->save();
 
         // Si el User del juego implementa MustVerifyEmail, Laravel envía el
         // correo de verificación al escuchar este evento (DC-14).
@@ -65,6 +71,12 @@ class AuthController extends Controller
             throw ValidationException::withMessages([
                 'email' => [__('motor::motor.invalid_credentials')],
             ]);
+        }
+
+        // El idioma preferido sigue al último login: los correos posteriores
+        // (reset de contraseña…) salen en el idioma en que usa la web.
+        if ($user->locale !== app()->getLocale()) {
+            $user->forceFill(['locale' => app()->getLocale()])->save();
         }
 
         $token = $user->createToken('bgm')->plainTextToken;

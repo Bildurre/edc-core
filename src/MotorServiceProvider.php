@@ -89,6 +89,10 @@ class MotorServiceProvider extends ServiceProvider
         $this->loadRoutesFrom(__DIR__.'/../routes/api.php');
         $this->loadMigrationsFrom(__DIR__.'/../database/migrations');
         $this->loadTranslationsFrom(__DIR__.'/../lang', 'motor');
+        // Traducciones JSON (sin namespace): los textos de las notificaciones
+        // de Laravel (verificación de email, reset…) en es/eu, para que los
+        // correos salgan en el idioma del usuario (preferredLocale, DC-14).
+        $this->loadJsonTranslationsFrom(__DIR__.'/../lang');
         $this->loadViewsFrom(__DIR__.'/../resources/views', 'motor');
 
         $router->aliasMiddleware('motor.admin', EnsureCanAccessAdmin::class);

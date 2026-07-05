@@ -45,5 +45,14 @@ Primera versión etiquetada (Fases 0–7 del plan).
 - **Web pública (doc 10)**: endpoints públicos de entidades (publicadas,
   slug resoluble en cualquier locale), `SitemapRegistry` + facade
   `Sitemap` (`GET /sitemap.xml`), monitor de salud.
+- **Privacidad y correos**: el registro exige aceptación explícita
+  (`privacy`), guarda el `locale` del usuario (registro/login) y las
+  notificaciones de Laravel salen en su idioma (`preferredLocale` +
+  traducciones JSON es/eu del motor).
+- **Nav pública con hijas**: `GET /api/pages/nav` incluye las páginas hijas
+  publicadas (submenú del nav, patrón CDL).
+- **Acciones "de todas" en PDF** (espejo de previews): `generate-missing`,
+  `regenerate-all` y `DELETE ?type=` + `stats` por idioma en el catálogo.
+- **Iconos**: edición (renombrar / sustituir imagen) además de alta y borrado.
 - Migraciones consolidadas, seeder demo completo, config publicable
-  (`motor.php`), Pint propio y suite Pest (111 tests) en el playground.
+  (`motor.php`), Pint propio y suite Pest (118 tests) en el playground.
