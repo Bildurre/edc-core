@@ -19,6 +19,7 @@ use Bgm\Core\Content\PagePdfExport;
 use Bgm\Core\Content\SitemapRegistry;
 use Bgm\Core\Pdf\PdfExportRegistry;
 use Bgm\Core\Previews\PreviewRegistry;
+use Illuminate\Console\Scheduling\Schedule;
 use Illuminate\Routing\Router;
 use Illuminate\Support\ServiceProvider;
 
@@ -62,8 +63,13 @@ class MotorServiceProvider extends ServiceProvider
         // PDF de páginas imprimibles del CRM (doc 03 + doc 02).
         $this->app->make(PdfExportRegistry::class)->register('pages', PagePdfExport::class);
 
-        // Copias de seguridad (doc 06): config de spatie derivada de motor.backup.
+        // Copias de seguridad (doc 06): config de spatie derivada de motor.backup
+        // y copia automática programada según lo configurado en el admin
+        // (BackupSettings). El juego solo necesita el cron de schedule:run.
         MotorBackup::applyConfig();
+        $this->callAfterResolving(Schedule::class, function (Schedule $schedule) {
+            MotorBackup::schedule($schedule);
+        });
 
         // Sitemap (doc 10): las páginas publicadas del CRM, con la home en la
         // raíz de cada locale. Los juegos añaden sus entidades con Sitemap::add.

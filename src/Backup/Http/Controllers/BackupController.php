@@ -2,22 +2,29 @@
 
 namespace Bgm\Core\Backup\Http\Controllers;
 
+use Bgm\Core\Backup\BackupSettings;
+use Illuminate\Http\Request;
 use Illuminate\Routing\Controller;
 use Illuminate\Support\Facades\Artisan;
 use Illuminate\Support\Facades\Storage;
+use Illuminate\Validation\Rule;
 use Spatie\Backup\BackupDestination\Backup;
 use Spatie\Backup\BackupDestination\BackupDestination;
 
 /**
  * Gestor de copias de seguridad (doc 06): listar, crear, descargar y borrar
- * los zips que genera spatie/laravel-backup. Protegido por manage-web.
- * DC-16: crear es síncrono (BBDD grandes irían en cola; se documenta).
+ * los zips que genera spatie/laravel-backup, y configurar la copia
+ * AUTOMÁTICA (activada, frecuencia, hora, retención) que programa el motor.
+ * Protegido por manage-web. DC-16: crear es síncrono (BBDD grandes irían en
+ * cola; se documenta).
  */
 class BackupController extends Controller
 {
+    public function __construct(protected BackupSettings $settings) {}
+
     public function index()
     {
-        return response()->json(['data' => $this->list()]);
+        return response()->json(['data' => $this->list(), 'schedule' => $this->settings->get()]);
     }
 
     public function store()
@@ -28,6 +35,20 @@ class BackupController extends Controller
         abort_if($exit !== 0, 500, trim(Artisan::output()) ?: 'backup:run failed');
 
         return response()->json(['data' => $this->list()], 201);
+    }
+
+    /** Configura la copia automática (la aplica el scheduler del motor). */
+    public function updateSchedule(Request $request)
+    {
+        $data = $request->validate([
+            'auto' => ['required', 'boolean'],
+            'frequency' => ['required', Rule::in(['daily', 'weekly'])],
+            'time' => ['required', 'date_format:H:i'],
+            'weekday' => ['required', 'integer', 'min:1', 'max:7'],
+            'keep_days' => ['required', 'integer', 'min:1', 'max:365'],
+        ]);
+
+        return response()->json(['schedule' => $this->settings->update($data)]);
     }
 
     public function download(string $file)

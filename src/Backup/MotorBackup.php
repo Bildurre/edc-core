@@ -2,6 +2,8 @@
 
 namespace Bgm\Core\Backup;
 
+use Illuminate\Console\Scheduling\Schedule;
+use Illuminate\Support\Facades\Artisan;
 use Illuminate\Support\Str;
 use Spatie\Backup\Tasks\Monitor\HealthChecks\MaximumAgeInDays;
 use Spatie\Backup\Tasks\Monitor\HealthChecks\MaximumStorageInMegabytes;
@@ -10,7 +12,9 @@ use Spatie\Backup\Tasks\Monitor\HealthChecks\MaximumStorageInMegabytes;
  * Copias de seguridad (doc 06, DC-16): el motor usa spatie/laravel-backup y
  * deriva su config de motor.backup para que el juego no tenga que publicar
  * config/backup.php (puede hacerlo si quiere afinar; lo puesto aquí solo
- * pisa las claves que gobierna el motor).
+ * pisa las claves que gobierna el motor). La copia automática (frecuencia,
+ * hora, retención) se edita desde el admin (BackupSettings) y la programa
+ * schedule(): el juego solo necesita el cron de `schedule:run`.
  */
 class MotorBackup
 {
@@ -53,7 +57,8 @@ class MotorBackup
             'backup.backup.source.files.include' => $include,
             'backup.backup.source.databases' => $databases,
             'backup.backup.destination.disks' => [$disk],
-            'backup.cleanup.default_strategy.keep_all_backups_for_days' => (int) config('motor.backup.keep_days', 14),
+            // Retención: la gobierna el admin (con motor.backup.keep_days de base).
+            'backup.cleanup.default_strategy.keep_all_backups_for_days' => (int) app(BackupSettings::class)->get()['keep_days'],
             // Sin notificaciones por correo: el gestor del admin ya avisa.
             'backup.notifications.notifications' => [],
             // backup:list / backup:monitor miran este destino.
@@ -66,5 +71,32 @@ class MotorBackup
                 ],
             ]],
         ]);
+    }
+
+    /**
+     * Programa la copia automática según lo configurado en el admin. La lee
+     * en cada schedule:run (los ajustes se aplican sin redeploy). Se ejecuta
+     * en el MISMO proceso (call + Artisan::call) para que la retención de
+     * applyConfig gobierne también el backup:clean.
+     */
+    public static function schedule(Schedule $schedule): void
+    {
+        $settings = app(BackupSettings::class)->get();
+
+        if (! ($settings['auto'] ?? true)) {
+            return;
+        }
+
+        $event = $schedule->call(function () {
+            Artisan::call('backup:run', ['--disable-notifications' => true]);
+            Artisan::call('backup:clean', ['--disable-notifications' => true]);
+        })->name('motor:backup')->withoutOverlapping();
+
+        if (($settings['frequency'] ?? 'daily') === 'weekly') {
+            // BackupSettings usa 1=lunes … 7=domingo; weeklyOn espera 0-6.
+            $event->weeklyOn(((int) $settings['weekday']) % 7, $settings['time']);
+        } else {
+            $event->dailyAt($settings['time']);
+        }
     }
 }
