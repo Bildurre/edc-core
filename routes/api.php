@@ -69,8 +69,21 @@ Route::prefix('api')->middleware('api')->group(function () {
         ->whereNumber('id');
 
     // Descarga de PDF: permanentes públicos (expositor); temporales, solo el
-    // dueño o un admin (lo comprueba el controlador).
+    // dueño (usuario o token de invitado) o un admin (lo comprueba el
+    // controlador). El apartado público de Descargas lista los permanentes.
+    Route::get('downloads', [PdfController::class, 'downloads']);
     Route::get('pdfs/{pdf}/download', [PdfController::class, 'download']);
+
+    // Colección temporal "para imprimir" (doc 02): para usuarios logueados
+    // Y para invitados (cabecera X-Collection-Token), como en CDL.
+    Route::prefix('pdf-collection')->group(function () {
+        Route::get('/', [PdfCollectionController::class, 'index']);
+        Route::post('items', [PdfCollectionController::class, 'store']);
+        Route::delete('items/{item}', [PdfCollectionController::class, 'destroy'])->whereNumber('item');
+        Route::delete('/', [PdfCollectionController::class, 'clear']);
+        Route::post('generate', [PdfCollectionController::class, 'generate']);
+        Route::get('pdfs/{pdf}', [PdfCollectionController::class, 'show'])->whereNumber('pdf');
+    });
 
     // Configuración de la web (doc 10): la SPA la aplica al arrancar
     // (título, favicon, fuentes, acento fijo o aleatorio…). Los ficheros de
@@ -98,16 +111,6 @@ Route::prefix('api')->middleware('api')->group(function () {
         Route::get('account', [AccountController::class, 'show']);
         Route::put('account', [AccountController::class, 'update']);
         Route::put('account/password', [AccountController::class, 'updatePassword']);
-
-        // Colección temporal "para imprimir" (doc 02).
-        Route::prefix('pdf-collection')->group(function () {
-            Route::get('/', [PdfCollectionController::class, 'index']);
-            Route::post('items', [PdfCollectionController::class, 'store']);
-            Route::delete('items/{item}', [PdfCollectionController::class, 'destroy'])->whereNumber('item');
-            Route::delete('/', [PdfCollectionController::class, 'clear']);
-            Route::post('generate', [PdfCollectionController::class, 'generate']);
-            Route::get('pdfs/{pdf}', [PdfCollectionController::class, 'show'])->whereNumber('pdf');
-        });
 
         // --- Solo admin/editor ---
         Route::middleware('motor.admin')->group(function () {

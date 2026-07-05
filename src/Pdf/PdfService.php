@@ -69,27 +69,33 @@ class PdfService
     }
 
     /**
-     * Genera el PDF temporal de una colección a la carta (doc 02).
+     * Genera el PDF temporal de una colección a la carta (doc 02). El dueño
+     * es un usuario logueado O un token de invitado (como en CDL).
      *
      * @param  array<int, array{entity: string, id: int|string, copies: int}>  $items
      */
     public function generateCollection(
-        User $owner,
+        ?User $owner,
         array $items,
         string $locale,
         ?string $layout = null,
         bool $sync = false,
+        ?string $guestToken = null,
     ): GeneratedPdf {
         if ($items === []) {
             throw new InvalidArgumentException('La colección está vacía.');
         }
+        if ($owner === null && ! $guestToken) {
+            throw new InvalidArgumentException('La colección necesita dueño: usuario o token de invitado.');
+        }
 
         $pdf = GeneratedPdf::create([
             'type' => self::COLLECTION_TYPE,
-            'owner_id' => $owner->getKey(),
+            'owner_id' => $owner?->getKey(),
+            'guest_token' => $owner ? null : $guestToken,
             'locale' => $locale,
             'layout' => $layout ?? config('motor.pdf.default_layout', 'card'),
-            'filename' => self::COLLECTION_TYPE."-{$owner->getKey()}-{$locale}",
+            'filename' => self::COLLECTION_TYPE.'-'.($owner?->getKey() ?? 'guest')."-{$locale}",
             'status' => GeneratedPdf::STATUS_PENDING,
             'payload' => array_values($items),
             'is_permanent' => false,

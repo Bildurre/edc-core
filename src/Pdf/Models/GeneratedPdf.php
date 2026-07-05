@@ -23,9 +23,9 @@ class GeneratedPdf extends Model
     protected $table = 'generated_pdfs';
 
     protected $fillable = [
-        'type', 'source_type', 'source_id', 'owner_id', 'locale', 'layout',
-        'path', 'filename', 'status', 'error', 'payload', 'is_permanent',
-        'expires_at', 'generated_at',
+        'type', 'source_type', 'source_id', 'owner_id', 'guest_token', 'locale',
+        'layout', 'path', 'filename', 'status', 'error', 'payload',
+        'is_permanent', 'expires_at', 'generated_at',
     ];
 
     protected function casts(): array

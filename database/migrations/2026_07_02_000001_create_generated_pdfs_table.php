@@ -18,8 +18,10 @@ return new class extends Migration
             // para los temporales a la carta.
             $table->string('type');
             $table->nullableMorphs('source');
-            // Usuario que lo generó (dueño de los temporales).
+            // Dueño de los temporales: usuario logueado O token de invitado
+            // (uuid que la SPA genera y guarda en localStorage, doc 02).
             $table->foreignId('owner_id')->nullable()->constrained('users')->nullOnDelete();
+            $table->string('guest_token', 64)->nullable()->index();
             $table->string('locale', 12);
             $table->string('layout');
             $table->string('path')->nullable();
@@ -36,11 +38,13 @@ return new class extends Migration
             $table->index(['type', 'source_type', 'source_id', 'locale']);
         });
 
-        // Colección temporal "para imprimir" de cada usuario (doc 02): ítems
-        // elegidos a la carta con copias; de aquí sale el PDF temporal.
+        // Colección temporal "para imprimir" (doc 02): ítems elegidos a la
+        // carta con copias; de aquí sale el PDF temporal. Es de un usuario
+        // logueado O de un invitado (token de la SPA), como en CDL.
         Schema::create('pdf_collection_items', function (Blueprint $table) {
             $table->id();
-            $table->foreignId('user_id')->constrained('users')->cascadeOnDelete();
+            $table->foreignId('user_id')->nullable()->constrained('users')->cascadeOnDelete();
+            $table->string('guest_token', 64)->nullable()->index();
             // Clave del PreviewRegistry (character, scheme, ...) + id.
             $table->string('entity');
             $table->unsignedBigInteger('entity_id');
@@ -48,6 +52,7 @@ return new class extends Migration
             $table->datetimes();
 
             $table->unique(['user_id', 'entity', 'entity_id']);
+            $table->unique(['guest_token', 'entity', 'entity_id']);
         });
     }
 

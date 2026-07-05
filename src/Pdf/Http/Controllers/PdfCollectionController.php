@@ -7,14 +7,19 @@ use Bgm\Core\Pdf\Models\GeneratedPdf;
 use Bgm\Core\Pdf\Models\PdfCollectionItem;
 use Bgm\Core\Pdf\PdfService;
 use Bgm\Core\Previews\PreviewRegistry;
+use Illuminate\Contracts\Database\Eloquent\Builder;
+use Illuminate\Foundation\Auth\User;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Http\Request;
 use Illuminate\Routing\Controller;
 use Illuminate\Validation\Rule;
 
 /**
- * Colección temporal "para imprimir" del usuario autenticado (doc 02):
- * añadir/quitar entidades renderizables con copias y generar su PDF temporal.
+ * Colección temporal "para imprimir" (doc 02): añadir/quitar entidades
+ * renderizables con copias y generar su PDF temporal. Funciona para
+ * usuarios logueados Y para invitados (como en CDL): sin token Sanctum, la
+ * SPA manda un token de invitado (uuid en localStorage) en la cabecera
+ * X-Collection-Token.
  */
 class PdfCollectionController extends Controller
 {
@@ -27,8 +32,7 @@ class PdfCollectionController extends Controller
     {
         $locale = app()->getLocale();
 
-        $items = PdfCollectionItem::query()
-            ->where('user_id', $request->user()->getKey())
+        $items = $this->scope($request, PdfCollectionItem::query())
             ->orderBy('id')
             ->get()
             ->map(function (PdfCollectionItem $item) use ($locale) {
@@ -60,9 +64,12 @@ class PdfCollectionController extends Controller
         // La entidad tiene que existir (y ser visible).
         $this->previewables->modelFor($data['entity'])::query()->findOrFail($data['id']);
 
+        [$user, $token] = $this->owner($request);
+
         PdfCollectionItem::query()->updateOrCreate(
             [
-                'user_id' => $request->user()->getKey(),
+                'user_id' => $user?->getKey(),
+                'guest_token' => $user ? null : $token,
                 'entity' => $data['entity'],
                 'entity_id' => $data['id'],
             ],
@@ -74,8 +81,7 @@ class PdfCollectionController extends Controller
 
     public function destroy(Request $request, int $item): JsonResponse
     {
-        PdfCollectionItem::query()
-            ->where('user_id', $request->user()->getKey())
+        $this->scope($request, PdfCollectionItem::query())
             ->whereKey($item)
             ->delete();
 
@@ -84,7 +90,7 @@ class PdfCollectionController extends Controller
 
     public function clear(Request $request): JsonResponse
     {
-        PdfCollectionItem::query()->where('user_id', $request->user()->getKey())->delete();
+        $this->scope($request, PdfCollectionItem::query())->delete();
 
         return response()->json(['data' => []]);
     }
@@ -97,8 +103,9 @@ class PdfCollectionController extends Controller
             'layout' => ['nullable', 'string'],
         ]);
 
-        $items = PdfCollectionItem::query()
-            ->where('user_id', $request->user()->getKey())
+        [$user, $token] = $this->owner($request);
+
+        $items = $this->scope($request, PdfCollectionItem::query())
             ->get()
             ->map(fn (PdfCollectionItem $item) => [
                 'entity' => $item->entity,
@@ -110,10 +117,11 @@ class PdfCollectionController extends Controller
         abort_if($items === [], 422, __('motor::motor.collection_empty'));
 
         $pdf = $this->service->generateCollection(
-            $request->user(),
+            $user,
             $items,
             $data['locale'] ?? app()->getLocale(),
             $data['layout'] ?? null,
+            guestToken: $token,
         );
 
         return (new GeneratedPdfResource($pdf))
@@ -125,10 +133,39 @@ class PdfCollectionController extends Controller
     /** Estado de un PDF temporal propio (para sondear hasta 'ready'). */
     public function show(Request $request, int $pdf): JsonResponse
     {
-        $model = GeneratedPdf::query()
-            ->where('owner_id', $request->user()->getKey())
-            ->findOrFail($pdf);
+        $model = $this->scope($request, GeneratedPdf::query(), 'owner_id')->findOrFail($pdf);
 
         return (new GeneratedPdfResource($model))->response();
+    }
+
+    /**
+     * Dueño de la colección: el usuario del token Sanctum si lo hay; si no,
+     * el token de invitado de la cabecera (obligatorio y con pinta de uuid).
+     *
+     * @return array{0: ?User, 1: ?string}
+     */
+    protected function owner(Request $request): array
+    {
+        // Guard por defecto (sesión/tests) con fallback al token Sanctum: la
+        // ruta es pública y el guard se resuelve bajo demanda.
+        $user = $request->user() ?? $request->user('sanctum');
+        if ($user) {
+            return [$user, null];
+        }
+
+        $token = (string) $request->header('X-Collection-Token', '');
+        abort_unless((bool) preg_match('/^[A-Za-z0-9\-]{16,64}$/', $token), 401, __('motor::motor.collection_token_missing'));
+
+        return [null, $token];
+    }
+
+    /** Restringe una query a lo del dueño actual (usuario o invitado). */
+    protected function scope(Request $request, Builder $query, string $ownerColumn = 'user_id'): Builder
+    {
+        [$user, $token] = $this->owner($request);
+
+        return $user
+            ? $query->where($ownerColumn, $user->getKey())
+            : $query->where('guest_token', $token);
     }
 }

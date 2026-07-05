@@ -125,17 +125,53 @@ class PdfController extends Controller
     }
 
     /**
+     * Apartado público de Descargas (doc 10, como en CDL): los PDF
+     * PERMANENTES listos, agrupados por tipo de export. Sin auth: es el
+     * expositor. La SPA pone las etiquetas de cada tipo.
+     */
+    public function downloads(): JsonResponse
+    {
+        $disk = Storage::disk(config('motor.pdf.disk'));
+
+        $groups = GeneratedPdf::query()
+            ->where('is_permanent', true)
+            ->where('status', GeneratedPdf::STATUS_READY)
+            ->orderBy('filename')
+            ->orderBy('locale')
+            ->get()
+            ->groupBy('type')
+            ->map(fn ($pdfs, $type) => [
+                'type' => $type,
+                'items' => $pdfs->map(fn (GeneratedPdf $pdf) => [
+                    'id' => $pdf->id,
+                    'filename' => $pdf->filename,
+                    'locale' => $pdf->locale,
+                    'url' => url("/api/pdfs/{$pdf->id}/download"),
+                    'size' => $pdf->path && $disk->exists($pdf->path) ? $disk->size($pdf->path) : null,
+                    'generated_at' => $pdf->generated_at?->toIso8601String(),
+                ])->values(),
+            ])
+            ->values();
+
+        return response()->json(['data' => $groups]);
+    }
+
+    /**
      * Descarga. Los permanentes son públicos (expositor); los temporales solo
-     * para su dueño (o un admin).
+     * para su dueño — usuario logueado o token de invitado — o un admin.
      */
     public function download(Request $request, GeneratedPdf $pdf): StreamedResponse
     {
         abort_unless($pdf->isReady() && ! $pdf->isExpired(), 404);
 
         if (! $pdf->is_permanent) {
-            $user = $request->user();
+            // Guard por defecto (sesión/tests) con fallback al token Sanctum:
+            // la ruta es pública y el guard se resuelve bajo demanda.
+            $user = $request->user() ?? $request->user('sanctum');
+            $guestToken = (string) $request->header('X-Collection-Token', $request->query('token', ''));
             abort_unless(
-                $user && ($user->getKey() === $pdf->owner_id || $user->canAccessAdmin()),
+                ($user && ($user->getKey() === $pdf->owner_id || $user->canAccessAdmin()))
+                || ($pdf->guest_token !== null && $guestToken !== '' && hash_equals($pdf->guest_token, $guestToken)),
                 403,
             );
         }
