@@ -14,6 +14,11 @@ Backend Laravel reutilizable del motor. Versión de tren con `@edc-motor/ui` y
   acento). El formato antiguo (string) se sigue aceptando y se normaliza al
   leer. Migración de la SPA: usar los resueltos `logoUrl`/`logoInline` del
   store del sitio (o resolver el mapa como el título).
+- **Subidas de imagen sin huérfanos**: `POST /admin/content/uploads` guarda
+  con el **nombre original** saneado (sufijo `-2`, `-3`… solo si colisiona) y
+  borra el fichero sustituido si llega `replaces`; nuevo
+  `DELETE /admin/content/uploads` para el botón "quitar" (acotado a
+  `content/`, sin traversal).
 
 ## [0.2.0] — 2026-07-06
 

@@ -172,6 +172,7 @@ Route::prefix('api')->middleware('api')->group(function () {
             // CRM de páginas y bloques (doc 03). Las estáticas antes que {page}.
             Route::get('admin/block-types', [BlockTypeController::class, 'index'])->middleware('can:manage-web');
             Route::post('admin/content/uploads', [ContentUploadController::class, 'store'])->middleware('can:manage-web');
+            Route::delete('admin/content/uploads', [ContentUploadController::class, 'destroy'])->middleware('can:manage-web');
             Route::prefix('admin/pages')->middleware('can:manage-web')->group(function () {
                 Route::get('/', [PageController::class, 'index']);
                 Route::post('/', [PageController::class, 'store']);
