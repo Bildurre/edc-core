@@ -1,11 +1,11 @@
 <?php
 
-namespace Bgm\Core\Content\BlockTypes;
+namespace Edc\Core\Content\BlockTypes;
 
-use Bgm\Core\Content\BlockType;
-use Bgm\Core\Content\BlockTypeRegistry;
-use Bgm\Core\Content\Fields\Field;
-use Bgm\Core\Content\Models\Block;
+use Edc\Core\Content\BlockType;
+use Edc\Core\Content\BlockTypeRegistry;
+use Edc\Core\Content\Fields\Field;
+use Edc\Core\Content\Models\Block;
 
 /**
  * Índice automático: enlaza a los bloques POSTERIORES de la página marcados

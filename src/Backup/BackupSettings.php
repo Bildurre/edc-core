@@ -1,8 +1,8 @@
 <?php
 
-namespace Bgm\Core\Backup;
+namespace Edc\Core\Backup;
 
-use Bgm\Core\Site\Models\Setting;
+use Edc\Core\Site\Models\Setting;
 use Illuminate\Support\Facades\Cache;
 
 /**

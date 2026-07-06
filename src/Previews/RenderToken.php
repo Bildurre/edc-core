@@ -1,6 +1,6 @@
 <?php
 
-namespace Bgm\Core\Previews;
+namespace Edc\Core\Previews;
 
 use Illuminate\Support\Facades\Cache;
 use Illuminate\Support\Str;

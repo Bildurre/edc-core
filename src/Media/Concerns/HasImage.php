@@ -1,6 +1,6 @@
 <?php
 
-namespace Bgm\Core\Media\Concerns;
+namespace Edc\Core\Media\Concerns;
 
 use Illuminate\Http\Request;
 use Spatie\MediaLibrary\InteractsWithMedia;

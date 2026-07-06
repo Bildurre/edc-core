@@ -1,12 +1,12 @@
 <?php
 
-namespace Bgm\Core\Content\Http\Controllers;
+namespace Edc\Core\Content\Http\Controllers;
 
-use Bgm\Core\Content\BlockService;
-use Bgm\Core\Content\BlockTypeRegistry;
-use Bgm\Core\Content\Http\Resources\BlockResource;
-use Bgm\Core\Content\Models\Block;
-use Bgm\Core\Content\Models\Page;
+use Edc\Core\Content\BlockService;
+use Edc\Core\Content\BlockTypeRegistry;
+use Edc\Core\Content\Http\Resources\BlockResource;
+use Edc\Core\Content\Models\Block;
+use Edc\Core\Content\Models\Page;
 use Illuminate\Http\Request;
 use Illuminate\Routing\Controller;
 use Illuminate\Validation\Rule;

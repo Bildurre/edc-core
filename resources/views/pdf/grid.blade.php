@@ -3,7 +3,7 @@
      (lo más fiable en DomPDF: nada de floats). Para layouts especiales, el
      export declara su propia vista (ver PdfExportContract::view). --}}
 @php
-    /** @var \Bgm\Core\Pdf\PrintLayout $layout */
+    /** @var \Edc\Core\Pdf\PrintLayout $layout */
     $cols = $layout->columns();
     $mark = $layout->cropMarks ? $layout->cropMarkLength : 0;
     // El margen de página cede sitio a las marcas; el contenido se desplaza

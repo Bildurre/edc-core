@@ -1,9 +1,19 @@
 {
-    "name": "bgm/core",
-    "description": "Boardgame Motor \u2014 n\u00facleo backend (Laravel) reutilizable",
+    "name": "edc-motor/core",
+    "description": "EdC Motor (Espadas de Ceniza Motor) — núcleo backend Laravel reutilizable para webs de juegos de mesa: auth y roles, contenido i18n, render a PNG, PDF recortables, CRM de páginas, configuración, usuarios y backup",
     "type": "library",
-    "license": "proprietary",
-    "version": "0.1.0",
+    "keywords": [
+        "laravel",
+        "boardgame",
+        "edc-motor"
+    ],
+    "homepage": "https://github.com/bildurre/boardgame_motor",
+    "license": "GPL-3.0-only",
+    "version": "0.2.0",
+    "support": {
+        "issues": "https://github.com/bildurre/boardgame_motor/issues",
+        "source": "https://github.com/bildurre/edc-core"
+    },
     "require": {
         "php": "^8.2",
         "laravel/sanctum": "^4.0",
@@ -17,13 +27,13 @@
     },
     "autoload": {
         "psr-4": {
-            "Bgm\\Core\\": "src/"
+            "Edc\\Core\\": "src/"
         }
     },
     "extra": {
         "laravel": {
             "providers": [
-                "Bgm\\Core\\MotorServiceProvider"
+                "Edc\\Core\\MotorServiceProvider"
             ]
         }
     },

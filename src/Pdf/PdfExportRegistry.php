@@ -1,6 +1,6 @@
 <?php
 
-namespace Bgm\Core\Pdf;
+namespace Edc\Core\Pdf;
 
 use InvalidArgumentException;
 

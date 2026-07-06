@@ -1,10 +1,10 @@
 <?php
 
-namespace Bgm\Core\Content;
+namespace Edc\Core\Content;
 
-use Bgm\Core\Content\Fields\Field;
-use Bgm\Core\Content\Models\Block;
-use Bgm\Core\Support\HtmlSanitizer;
+use Edc\Core\Content\Fields\Field;
+use Edc\Core\Content\Models\Block;
+use Edc\Core\Support\HtmlSanitizer;
 
 /**
  * La pieza central del CRM (doc 03): un tipo de bloque se declara UNA vez y

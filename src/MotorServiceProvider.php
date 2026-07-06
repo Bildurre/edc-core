@@ -1,25 +1,25 @@
 <?php
 
-namespace Bgm\Core;
+namespace Edc\Core;
 
-use Bgm\Core\Auth\Http\Middleware\EnsureCanAccessAdmin;
-use Bgm\Core\Backup\MotorBackup;
-use Bgm\Core\Console\InstallCommand;
-use Bgm\Core\Console\PdfCleanupCommand;
-use Bgm\Core\Console\PreviewManageCommand;
-use Bgm\Core\Content\BlockTypeRegistry;
-use Bgm\Core\Content\BlockTypes\CtaBlock;
-use Bgm\Core\Content\BlockTypes\FaqBlock;
-use Bgm\Core\Content\BlockTypes\HeaderBlock;
-use Bgm\Core\Content\BlockTypes\IndexBlock;
-use Bgm\Core\Content\BlockTypes\QuoteBlock;
-use Bgm\Core\Content\BlockTypes\TextBlock;
-use Bgm\Core\Content\BlockTypes\TextCardBlock;
-use Bgm\Core\Content\Models\Page;
-use Bgm\Core\Content\PagePdfExport;
-use Bgm\Core\Content\SitemapRegistry;
-use Bgm\Core\Pdf\PdfExportRegistry;
-use Bgm\Core\Previews\PreviewRegistry;
+use Edc\Core\Auth\Http\Middleware\EnsureCanAccessAdmin;
+use Edc\Core\Backup\MotorBackup;
+use Edc\Core\Console\InstallCommand;
+use Edc\Core\Console\PdfCleanupCommand;
+use Edc\Core\Console\PreviewManageCommand;
+use Edc\Core\Content\BlockTypeRegistry;
+use Edc\Core\Content\BlockTypes\CtaBlock;
+use Edc\Core\Content\BlockTypes\FaqBlock;
+use Edc\Core\Content\BlockTypes\HeaderBlock;
+use Edc\Core\Content\BlockTypes\IndexBlock;
+use Edc\Core\Content\BlockTypes\QuoteBlock;
+use Edc\Core\Content\BlockTypes\TextBlock;
+use Edc\Core\Content\BlockTypes\TextCardBlock;
+use Edc\Core\Content\Models\Page;
+use Edc\Core\Content\PagePdfExport;
+use Edc\Core\Content\SitemapRegistry;
+use Edc\Core\Pdf\PdfExportRegistry;
+use Edc\Core\Previews\PreviewRegistry;
 use Illuminate\Auth\Notifications\ResetPassword;
 use Illuminate\Console\Scheduling\Schedule;
 use Illuminate\Routing\Router;

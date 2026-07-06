@@ -1,6 +1,6 @@
 <?php
 
-namespace Bgm\Core\Site\Models;
+namespace Edc\Core\Site\Models;
 
 use Illuminate\Database\Eloquent\Model;
 

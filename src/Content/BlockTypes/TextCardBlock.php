@@ -1,9 +1,9 @@
 <?php
 
-namespace Bgm\Core\Content\BlockTypes;
+namespace Edc\Core\Content\BlockTypes;
 
-use Bgm\Core\Content\BlockType;
-use Bgm\Core\Content\Fields\Field;
+use Edc\Core\Content\BlockType;
+use Edc\Core\Content\Fields\Field;
 
 /** Tarjeta destacada: etiqueta + título + texto, con imagen opcional. */
 class TextCardBlock extends BlockType

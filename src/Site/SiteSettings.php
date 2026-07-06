@@ -1,8 +1,8 @@
 <?php
 
-namespace Bgm\Core\Site;
+namespace Edc\Core\Site;
 
-use Bgm\Core\Site\Models\Setting;
+use Edc\Core\Site\Models\Setting;
 use Illuminate\Http\UploadedFile;
 use Illuminate\Support\Facades\Cache;
 use Illuminate\Support\Facades\Storage;

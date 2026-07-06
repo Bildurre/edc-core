@@ -1,10 +1,10 @@
 <?php
 
-namespace Bgm\Core\Content\Http\Controllers;
+namespace Edc\Core\Content\Http\Controllers;
 
-use Bgm\Core\Content\Http\Resources\PageResource;
-use Bgm\Core\Content\Models\Page;
-use Bgm\Core\Content\PageService;
+use Edc\Core\Content\Http\Resources\PageResource;
+use Edc\Core\Content\Models\Page;
+use Edc\Core\Content\PageService;
 use Illuminate\Http\Request;
 use Illuminate\Routing\Controller;
 

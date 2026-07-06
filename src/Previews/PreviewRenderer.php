@@ -1,6 +1,6 @@
 <?php
 
-namespace Bgm\Core\Previews;
+namespace Edc\Core\Previews;
 
 use Spatie\Browsershot\Browsershot;
 

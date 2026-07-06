@@ -1,8 +1,8 @@
 <?php
 
-namespace Bgm\Core\Support\Facades;
+namespace Edc\Core\Support\Facades;
 
-use Bgm\Core\Previews\PreviewRegistry;
+use Edc\Core\Previews\PreviewRegistry;
 use Illuminate\Support\Facades\Facade;
 
 /**

@@ -1,8 +1,8 @@
 <?php
 
-namespace Bgm\Core\Previews\Jobs;
+namespace Edc\Core\Previews\Jobs;
 
-use Bgm\Core\Previews\PreviewService;
+use Edc\Core\Previews\PreviewService;
 use Illuminate\Bus\Queueable;
 use Illuminate\Contracts\Queue\ShouldBeUnique;
 use Illuminate\Contracts\Queue\ShouldQueue;

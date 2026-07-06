@@ -1,6 +1,6 @@
 <?php
 
-namespace Bgm\Core\Auth;
+namespace Edc\Core\Auth;
 
 use Spatie\Permission\Models\Permission;
 use Spatie\Permission\Models\Role;

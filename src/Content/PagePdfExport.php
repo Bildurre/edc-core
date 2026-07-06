@@ -1,9 +1,9 @@
 <?php
 
-namespace Bgm\Core\Content;
+namespace Edc\Core\Content;
 
-use Bgm\Core\Content\Models\Page;
-use Bgm\Core\Pdf\PdfExport;
+use Edc\Core\Content\Models\Page;
+use Edc\Core\Pdf\PdfExport;
 use Illuminate\Database\Eloquent\Model;
 
 /**

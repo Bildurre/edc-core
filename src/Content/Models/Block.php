@@ -1,6 +1,6 @@
 <?php
 
-namespace Bgm\Core\Content\Models;
+namespace Edc\Core\Content\Models;
 
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;

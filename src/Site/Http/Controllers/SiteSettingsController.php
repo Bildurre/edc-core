@@ -1,8 +1,8 @@
 <?php
 
-namespace Bgm\Core\Site\Http\Controllers;
+namespace Edc\Core\Site\Http\Controllers;
 
-use Bgm\Core\Site\SiteSettings;
+use Edc\Core\Site\SiteSettings;
 use Illuminate\Http\Request;
 use Illuminate\Routing\Controller;
 use Illuminate\Support\Facades\Storage;

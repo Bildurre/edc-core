@@ -1,6 +1,6 @@
 <?php
 
-namespace Bgm\Core\Backup\Jobs;
+namespace Edc\Core\Backup\Jobs;
 
 use Illuminate\Bus\Queueable;
 use Illuminate\Contracts\Queue\ShouldQueue;

@@ -1,9 +1,9 @@
 <?php
 
-namespace Bgm\Core\Pdf;
+namespace Edc\Core\Pdf;
 
 use Barryvdh\DomPDF\Facade\Pdf as DomPdf;
-use Bgm\Core\Pdf\Models\GeneratedPdf;
+use Edc\Core\Pdf\Models\GeneratedPdf;
 use Illuminate\Contracts\Filesystem\Filesystem;
 use Illuminate\Support\Facades\Storage;
 use Illuminate\Support\Str;

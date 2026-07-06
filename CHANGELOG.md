@@ -1,7 +1,21 @@
-# Changelog — bgm/core
+# Changelog — edc-motor/core
 
-Backend Laravel reutilizable del motor. Versión de tren con `@bgm/ui` y
-`@bgm/admin-kit` (tag `vX.Y.Z` en el monorepo).
+Backend Laravel reutilizable del motor. Versión de tren con `@edc-motor/ui` y
+`@edc-motor/admin-kit` (tag `vX.Y.Z` en el monorepo).
+
+## [0.2.0] — 2026-07-06
+
+### Cambiado
+
+- **Renombrado del vendor/scope a `edc-motor`** (DC-21 revisada): el paquete
+  Composer pasa de `bgm/core` a **`edc-motor/core`** (namespace PHP
+  `Edc\Core`) y los npm a **`@edc-motor/ui`** y **`@edc-motor/admin-kit`**.
+  Migración de un juego existente: actualizar `composer.json`/`package.json`,
+  los imports (`@bgm/` → `@edc-motor/`), el namespace en `config/motor.php` y
+  las clases propias, y las clases CSS `bgm-*` → `edc-*`.
+- **Licencia GPL-3.0-only** y publicación en registros públicos: Packagist
+  (`edc-motor/core`, vía el repo split `bildurre/edc-core`) y npmjs
+  (org `edc-motor`). El consumo por clon hermano deja de ser necesario.
 
 ## [0.1.0] — 2026-07-05
 
@@ -63,4 +77,4 @@ Primera versión etiquetada (Fases 0–7 del plan).
   `regenerate-all` y `DELETE ?type=` + `stats` por idioma en el catálogo.
 - **Iconos**: edición (renombrar / sustituir imagen) además de alta y borrado.
 - Migraciones consolidadas, seeder demo completo, config publicable
-  (`motor.php`), Pint propio y suite Pest (118 tests) en el playground.
+  (`motor.php`), Pint propio y suite Pest.

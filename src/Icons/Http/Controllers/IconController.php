@@ -1,9 +1,9 @@
 <?php
 
-namespace Bgm\Core\Icons\Http\Controllers;
+namespace Edc\Core\Icons\Http\Controllers;
 
-use Bgm\Core\Icons\Http\Resources\IconResource;
-use Bgm\Core\Icons\Models\Icon;
+use Edc\Core\Icons\Http\Resources\IconResource;
+use Edc\Core\Icons\Models\Icon;
 use Illuminate\Http\Request;
 use Illuminate\Routing\Controller;
 use Illuminate\Support\Facades\Validator;

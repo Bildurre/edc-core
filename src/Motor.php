@@ -1,11 +1,11 @@
 <?php
 
-namespace Bgm\Core;
+namespace Edc\Core;
 
 class Motor
 {
     /**
      * Versión del núcleo del motor.
      */
-    public const VERSION = '0.1.0';
+    public const VERSION = '0.2.0';
 }

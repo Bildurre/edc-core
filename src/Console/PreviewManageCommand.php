@@ -1,9 +1,9 @@
 <?php
 
-namespace Bgm\Core\Console;
+namespace Edc\Core\Console;
 
-use Bgm\Core\Previews\PreviewRegistry;
-use Bgm\Core\Previews\PreviewService;
+use Edc\Core\Previews\PreviewRegistry;
+use Edc\Core\Previews\PreviewService;
 use Illuminate\Console\Command;
 
 /**

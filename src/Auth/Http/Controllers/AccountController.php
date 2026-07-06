@@ -1,8 +1,8 @@
 <?php
 
-namespace Bgm\Core\Auth\Http\Controllers;
+namespace Edc\Core\Auth\Http\Controllers;
 
-use Bgm\Core\Auth\Http\Resources\UserResource;
+use Edc\Core\Auth\Http\Resources\UserResource;
 use Illuminate\Contracts\Auth\MustVerifyEmail;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Http\Request;

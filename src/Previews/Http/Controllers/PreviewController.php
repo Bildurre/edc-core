@@ -1,9 +1,9 @@
 <?php
 
-namespace Bgm\Core\Previews\Http\Controllers;
+namespace Edc\Core\Previews\Http\Controllers;
 
-use Bgm\Core\Previews\PreviewRegistry;
-use Bgm\Core\Previews\PreviewService;
+use Edc\Core\Previews\PreviewRegistry;
+use Edc\Core\Previews\PreviewService;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Http\Request;
 use Illuminate\Routing\Controller;
@@ -12,7 +12,7 @@ use Illuminate\Routing\Controller;
  * Gestor de previews del admin: estado global, listado por entidad con el
  * detalle por locale, lotes por tipo (generar pendientes / regenerar todo /
  * borrar todo), acciones individuales y limpieza de huérfanos.
- * La UI vive en @bgm/admin-kit (PreviewManager).
+ * La UI vive en @edc-motor/admin-kit (PreviewManager).
  */
 class PreviewController extends Controller
 {

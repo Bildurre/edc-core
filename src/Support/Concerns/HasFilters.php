@@ -1,6 +1,6 @@
 <?php
 
-namespace Bgm\Core\Support\Concerns;
+namespace Edc\Core\Support\Concerns;
 
 use Illuminate\Database\Eloquent\Builder;
 

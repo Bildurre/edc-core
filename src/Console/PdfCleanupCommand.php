@@ -1,8 +1,8 @@
 <?php
 
-namespace Bgm\Core\Console;
+namespace Edc\Core\Console;
 
-use Bgm\Core\Pdf\PdfService;
+use Edc\Core\Pdf\PdfService;
 use Illuminate\Console\Command;
 
 /**

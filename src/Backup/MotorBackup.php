@@ -1,6 +1,6 @@
 <?php
 
-namespace Bgm\Core\Backup;
+namespace Edc\Core\Backup;
 
 use Illuminate\Console\Scheduling\Schedule;
 use Illuminate\Support\Facades\Artisan;

@@ -1,8 +1,8 @@
 <?php
 
-namespace Bgm\Core\Icons\Models;
+namespace Edc\Core\Icons\Models;
 
-use Bgm\Core\Media\Concerns\HasImage;
+use Edc\Core\Media\Concerns\HasImage;
 use Illuminate\Database\Eloquent\Model;
 use Spatie\MediaLibrary\HasMedia;
 use Spatie\Sluggable\HasSlug;

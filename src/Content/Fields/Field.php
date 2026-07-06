@@ -1,6 +1,6 @@
 <?php
 
-namespace Bgm\Core\Content\Fields;
+namespace Edc\Core\Content\Fields;
 
 /**
  * DSL de campos (DC-08): describe QUÉ edita el admin en un tipo de bloque.

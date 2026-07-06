@@ -1,10 +1,10 @@
 {{-- PDF de una página del CRM: los bloques imprimibles como documento de
      texto (DomPDF). El HTML rico ya llega saneado (DC-09). --}}
 @php
-    /** @var \Bgm\Core\Pdf\Models\GeneratedPdf $pdf */
+    /** @var \Edc\Core\Pdf\Models\GeneratedPdf $pdf */
     $page = $pdf->source;
     $locale = $pdf->locale;
-    $registry = app(\Bgm\Core\Content\BlockTypeRegistry::class);
+    $registry = app(\Edc\Core\Content\BlockTypeRegistry::class);
     $blocks = $page->blocks()->printable()->get()
         ->filter(fn ($block) => $registry->has($block->type) && $block->type !== 'index');
 @endphp

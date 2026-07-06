@@ -1,9 +1,9 @@
 <?php
 
-use Bgm\Core\Motor;
+use Edc\Core\Motor;
 
 return [
-    // Versión expuesta por la API (debe casar con Bgm\Core\Motor::VERSION).
+    // Versión expuesta por la API (debe casar con Edc\Core\Motor::VERSION).
     'version' => Motor::VERSION,
 
     // Locales de contenido del motor (DC-23). Cada juego puede ajustarlos.
@@ -120,7 +120,7 @@ return [
     ],
 
     // Copias de seguridad de la BBDD (doc 06, DC-16): spatie/laravel-backup
-    // con la config derivada de aquí (ver Bgm\Core\Backup\MotorBackup).
+    // con la config derivada de aquí (ver Edc\Core\Backup\MotorBackup).
     'backup' => [
         // Disco donde se guardan los zips. Si el juego no lo define en
         // filesystems, el motor crea uno local en storage/app/backups.

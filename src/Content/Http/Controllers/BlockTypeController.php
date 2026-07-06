@@ -1,8 +1,8 @@
 <?php
 
-namespace Bgm\Core\Content\Http\Controllers;
+namespace Edc\Core\Content\Http\Controllers;
 
-use Bgm\Core\Content\BlockTypeRegistry;
+use Edc\Core\Content\BlockTypeRegistry;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Routing\Controller;
 

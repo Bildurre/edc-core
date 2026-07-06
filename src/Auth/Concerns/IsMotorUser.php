@@ -1,6 +1,6 @@
 <?php
 
-namespace Bgm\Core\Auth\Concerns;
+namespace Edc\Core\Auth\Concerns;
 
 use Laravel\Sanctum\HasApiTokens;
 use Spatie\Permission\Traits\HasRoles;

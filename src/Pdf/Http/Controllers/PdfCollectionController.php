@@ -1,12 +1,12 @@
 <?php
 
-namespace Bgm\Core\Pdf\Http\Controllers;
+namespace Edc\Core\Pdf\Http\Controllers;
 
-use Bgm\Core\Pdf\Http\Resources\GeneratedPdfResource;
-use Bgm\Core\Pdf\Models\GeneratedPdf;
-use Bgm\Core\Pdf\Models\PdfCollectionItem;
-use Bgm\Core\Pdf\PdfService;
-use Bgm\Core\Previews\PreviewRegistry;
+use Edc\Core\Pdf\Http\Resources\GeneratedPdfResource;
+use Edc\Core\Pdf\Models\GeneratedPdf;
+use Edc\Core\Pdf\Models\PdfCollectionItem;
+use Edc\Core\Pdf\PdfService;
+use Edc\Core\Previews\PreviewRegistry;
 use Illuminate\Contracts\Database\Eloquent\Builder;
 use Illuminate\Foundation\Auth\User;
 use Illuminate\Http\JsonResponse;

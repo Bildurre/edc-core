@@ -1,8 +1,8 @@
 <?php
 
-namespace Bgm\Core\Support\Facades;
+namespace Edc\Core\Support\Facades;
 
-use Bgm\Core\Pdf\PdfExportRegistry;
+use Edc\Core\Pdf\PdfExportRegistry;
 use Illuminate\Support\Facades\Facade;
 
 /**
@@ -10,7 +10,7 @@ use Illuminate\Support\Facades\Facade;
  * @method static void layout(string $key, array $preset)
  * @method static bool has(string $type)
  * @method static array types()
- * @method static \Bgm\Core\Pdf\PdfExportContract get(string $type)
+ * @method static \Edc\Core\Pdf\PdfExportContract get(string $type)
  *
  * @see PdfExportRegistry
  */

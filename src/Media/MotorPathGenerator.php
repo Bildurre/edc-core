@@ -1,6 +1,6 @@
 <?php
 
-namespace Bgm\Core\Media;
+namespace Edc\Core\Media;
 
 use Spatie\MediaLibrary\MediaCollections\Models\Media;
 use Spatie\MediaLibrary\Support\PathGenerator\PathGenerator;

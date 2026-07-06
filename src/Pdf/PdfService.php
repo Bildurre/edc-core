@@ -1,11 +1,11 @@
 <?php
 
-namespace Bgm\Core\Pdf;
+namespace Edc\Core\Pdf;
 
-use Bgm\Core\Pdf\Jobs\GeneratePdfJob;
-use Bgm\Core\Pdf\Models\GeneratedPdf;
-use Bgm\Core\Previews\PreviewRegistry;
-use Bgm\Core\Previews\PreviewService;
+use Edc\Core\Pdf\Jobs\GeneratePdfJob;
+use Edc\Core\Pdf\Models\GeneratedPdf;
+use Edc\Core\Previews\PreviewRegistry;
+use Edc\Core\Previews\PreviewService;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Foundation\Auth\User;
 use Illuminate\Support\Facades\Storage;

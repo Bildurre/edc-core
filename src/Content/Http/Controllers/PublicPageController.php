@@ -1,9 +1,9 @@
 <?php
 
-namespace Bgm\Core\Content\Http\Controllers;
+namespace Edc\Core\Content\Http\Controllers;
 
-use Bgm\Core\Content\Models\Page;
-use Bgm\Core\Content\PageRenderer;
+use Edc\Core\Content\Models\Page;
+use Edc\Core\Content\PageRenderer;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Routing\Controller;
 use Illuminate\Support\Facades\Cache;

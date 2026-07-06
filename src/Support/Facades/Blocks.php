@@ -1,15 +1,15 @@
 <?php
 
-namespace Bgm\Core\Support\Facades;
+namespace Edc\Core\Support\Facades;
 
-use Bgm\Core\Content\BlockTypeRegistry;
+use Edc\Core\Content\BlockTypeRegistry;
 use Illuminate\Support\Facades\Facade;
 
 /**
  * @method static void register(string $typeClass)
  * @method static bool has(string $key)
  * @method static array keys()
- * @method static \Bgm\Core\Content\BlockType get(string $key)
+ * @method static \Edc\Core\Content\BlockType get(string $key)
  * @method static array toArray()
  *
  * @see BlockTypeRegistry

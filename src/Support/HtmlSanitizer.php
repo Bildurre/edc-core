@@ -1,6 +1,6 @@
 <?php
 
-namespace Bgm\Core\Support;
+namespace Edc\Core\Support;
 
 use DOMDocument;
 use DOMElement;

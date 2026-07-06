@@ -1,10 +1,10 @@
 <?php
 
-namespace Bgm\Core\Previews\Concerns;
+namespace Edc\Core\Previews\Concerns;
 
-use Bgm\Core\Previews\Jobs\GeneratePreviewJob;
-use Bgm\Core\Previews\PreviewRegistry;
-use Bgm\Core\Previews\PreviewService;
+use Edc\Core\Previews\Jobs\GeneratePreviewJob;
+use Edc\Core\Previews\PreviewRegistry;
+use Edc\Core\Previews\PreviewService;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\SoftDeletes;
 use Illuminate\Support\Facades\Storage;

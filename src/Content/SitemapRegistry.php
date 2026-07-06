@@ -1,6 +1,6 @@
 <?php
 
-namespace Bgm\Core\Content;
+namespace Edc\Core\Content;
 
 /**
  * Registro de URLs del sitemap (doc 10, DC-18). El motor aporta las páginas

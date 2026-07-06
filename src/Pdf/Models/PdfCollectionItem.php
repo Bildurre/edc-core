@@ -1,6 +1,6 @@
 <?php
 
-namespace Bgm\Core\Pdf\Models;
+namespace Edc\Core\Pdf\Models;
 
 use Illuminate\Database\Eloquent\Model;
 

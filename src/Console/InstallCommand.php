@@ -1,8 +1,8 @@
 <?php
 
-namespace Bgm\Core\Console;
+namespace Edc\Core\Console;
 
-use Bgm\Core\Auth\MotorAuth;
+use Edc\Core\Auth\MotorAuth;
 use Illuminate\Console\Command;
 
 /**

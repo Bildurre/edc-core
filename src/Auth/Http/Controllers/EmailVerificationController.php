@@ -1,6 +1,6 @@
 <?php
 
-namespace Bgm\Core\Auth\Http\Controllers;
+namespace Edc\Core\Auth\Http\Controllers;
 
 use App\Models\User;
 use Illuminate\Contracts\Auth\MustVerifyEmail;

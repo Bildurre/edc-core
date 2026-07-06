@@ -1,9 +1,9 @@
 <?php
 
-namespace Bgm\Core\Backup\Http\Controllers;
+namespace Edc\Core\Backup\Http\Controllers;
 
-use Bgm\Core\Backup\BackupSettings;
-use Bgm\Core\Backup\Jobs\RunBackupJob;
+use Edc\Core\Backup\BackupSettings;
+use Edc\Core\Backup\Jobs\RunBackupJob;
 use Illuminate\Http\Request;
 use Illuminate\Routing\Controller;
 use Illuminate\Support\Facades\Artisan;

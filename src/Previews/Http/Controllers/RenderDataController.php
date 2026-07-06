@@ -1,9 +1,9 @@
 <?php
 
-namespace Bgm\Core\Previews\Http\Controllers;
+namespace Edc\Core\Previews\Http\Controllers;
 
-use Bgm\Core\Previews\PreviewRegistry;
-use Bgm\Core\Previews\RenderToken;
+use Edc\Core\Previews\PreviewRegistry;
+use Edc\Core\Previews\RenderToken;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Http\Request;
 use Illuminate\Routing\Controller;

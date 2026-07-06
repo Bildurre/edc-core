@@ -1,6 +1,6 @@
 <?php
 
-namespace Bgm\Core\Previews;
+namespace Edc\Core\Previews;
 
 /**
  * Contrato que implementa cada entidad del juego renderizable a PNG (doc 01).

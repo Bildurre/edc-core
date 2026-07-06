@@ -1,8 +1,8 @@
 <?php
 
-namespace Bgm\Core\Content\Http\Controllers;
+namespace Edc\Core\Content\Http\Controllers;
 
-use Bgm\Core\Content\SitemapRegistry;
+use Edc\Core\Content\SitemapRegistry;
 use Illuminate\Http\Response;
 use Illuminate\Routing\Controller;
 

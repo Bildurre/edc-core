@@ -1,10 +1,10 @@
 <?php
 
-namespace Bgm\Core\Pdf\Jobs;
+namespace Edc\Core\Pdf\Jobs;
 
-use Bgm\Core\Pdf\Models\GeneratedPdf;
-use Bgm\Core\Pdf\PdfCompositionException;
-use Bgm\Core\Pdf\PdfService;
+use Edc\Core\Pdf\Models\GeneratedPdf;
+use Edc\Core\Pdf\PdfCompositionException;
+use Edc\Core\Pdf\PdfService;
 use Illuminate\Bus\Queueable;
 use Illuminate\Contracts\Queue\ShouldBeUnique;
 use Illuminate\Contracts\Queue\ShouldQueue;

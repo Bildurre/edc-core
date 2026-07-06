@@ -1,8 +1,8 @@
 <?php
 
-namespace Bgm\Core\Support\Facades;
+namespace Edc\Core\Support\Facades;
 
-use Bgm\Core\Content\SitemapRegistry;
+use Edc\Core\Content\SitemapRegistry;
 use Illuminate\Support\Facades\Facade;
 
 /**

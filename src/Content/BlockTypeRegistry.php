@@ -1,6 +1,6 @@
 <?php
 
-namespace Bgm\Core\Content;
+namespace Edc\Core\Content;
 
 use InvalidArgumentException;
 

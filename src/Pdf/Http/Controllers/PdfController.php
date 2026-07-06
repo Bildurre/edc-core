@@ -1,11 +1,11 @@
 <?php
 
-namespace Bgm\Core\Pdf\Http\Controllers;
+namespace Edc\Core\Pdf\Http\Controllers;
 
-use Bgm\Core\Pdf\Http\Resources\GeneratedPdfResource;
-use Bgm\Core\Pdf\Models\GeneratedPdf;
-use Bgm\Core\Pdf\PdfExportRegistry;
-use Bgm\Core\Pdf\PdfService;
+use Edc\Core\Pdf\Http\Resources\GeneratedPdfResource;
+use Edc\Core\Pdf\Models\GeneratedPdf;
+use Edc\Core\Pdf\PdfExportRegistry;
+use Edc\Core\Pdf\PdfService;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Http\Request;
@@ -15,7 +15,7 @@ use Symfony\Component\HttpFoundation\StreamedResponse;
 
 /**
  * Gestión de PDF desde el admin (doc 02): listar por export/entidad, generar,
- * regenerar y borrar con un clic. La UI vive en @bgm/admin-kit (PdfManager).
+ * regenerar y borrar con un clic. La UI vive en @edc-motor/admin-kit (PdfManager).
  */
 class PdfController extends Controller
 {

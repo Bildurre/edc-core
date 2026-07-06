@@ -1,6 +1,6 @@
 <?php
 
-namespace Bgm\Core\Previews;
+namespace Edc\Core\Previews;
 
 use Illuminate\Contracts\Filesystem\Filesystem;
 use Illuminate\Database\Eloquent\Model;
@@ -47,7 +47,7 @@ class PreviewService
         $url = $this->renderUrl($key, $entity->getKey(), $locale);
 
         // Captura a un temporal y después al disco de previews.
-        $tmp = tempnam(sys_get_temp_dir(), 'bgm-preview-').'.png';
+        $tmp = tempnam(sys_get_temp_dir(), 'edc-preview-').'.png';
 
         try {
             $this->renderer->capture($url, (int) $size['width'], (int) $size['height'], $tmp);

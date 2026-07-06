@@ -1,9 +1,9 @@
 <?php
 
-namespace Bgm\Core\Content;
+namespace Edc\Core\Content;
 
-use Bgm\Core\Content\Models\Block;
-use Bgm\Core\Content\Models\Page;
+use Edc\Core\Content\Models\Block;
+use Edc\Core\Content\Models\Page;
 
 /**
  * CRUD y reorden de bloques (doc 03). La validación de `settings` la deriva

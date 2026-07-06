@@ -1,8 +1,8 @@
 <?php
 
-namespace Bgm\Core\Auth\Http\Controllers;
+namespace Edc\Core\Auth\Http\Controllers;
 
-use Bgm\Core\Auth\Http\Resources\UserResource;
+use Edc\Core\Auth\Http\Resources\UserResource;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Http\Request;
 use Illuminate\Routing\Controller;

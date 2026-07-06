@@ -1,9 +1,9 @@
 <?php
 
-namespace Bgm\Core\Auth\Http\Controllers;
+namespace Edc\Core\Auth\Http\Controllers;
 
 use App\Models\User;
-use Bgm\Core\Auth\Http\Resources\UserResource;
+use Edc\Core\Auth\Http\Resources\UserResource;
 use Illuminate\Auth\Events\Registered;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Http\Request;
@@ -53,7 +53,7 @@ class AuthController extends Controller
         // correo de verificación al escuchar este evento (DC-14).
         event(new Registered($user));
 
-        $token = $user->createToken('bgm')->plainTextToken;
+        $token = $user->createToken('edc')->plainTextToken;
 
         return response()->json([
             'user' => new UserResource($user->load('roles')),
@@ -85,7 +85,7 @@ class AuthController extends Controller
             rescue(fn () => $user->forceFill(['locale' => app()->getLocale()])->save());
         }
 
-        $token = $user->createToken('bgm')->plainTextToken;
+        $token = $user->createToken('edc')->plainTextToken;
 
         return response()->json([
             'user' => new UserResource($user->load('roles')),
@@ -129,7 +129,7 @@ class AuthController extends Controller
 
         $model = $this->userModel();
         $user = $model::query()->findOrFail($userId);
-        $token = $user->createToken('bgm')->plainTextToken;
+        $token = $user->createToken('edc')->plainTextToken;
 
         return response()->json([
             'user' => new UserResource($user->load('roles')),

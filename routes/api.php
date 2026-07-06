@@ -1,23 +1,23 @@
 <?php
 
-use Bgm\Core\Auth\Http\Controllers\AccountController;
-use Bgm\Core\Auth\Http\Controllers\AuthController;
-use Bgm\Core\Auth\Http\Controllers\EmailVerificationController;
-use Bgm\Core\Auth\Http\Controllers\PasswordResetController;
-use Bgm\Core\Auth\Http\Controllers\UserController;
-use Bgm\Core\Backup\Http\Controllers\BackupController;
-use Bgm\Core\Content\Http\Controllers\BlockController;
-use Bgm\Core\Content\Http\Controllers\BlockTypeController;
-use Bgm\Core\Content\Http\Controllers\ContentUploadController;
-use Bgm\Core\Content\Http\Controllers\PageController;
-use Bgm\Core\Content\Http\Controllers\PublicPageController;
-use Bgm\Core\Content\Http\Controllers\SitemapController;
-use Bgm\Core\Icons\Http\Controllers\IconController;
-use Bgm\Core\Pdf\Http\Controllers\PdfCollectionController;
-use Bgm\Core\Pdf\Http\Controllers\PdfController;
-use Bgm\Core\Previews\Http\Controllers\PreviewController;
-use Bgm\Core\Previews\Http\Controllers\RenderDataController;
-use Bgm\Core\Site\Http\Controllers\SiteSettingsController;
+use Edc\Core\Auth\Http\Controllers\AccountController;
+use Edc\Core\Auth\Http\Controllers\AuthController;
+use Edc\Core\Auth\Http\Controllers\EmailVerificationController;
+use Edc\Core\Auth\Http\Controllers\PasswordResetController;
+use Edc\Core\Auth\Http\Controllers\UserController;
+use Edc\Core\Backup\Http\Controllers\BackupController;
+use Edc\Core\Content\Http\Controllers\BlockController;
+use Edc\Core\Content\Http\Controllers\BlockTypeController;
+use Edc\Core\Content\Http\Controllers\ContentUploadController;
+use Edc\Core\Content\Http\Controllers\PageController;
+use Edc\Core\Content\Http\Controllers\PublicPageController;
+use Edc\Core\Content\Http\Controllers\SitemapController;
+use Edc\Core\Icons\Http\Controllers\IconController;
+use Edc\Core\Pdf\Http\Controllers\PdfCollectionController;
+use Edc\Core\Pdf\Http\Controllers\PdfController;
+use Edc\Core\Previews\Http\Controllers\PreviewController;
+use Edc\Core\Previews\Http\Controllers\RenderDataController;
+use Edc\Core\Site\Http\Controllers\SiteSettingsController;
 use Illuminate\Support\Facades\Route;
 
 /*
@@ -26,8 +26,8 @@ use Illuminate\Support\Facades\Route;
 
 Route::get('api/motor/ping', function () {
     return response()->json([
-        'name' => 'Boardgame Motor',
-        'package' => 'bgm/core',
+        'name' => 'EdC Motor',
+        'package' => 'edc-motor/core',
         'version' => config('motor.version'),
         'default_locale' => config('motor.default_locale'),
         'locales' => array_keys(config('motor.locales', [])),

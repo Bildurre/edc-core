@@ -1,8 +1,8 @@
 <?php
 
-namespace Bgm\Core\Pdf;
+namespace Edc\Core\Pdf;
 
-use Bgm\Core\Previews\PreviewableContract;
+use Edc\Core\Previews\PreviewableContract;
 use Illuminate\Database\Eloquent\Model;
 
 /**
