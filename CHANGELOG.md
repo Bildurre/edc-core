@@ -12,8 +12,11 @@ Backend Laravel reutilizable del motor. Versión de tren con `@edc-motor/ui` y
   `logo` viaja siempre normalizado a mapa y `logo_inline` pasa a ser un mapa
   por idioma con el contenido de los SVG del disco (currentColor hereda el
   acento). El formato antiguo (string) se sigue aceptando y se normaliza al
-  leer. Migración de la SPA: usar los resueltos `logoUrl`/`logoInline` del
-  store del sitio (o resolver el mapa como el título).
+  leer. **Migración del cascarón** (juegos generados con la plantilla ≤0.2.0,
+  sin tocar esos archivos: cópialos de `plantilla/`): `app/src/stores/site.ts`,
+  `app/src/components/AppHeader.vue`,
+  `admin/src/views/settings/SettingsView.vue` y
+  `admin/src/components/pages/PageFormModal.vue`.
 - **Subidas de imagen sin huérfanos**: `POST /admin/content/uploads` guarda
   con el **nombre original** saneado (sufijo `-2`, `-3`… solo si colisiona) y
   borra el fichero sustituido si llega `replaces`; nuevo
