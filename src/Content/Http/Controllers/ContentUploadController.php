@@ -20,7 +20,9 @@ class ContentUploadController extends Controller
     public function store(Request $request): JsonResponse
     {
         $request->validate([
-            'image' => ['required', 'image', 'max:4096'],
+            // allow_svg: la regla image moderna excluye SVG por defecto y el
+            // logo/los fondos lo necesitan. El contenido se sanea abajo.
+            'image' => ['required', 'image:allow_svg', 'max:4096'],
             'replaces' => ['sometimes', 'nullable', 'string', 'max:2048'],
         ]);
 
@@ -40,12 +42,30 @@ class ContentUploadController extends Controller
             $filename = "{$base}-{$i}.{$extension}";
         }
 
-        $path = $file->storeAs('content', $filename, $disk);
+        if ($extension === 'svg') {
+            // El SVG puede acabar inlineado en la web (logo): se guarda ya
+            // saneado — sin scripts, handlers on*, javascript: ni foreignObject.
+            Storage::disk($disk)->put("content/{$filename}", $this->sanitizeSvg($file->get()));
+            $path = "content/{$filename}";
+        } else {
+            $path = $file->storeAs('content', $filename, $disk);
+        }
 
         return response()->json([
             'url' => Storage::disk($disk)->url($path),
             'path' => $path,
         ], 201);
+    }
+
+    /** Saneado básico de SVG: fuera vectores de ejecución, queda el dibujo. */
+    protected function sanitizeSvg(string $svg): string
+    {
+        $svg = preg_replace('#<script\b[^>]*>.*?</script>#is', '', $svg);
+        $svg = preg_replace('#<foreignObject\b[^>]*>.*?</foreignObject>#is', '', $svg);
+        $svg = preg_replace('#\son[a-z]+\s*=\s*("[^"]*"|\'[^\']*\')#i', '', $svg);
+        $svg = preg_replace('#\s(?:xlink:)?href\s*=\s*("javascript:[^"]*"|\'javascript:[^\']*\')#i', '', $svg);
+
+        return $svg;
     }
 
     /** Borra una imagen subida (el botón "quitar" de los inputs de imagen). */

@@ -3,6 +3,16 @@
 Backend Laravel reutilizable del motor. Versión de tren con `@edc-motor/ui` y
 `@edc-motor/admin-kit` (tag `vX.Y.Z` en el monorepo).
 
+## [0.3.1] — 2026-07-07
+
+### Corregido
+
+- **Los SVG vuelven a poder subirse** (logo, fondos, imágenes de bloque): la
+  regla `image` de Laravel excluye SVG por defecto y la subida los rechazaba
+  con "debe ser una imagen". Ahora se admiten (`image:allow_svg`) y se
+  guardan **saneados**: sin `<script>`, handlers `on*`, `javascript:` ni
+  `foreignObject` (el logo se inlinea en la web pública).
+
 ## [0.3.0] — 2026-07-07
 
 ### Cambiado
