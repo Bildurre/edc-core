@@ -3,6 +3,18 @@
 Backend Laravel reutilizable del motor. Versión de tren con `@edc-motor/ui` y
 `@edc-motor/admin-kit` (tag `vX.Y.Z` en el monorepo).
 
+## [0.3.0] — 2026-07-07
+
+### Cambiado
+
+- **Logo traducible** (Configuración): `logo` pasa de una URL única a un mapa
+  `{locale: URL}` con fallback al locale por defecto; en el payload público,
+  `logo` viaja siempre normalizado a mapa y `logo_inline` pasa a ser un mapa
+  por idioma con el contenido de los SVG del disco (currentColor hereda el
+  acento). El formato antiguo (string) se sigue aceptando y se normaliza al
+  leer. Migración de la SPA: usar los resueltos `logoUrl`/`logoInline` del
+  store del sitio (o resolver el mapa como el título).
+
 ## [0.2.0] — 2026-07-06
 
 ### Cambiado

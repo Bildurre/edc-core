@@ -125,7 +125,12 @@ class SiteSettings
     /** Payload para las SPA: ajustes + catálogo de fuentes resuelto. */
     public function payload(): array
     {
-        return [...$this->get(), 'fonts' => $this->fonts(), 'logo_inline' => $this->logoInline()];
+        return [
+            ...$this->get(),
+            'logo' => $this->logoMap(),
+            'fonts' => $this->fonts(),
+            'logo_inline' => $this->logoInlineMap(),
+        ];
     }
 
     /** URL de un fichero de fuente por la ruta con CORS del API. */
@@ -135,20 +140,40 @@ class SiteSettings
     }
 
     /**
-     * Contenido del logo cuando es un SVG del disco del motor: la SPA lo
-     * inlinea y currentColor hereda el acento (el modo aleatorio lo
-     * recolorea, como los logo-path de CDL). Un fichero cross-origin no
-     * serviría (fetch/mask exigen CORS); por eso viaja dentro del payload.
+     * Logo como mapa {locale: URL} (traducible). Tolera el formato antiguo
+     * (un string): se normaliza al locale por defecto. La SPA resuelve el
+     * idioma actual con fallback al por defecto, como el título.
      */
-    protected function logoInline(): ?string
+    public function logoMap(): array
     {
         $logo = $this->get()['logo'] ?? null;
-        if (! $logo || ! str_ends_with($logo, '.svg')) {
+        if (! $logo) {
+            return [];
+        }
+
+        return is_array($logo) ? array_filter($logo) : [config('motor.default_locale', 'es') => $logo];
+    }
+
+    /**
+     * Contenido de cada logo que sea un SVG del disco del motor, por locale:
+     * la SPA lo inlinea y currentColor hereda el acento (el modo aleatorio
+     * lo recolorea, como los logo-path de CDL). Un fichero cross-origin no
+     * serviría (fetch/mask exigen CORS); por eso viaja dentro del payload.
+     */
+    protected function logoInlineMap(): array
+    {
+        return array_filter(array_map(fn (string $url) => $this->inlineSvg($url), $this->logoMap()));
+    }
+
+    /** Contenido de un SVG del disco del motor (o null si no lo es / no está). */
+    protected function inlineSvg(string $url): ?string
+    {
+        if (! str_ends_with($url, '.svg')) {
             return null;
         }
 
         $disk = Storage::disk(config('motor.storage.disk', 'public'));
-        $path = ltrim(parse_url($logo, PHP_URL_PATH) ?: '', '/');
+        $path = ltrim(parse_url($url, PHP_URL_PATH) ?: '', '/');
         $path = preg_replace('#^storage/#', '', $path);
 
         return $path && $disk->exists($path) ? $disk->get($path) : null;

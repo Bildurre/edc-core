@@ -44,7 +44,9 @@ class SiteSettingsController extends Controller
             'title.*' => ['nullable', 'string', 'max:120'],
             'description' => ['sometimes', 'array'],
             'description.*' => ['nullable', 'string', 'max:300'],
-            'logo' => ['sometimes', 'nullable', 'string', 'max:2048'],
+            // Logo traducible: {locale: URL}.
+            'logo' => ['sometimes', 'nullable', 'array'],
+            'logo.*' => ['nullable', 'string', 'max:2048'],
             'favicon' => ['sometimes', 'nullable', 'string', 'max:2048'],
             'accent_mode' => ['sometimes', 'in:fixed,random'],
             'accent_color' => ['sometimes', 'string', $hex],
