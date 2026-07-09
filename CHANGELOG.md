@@ -26,8 +26,10 @@ Backend Laravel reutilizable del motor. Versión de tren con `@edc-motor/ui` y
 
 **Migración del cascarón** (si no tocaste esos archivos, cópialos de
 `plantilla/`): `admin/src/views/pages/PageSingleView.vue` (panel de la página
-en el single) y las claves i18n `pages.blocks.parent` / `parentNone` en
-`admin/src/i18n/locales/*.json`.
+en el single), las claves i18n `pages.blocks.parent` / `parentNone` en
+`admin/src/i18n/locales/*.json` y
+`app/src/assets/scss/components/_app-header.scss` (logo del header más alto
+en ancho: 34 → 44 → 56 → 68px por breakpoint).
 
 ## [0.3.1] — 2026-07-07
 
