@@ -30,7 +30,17 @@ class PageRenderer
 
     protected function build(Page $page, string $locale): array
     {
-        $blocks = $page->blocks()->get()
+        $all = $page->blocks()->orderBy('order')->get();
+
+        // Anidado de un nivel: cada bloque hijo se renderiza justo después
+        // de su padre (mismo criterio que el índice y el admin).
+        $ordered = collect();
+        foreach ($all->whereNull('parent_id') as $parent) {
+            $ordered->push($parent, ...$all->where('parent_id', $parent->id));
+        }
+        $ordered = $ordered->merge($all->diff($ordered)); // huérfanos, al final
+
+        $blocks = $ordered
             ->filter(fn (Block $block) => $this->registry->has($block->type))
             ->map(function (Block $block) use ($locale) {
                 $type = $this->registry->get($block->type);

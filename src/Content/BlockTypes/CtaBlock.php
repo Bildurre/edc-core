@@ -18,6 +18,7 @@ class CtaBlock extends BlockType
     {
         return [
             Field::text('title')->label('Título')->translatable(),
+            Field::text('subtitle')->label('Subtítulo')->translatable(),
             Field::richtext('body')->label('Texto')->translatable(),
             Field::text('button_text')->label('Texto del botón')->translatable()->required(),
             Field::text('button_url')->label('Enlace del botón')->translatable()->required(),
@@ -26,7 +27,7 @@ class CtaBlock extends BlockType
                 'secondary' => 'Inverso (fondo del fondo)',
             ])->label('Estilo del botón'),
             Field::image('image')->label('Imagen')->translatable(),
-            static::imagePositionField(),
+            ...static::imageLayoutFields(),
         ];
     }
 }

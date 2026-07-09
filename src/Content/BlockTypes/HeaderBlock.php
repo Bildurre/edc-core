@@ -17,7 +17,7 @@ class HeaderBlock extends BlockType
     public function fields(): array
     {
         return [
-            Field::text('title')->label('Título')->translatable()->required(),
+            Field::text('title')->label('Título')->translatable(),
             Field::text('subtitle')->label('Subtítulo')->translatable(),
             Field::image('image')->label('Imagen (banner)')->translatable(),
         ];

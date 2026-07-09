@@ -14,6 +14,7 @@ class BlockResource extends JsonResource
             'page_id' => $this->page_id,
             'type' => $this->type,
             'order' => $this->order,
+            'parent_id' => $this->parent_id,
             'settings' => $this->settings ?? (object) [],
             'is_printable' => $this->is_printable,
             'is_indexable' => $this->is_indexable,

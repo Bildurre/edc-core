@@ -24,6 +24,7 @@ class IndexBlock extends BlockType
     {
         return [
             Field::text('title')->label('Título')->translatable(),
+            Field::text('subtitle')->label('Subtítulo')->translatable(),
             Field::boolean('numbered')->label('Numerado'),
         ];
     }
@@ -32,32 +33,42 @@ class IndexBlock extends BlockType
     {
         $registry = app(BlockTypeRegistry::class);
 
-        $items = $block->page->blocks()
+        $blocks = $block->page->blocks()
             ->indexable()
             ->where('order', '>', $block->order)
             ->whereKeyNot($block->id)
+            ->orderBy('order')
             ->get()
-            ->filter(fn (Block $other) => $registry->has($other->type))
-            ->map(function (Block $other) use ($registry, $locale) {
-                $type = $registry->get($other->type);
-                $settings = $type->localizeSettings($other->settings, $locale);
+            ->filter(fn (Block $other) => $registry->has($other->type));
 
-                $label = null;
-                foreach ($type->fields() as $field) {
-                    if ($field->translatable && in_array($field->type, ['text', 'richtext'], true)) {
-                        $value = trim(strip_tags((string) ($settings[$field->key] ?? '')));
-                        if ($value !== '') {
-                            $label = mb_substr($value, 0, 80);
+        $entry = function (Block $other, int $depth) use ($registry, $locale): array {
+            $type = $registry->get($other->type);
+            $settings = $type->localizeSettings($other->settings, $locale);
 
-                            break;
-                        }
+            $label = null;
+            foreach ($type->fields() as $field) {
+                if ($field->translatable && in_array($field->type, ['text', 'richtext'], true)) {
+                    $value = trim(strip_tags((string) ($settings[$field->key] ?? '')));
+                    if ($value !== '') {
+                        $label = mb_substr($value, 0, 80);
+
+                        break;
                     }
                 }
+            }
 
-                return ['id' => $other->id, 'label' => $label ?? $other->type];
-            })
-            ->values()
-            ->all();
+            return ['id' => $other->id, 'label' => $label ?? $other->type, 'depth' => $depth];
+        };
+
+        // Jerarquía de un nivel (parent_id): cada padre con sus hijos
+        // indentados justo debajo, para índices con sangría.
+        $items = [];
+        foreach ($blocks->whereNull('parent_id') as $parent) {
+            $items[] = $entry($parent, 0);
+            foreach ($blocks->where('parent_id', $parent->id) as $child) {
+                $items[] = $entry($child, 1);
+            }
+        }
 
         return ['items' => $items];
     }

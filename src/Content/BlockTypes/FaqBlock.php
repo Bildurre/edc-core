@@ -22,6 +22,7 @@ class FaqBlock extends BlockType
     {
         return [
             Field::text('title')->label('Título')->translatable(),
+            Field::text('subtitle')->label('Subtítulo')->translatable(),
             Field::repeater('items')->label('Preguntas')->min(1)->fields([
                 Field::text('question')->label('Pregunta')->translatable()->required(),
                 Field::richtext('answer')->label('Respuesta')->translatable(),

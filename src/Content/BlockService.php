@@ -25,6 +25,7 @@ class BlockService
             'type' => $type,
             'settings' => $blockType->sanitizeSettings($data['settings'] ?? []),
             'order' => $page->blocks()->max('order') + 1,
+            'parent_id' => $data['parent_id'] ?? null,
             'is_printable' => $data['is_printable'] ?? true,
             'is_indexable' => $data['is_indexable'] ?? true,
         ]);
@@ -43,7 +44,7 @@ class BlockService
         if (array_key_exists('settings', $data)) {
             $block->settings = $blockType->sanitizeSettings($data['settings'] ?? []);
         }
-        foreach (['is_printable', 'is_indexable'] as $field) {
+        foreach (['is_printable', 'is_indexable', 'parent_id'] as $field) {
             if (array_key_exists($field, $data)) {
                 $block->{$field} = $data[$field];
             }

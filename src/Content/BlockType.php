@@ -66,14 +66,14 @@ abstract class BlockType
                 'center' => 'Centrado',
                 'right' => 'Derecha',
                 'justify' => 'Justificado',
-            ])->label('Alineación'),
+            ])->label('Alineación')->default('left'),
             // Anchura del contenido del bloque: coherencia entre bloques y
-            // entre páginas (la columna de lectura la decide cada bloque).
+            // entre páginas. Por defecto 'wide' (~1200px).
             Field::select('width', [
                 'wide' => 'Ancho',
                 'full' => 'Ancho completo',
                 'narrow' => 'Estrecho',
-            ])->label('Anchura del contenido'),
+            ])->label('Anchura del contenido')->default('wide'),
             Field::color('background')->label('Color de fondo'),
         ];
     }
@@ -93,6 +93,38 @@ abstract class BlockType
             'clear-left' => 'Izquierda (el texto la rodea)',
             'clear-right' => 'Derecha (el texto la rodea)',
         ])->label('Posición de la imagen')->default('top');
+    }
+
+    /**
+     * Campos estándar del layout de imagen en columnas: posición + modo de
+     * escalado (el alto lo marca el texto de al lado) + reparto de columnas
+     * izquierda:derecha. Cualquier tipo con un campo image los reutiliza.
+     *
+     * @return Field[]
+     */
+    public static function imageLayoutFields(): array
+    {
+        return [
+            static::imagePositionField(),
+            Field::select('image_fit', [
+                'contain' => 'Contener (entera, sin deformar)',
+                'cover' => 'Cubrir (recorta para llenar)',
+                'fill' => 'Rellenar (deforma para llenar)',
+            ])->label('Escalado de la imagen (en columnas)')->default('contain'),
+            Field::select('image_columns', [
+                '1:1' => '1 : 1',
+                '1:2' => '1 : 2',
+                '2:1' => '2 : 1',
+                '1:3' => '1 : 3',
+                '3:1' => '3 : 1',
+                '2:3' => '2 : 3',
+                '3:2' => '3 : 2',
+                '1:4' => '1 : 4',
+                '4:1' => '4 : 1',
+                '3:4' => '3 : 4',
+                '4:3' => '4 : 3',
+            ])->label('Reparto de columnas (izquierda : derecha)')->default('2:3'),
+        ];
     }
 
     /**

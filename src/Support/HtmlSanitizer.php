@@ -68,7 +68,9 @@ class HtmlSanitizer
             $out .= $doc->saveHTML($child);
         }
 
-        return $out;
+        // TipTap cuela párrafos vacíos (<p> </p>, <p><br></p>) al editar:
+        // fuera — el espaciado entre elementos lo pone el CSS, no los huecos.
+        return preg_replace('#<p>(\s|&nbsp;|<br\s*/?>)*</p>#iu', '', $out);
     }
 
     protected function cleanChildren(DOMNode $node): void

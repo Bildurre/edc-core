@@ -3,6 +3,32 @@
 Backend Laravel reutilizable del motor. Versión de tren con `@edc-motor/ui` y
 `@edc-motor/admin-kit` (tag `vX.Y.Z` en el monorepo).
 
+## [0.4.0] — 2026-07-07
+
+### Añadido
+
+- **Bloques anidados de un nivel** (`parent_id`, validado: misma página, sin
+  encadenar): el hijo se renderiza justo después de su padre y el **índice
+  automático** lo saca **indentado** (`items[].depth`).
+- **Layout de imagen en columnas** (bloques texto y CTA): `image_fit`
+  (contener / cubrir / rellenar, con el alto que marca el texto de al lado) e
+  `image_columns` (reparto izquierda:derecha 1:1 … 4:3).
+- **Subtítulo en todos los bloques** de presentación; el título ya no es
+  obligatorio en ninguno (cabecera incluida).
+
+### Cambiado
+
+- Campos comunes con **valores por defecto**: anchura `wide` (~1200px) y
+  alineación izquierda.
+- El saneado de texto rico **tira los párrafos vacíos** que cuela el editor
+  (`<p> </p>`, `<p><br></p>`).
+- Subida de imágenes hasta **10 MB**.
+
+**Migración del cascarón** (si no tocaste esos archivos, cópialos de
+`plantilla/`): `admin/src/views/pages/PageSingleView.vue` (panel de la página
+en el single) y las claves i18n `pages.blocks.parent` / `parentNone` en
+`admin/src/i18n/locales/*.json`.
+
 ## [0.3.1] — 2026-07-07
 
 ### Corregido

@@ -22,7 +22,7 @@ class ContentUploadController extends Controller
         $request->validate([
             // allow_svg: la regla image moderna excluye SVG por defecto y el
             // logo/los fondos lo necesitan. El contenido se sanea abajo.
-            'image' => ['required', 'image:allow_svg', 'max:4096'],
+            'image' => ['required', 'image:allow_svg', 'max:10240'],
             'replaces' => ['sometimes', 'nullable', 'string', 'max:2048'],
         ]);
 

@@ -18,9 +18,10 @@ class TextBlock extends BlockType
     {
         return [
             Field::text('title')->label('Título')->translatable(),
+            Field::text('subtitle')->label('Subtítulo')->translatable(),
             Field::richtext('body')->label('Texto')->translatable()->required(),
             Field::image('image')->label('Imagen')->translatable(),
-            static::imagePositionField(),
+            ...static::imageLayoutFields(),
         ];
     }
 }
