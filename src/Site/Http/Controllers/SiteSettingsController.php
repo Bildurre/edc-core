@@ -3,6 +3,7 @@
 namespace Edc\Core\Site\Http\Controllers;
 
 use Edc\Core\Site\SiteSettings;
+use Edc\Core\Support\HtmlSanitizer;
 use Illuminate\Http\Request;
 use Illuminate\Routing\Controller;
 use Illuminate\Support\Facades\Storage;
@@ -60,8 +61,18 @@ class SiteSettingsController extends Controller
             'custom_fonts.*.name' => ['required', 'string', 'max:80'],
             'custom_fonts.*.file' => ['required', 'string', 'max:120'],
             'footer_text' => ['sometimes', 'array'],
-            'footer_text.*' => ['nullable', 'string', 'max:500'],
+            'footer_text.*' => ['nullable', 'string', 'max:2000'],
         ]);
+
+        // El pie es texto rico (wysiwyg): saneado por lista blanca, como los
+        // bloques del CRM.
+        if (isset($data['footer_text'])) {
+            $sanitizer = app(HtmlSanitizer::class);
+            $data['footer_text'] = array_map(
+                fn (?string $html) => $sanitizer->clean($html),
+                $data['footer_text'],
+            );
+        }
 
         $this->settings->update($data);
 

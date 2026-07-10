@@ -3,6 +3,14 @@
 Backend Laravel reutilizable del motor. Versión de tren con `@edc-motor/ui` y
 `@edc-motor/admin-kit` (tag `vX.Y.Z` en el monorepo).
 
+## [Sin publicar]
+
+### Cambiado
+
+- **El pie de página es texto rico**: `footer_text` admite el HTML del
+  wysiwyg (hasta 2000 caracteres por idioma) y se **sanea por lista blanca**
+  al guardar, igual que los bloques del CRM.
+
 ## [0.4.0] — 2026-07-07
 
 ### Añadido
