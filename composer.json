@@ -9,7 +9,7 @@
     ],
     "homepage": "https://github.com/bildurre/boardgame_motor",
     "license": "GPL-3.0-only",
-    "version": "0.4.5",
+    "version": "0.4.6",
     "support": {
         "issues": "https://github.com/bildurre/boardgame_motor/issues",
         "source": "https://github.com/bildurre/edc-core"
