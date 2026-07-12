@@ -27,7 +27,16 @@ class UserController extends Controller
                     ->where('name', 'like', "%{$search}%")
                     ->orWhere('email', 'like', "%{$search}%"));
             })
-            ->orderBy('name')
+            ->tap(function ($query) use ($request) {
+                // Contrato de `sort` de los index: alfabético (defecto: los
+                // usuarios se listan por nombre) o por id para latest/oldest.
+                match ($request->string('sort')->toString()) {
+                    'name_desc' => $query->orderByDesc('name'),
+                    'latest' => $query->orderByDesc('id'),
+                    'oldest' => $query->orderBy('id'),
+                    default => $query->orderBy('name'),
+                };
+            })
             ->paginate(20);
 
         return UserResource::collection($users);

@@ -5,6 +5,12 @@ Backend Laravel reutilizable del motor. Versión de tren con `@edc-motor/ui` y
 
 ## [Sin publicar]
 
+### Añadido
+
+- **Ordenación en el listado de usuarios del admin**: `GET /admin/users`
+  acepta `?sort` con el contrato de los index — `name`/omitido (alfabético,
+  el orden de siempre), `name_desc`, `latest` y `oldest` (por id).
+
 ### Corregido
 
 - **La búsqueda de `HasFilters` respeta el locale activo**: `scopeFilter`
