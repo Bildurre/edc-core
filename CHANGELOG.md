@@ -7,6 +7,12 @@ Backend Laravel reutilizable del motor. Versión de tren con `@edc-motor/ui` y
 
 ### Corregido
 
+- **La búsqueda de `HasFilters` respeta el locale activo**: `scopeFilter`
+  hace el LIKE de cada campo de `$searchable` sobre el json del locale
+  activo (`campo->locale`) cuando el campo es traducible (antes buscaba
+  sobre el json crudo y mezclaba locales). Sigue recorriendo TODOS los
+  campos del array, agrupados en un `where` propio para no pisar el resto
+  de filtros (status, etc.).
 - **Guardar una entidad renderizable ya no se cuelga con la cola `sync`**:
   `regeneratePreviews()` difiere la generación a después de la respuesta
   cuando el driver es `sync` (antes Browsershot corría inline en la petición
