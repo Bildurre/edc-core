@@ -9,8 +9,9 @@ Backend Laravel reutilizable del motor. Versión de tren con `@edc-motor/ui` y
 
 - **Ordenación en el catálogo público**: el modo lista de
   `GET /api/catalog/{key}` acepta `?sort` — `name` (ascendente por el `name`
-  del locale activo), `name_desc` (descendente) y `latest`/omitido (id
-  descendente, el comportamiento de siempre). El modo `random` lo ignora.
+  del locale activo), `name_desc` (descendente), `oldest` (id ascendente) y
+  `latest`/omitido (id descendente, el comportamiento de siempre). El modo
+  `random` lo ignora.
 
 ## [0.4.4] — 2026-07-12
 
