@@ -14,8 +14,9 @@ use Illuminate\Routing\Controller;
  * locale por SetLocale. Dos modos:
  *
  * - lista (por defecto): ?page, ?per_page (24, tope 48), ?search (LIKE sobre
- *   el name del locale activo), orden id desc, con meta de paginación.
- * - random: ?mode=random&count=N (1..12, default 4), sin paginar.
+ *   el name del locale activo), ?sort (`name` asc / `name_desc` sobre el name
+ *   del locale activo; default/`latest` = id desc), con meta de paginación.
+ * - random: ?mode=random&count=N (1..12, default 4), sin paginar; ignora ?sort.
  *
  * ?exclude=<id> deja fuera una entidad (los singles excluyen la actual).
  */
@@ -49,8 +50,14 @@ class CatalogController extends Controller
             $query->where("name->{$locale}", 'like', "%{$search}%");
         }
 
+        match ($request->query('sort')) {
+            'name' => $query->orderBy("name->{$locale}"),
+            'name_desc' => $query->orderByDesc("name->{$locale}"),
+            default => $query->orderByDesc('id'),
+        };
+
         $perPage = min(max((int) $request->query('per_page', 24), 1), 48);
-        $paginated = $query->orderByDesc('id')->paginate($perPage);
+        $paginated = $query->paginate($perPage);
 
         return response()->json([
             'key' => $key,
