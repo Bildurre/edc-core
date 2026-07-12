@@ -93,6 +93,11 @@ trait HasPreviewImage
     /**
      * Encola (o ejecuta, con $sync) la regeneración por locale. Por defecto
      * regenera TODAS las previews del modelo (todas sus claves registradas).
+     *
+     * Con el driver de cola 'sync', dispatch() correría INLINE en la petición
+     * (guardar una entidad se colgaba en Browsershot y podía acabar en 500):
+     * en ese caso se difiere a después de la respuesta — el guardado vuelve
+     * al instante y un fallo de render queda en el log, no en la petición.
      */
     public function regeneratePreviews(?array $locales = null, bool $sync = false, ?array $types = null): void
     {
@@ -102,12 +107,15 @@ trait HasPreviewImage
 
         $locales ??= array_keys(config('motor.locales', []));
         $types ??= app(PreviewRegistry::class)->keysFor($this);
+        $syncQueue = config('queue.default') === 'sync';
 
         foreach ($types as $type) {
             foreach ($locales as $locale) {
-                $sync
-                    ? GeneratePreviewJob::dispatchSync(static::class, $this->getKey(), $locale, $type)
-                    : GeneratePreviewJob::dispatch(static::class, $this->getKey(), $locale, $type);
+                match (true) {
+                    $sync => GeneratePreviewJob::dispatchSync(static::class, $this->getKey(), $locale, $type),
+                    $syncQueue => GeneratePreviewJob::dispatchAfterResponse(static::class, $this->getKey(), $locale, $type),
+                    default => GeneratePreviewJob::dispatch(static::class, $this->getKey(), $locale, $type),
+                };
             }
         }
     }

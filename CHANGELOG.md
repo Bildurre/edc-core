@@ -3,6 +3,18 @@
 Backend Laravel reutilizable del motor. Versión de tren con `@edc-motor/ui` y
 `@edc-motor/admin-kit` (tag `vX.Y.Z` en el monorepo).
 
+## [Sin publicar]
+
+### Corregido
+
+- **Guardar una entidad renderizable ya no se cuelga con la cola `sync`**:
+  `regeneratePreviews()` difiere la generación a después de la respuesta
+  cuando el driver es `sync` (antes Browsershot corría inline en la petición
+  y el guardado podía colgarse y acabar en 500). La plantilla pasa a
+  `QUEUE_CONNECTION=database` en su `.env.example` (el `npm run dev` de los
+  juegos ya arranca el worker). **Migración de juegos existentes**: poner
+  `QUEUE_CONNECTION=database` en `api/.env`.
+
 ## [0.4.6] — 2026-07-12
 
 ### Añadido
