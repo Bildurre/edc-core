@@ -13,6 +13,7 @@ use Edc\Core\Content\BlockTypes\FaqBlock;
 use Edc\Core\Content\BlockTypes\HeaderBlock;
 use Edc\Core\Content\BlockTypes\IndexBlock;
 use Edc\Core\Content\BlockTypes\QuoteBlock;
+use Edc\Core\Content\BlockTypes\RelatedBlock;
 use Edc\Core\Content\BlockTypes\TextBlock;
 use Edc\Core\Content\BlockTypes\TextCardBlock;
 use Edc\Core\Content\Models\Page;
@@ -49,7 +50,7 @@ class MotorServiceProvider extends ServiceProvider
         // motor aporta los de presentación; cada juego añade los suyos.
         $this->app->singleton(BlockTypeRegistry::class, function () {
             $registry = new BlockTypeRegistry;
-            foreach ([HeaderBlock::class, TextBlock::class, TextCardBlock::class, QuoteBlock::class, CtaBlock::class, IndexBlock::class, FaqBlock::class] as $type) {
+            foreach ([HeaderBlock::class, TextBlock::class, TextCardBlock::class, QuoteBlock::class, CtaBlock::class, IndexBlock::class, FaqBlock::class, RelatedBlock::class] as $type) {
                 $registry->register($type);
             }
 

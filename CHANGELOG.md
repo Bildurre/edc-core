@@ -3,6 +3,26 @@
 Backend Laravel reutilizable del motor. Versión de tren con `@edc-motor/ui` y
 `@edc-motor/admin-kit` (tag `vX.Y.Z` en el monorepo).
 
+## [Sin publicar]
+
+### Añadido
+
+- **Catálogo público genérico**: `GET /api/catalog/{key}` sirve cualquier
+  entidad del registry de previews (404 si la clave no existe), sin auth y
+  solo publicadas (si el modelo usa `HasPublishedState`). Modo lista con
+  `?page`/`?per_page` (24, tope 48), `?search` (sobre el `name` del locale
+  activo) y meta de paginación estándar; modo `?mode=random&count=N` (1..12,
+  default 4) sin paginar; `?exclude=<id>` para que los singles dejen fuera la
+  entidad actual. Ítem: `{id, name, slug|null, preview|null}`
+  (`Edc\Core\Previews\CatalogItem`).
+- **Bloque `related`** (categoría `data`, el primero del motor): rejilla de
+  entidades relacionadas de cualquier clave del registry de previews —
+  título/subtítulo, entidad (opciones en vivo del registry), modo
+  `latest|random`, `count` (1..12, default 4) y botón opcional al índice.
+  `resolveData` devuelve `{key, items}` en formato de ítem de catálogo y no
+  revienta si la clave se desregistra. Requiere versión nueva de
+  `@edc-motor/ui` (componente `BlockRelated`).
+
 ## [0.4.3] — 2026-07-11
 
 - Sin cambios propios: versión de tren.

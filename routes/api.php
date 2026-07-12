@@ -15,6 +15,7 @@ use Edc\Core\Content\Http\Controllers\SitemapController;
 use Edc\Core\Icons\Http\Controllers\IconController;
 use Edc\Core\Pdf\Http\Controllers\PdfCollectionController;
 use Edc\Core\Pdf\Http\Controllers\PdfController;
+use Edc\Core\Previews\Http\Controllers\CatalogController;
 use Edc\Core\Previews\Http\Controllers\PreviewController;
 use Edc\Core\Previews\Http\Controllers\RenderDataController;
 use Edc\Core\Site\Http\Controllers\SiteSettingsController;
@@ -75,6 +76,11 @@ Route::prefix('api')->middleware('api')->group(function () {
 
     // Biblioteca de iconos (para el selector del editor WYSIWYG).
     Route::get('icons', [IconController::class, 'index']);
+
+    // Catálogo público genérico: cualquier entidad del registry de previews,
+    // paginado con búsqueda o en modo aleatorio. Solo publicadas.
+    Route::get('catalog/{key}', [CatalogController::class, 'show'])
+        ->where('key', '[a-z0-9\-]+');
 
     // Datos para la ruta /_render de la SPA: exige token de servicio (DC-04).
     Route::get('render/{entity}/{id}', [RenderDataController::class, 'show'])
