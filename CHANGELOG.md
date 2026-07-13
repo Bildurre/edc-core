@@ -3,9 +3,35 @@
 Backend Laravel reutilizable del motor. Versión de tren con `@edc-motor/ui` y
 `@edc-motor/admin-kit` (tag `vX.Y.Z` en el monorepo).
 
+<<<<<<< HEAD
 ## [0.4.7] — 2026-07-12
 
 - Sin cambios propios: versión de tren.
+=======
+## [Sin publicar]
+
+### Añadido
+
+- **Ordenación en el listado de usuarios del admin**: `GET /admin/users`
+  acepta `?sort` con el contrato de los index — `name`/omitido (alfabético,
+  el orden de siempre), `name_desc`, `latest` y `oldest` (por id).
+
+### Corregido
+
+- **La búsqueda de `HasFilters` respeta el locale activo**: `scopeFilter`
+  hace el LIKE de cada campo de `$searchable` sobre el json del locale
+  activo (`campo->locale`) cuando el campo es traducible (antes buscaba
+  sobre el json crudo y mezclaba locales). Sigue recorriendo TODOS los
+  campos del array, agrupados en un `where` propio para no pisar el resto
+  de filtros (status, etc.).
+- **Guardar una entidad renderizable ya no se cuelga con la cola `sync`**:
+  `regeneratePreviews()` difiere la generación a después de la respuesta
+  cuando el driver es `sync` (antes Browsershot corría inline en la petición
+  y el guardado podía colgarse y acabar en 500). La plantilla pasa a
+  `QUEUE_CONNECTION=database` en su `.env.example` (el `npm run dev` de los
+  juegos ya arranca el worker). **Migración de juegos existentes**: poner
+  `QUEUE_CONNECTION=database` en `api/.env`.
+>>>>>>> claude/choique-disable-language-abgt8x
 
 ## [0.4.6] — 2026-07-12
 

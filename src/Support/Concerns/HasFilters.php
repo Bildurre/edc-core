@@ -16,9 +16,17 @@ trait HasFilters
         $search = trim((string) ($filters['search'] ?? ''));
         if ($search !== '') {
             $columns = property_exists($this, 'searchable') ? $this->searchable : [];
-            $query->where(function (Builder $query) use ($columns, $search) {
+            $locale = app()->getLocale();
+            // Agrupado para no romper otros wheres del listado (status, etc.).
+            $query->where(function (Builder $query) use ($columns, $search, $locale) {
                 foreach ($columns as $column) {
-                    $query->orWhere($column, 'like', "%{$search}%");
+                    // Columna traducible: busca SOLO en el json del locale
+                    // activo (antes el LIKE sobre el json crudo mezclaba locales).
+                    $target = method_exists($this, 'isTranslatableAttribute')
+                        && $this->isTranslatableAttribute($column)
+                            ? "{$column}->{$locale}"
+                            : $column;
+                    $query->orWhere($target, 'like', "%{$search}%");
                 }
             });
         }
