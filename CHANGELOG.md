@@ -3,11 +3,6 @@
 Backend Laravel reutilizable del motor. Versión de tren con `@edc-motor/ui` y
 `@edc-motor/admin-kit` (tag `vX.Y.Z` en el monorepo).
 
-<<<<<<< HEAD
-## [0.4.7] — 2026-07-12
-
-- Sin cambios propios: versión de tren.
-=======
 ## [0.4.8] — 2026-07-13
 
 ### Añadido
@@ -31,7 +26,10 @@ Backend Laravel reutilizable del motor. Versión de tren con `@edc-motor/ui` y
   `QUEUE_CONNECTION=database` en su `.env.example` (el `npm run dev` de los
   juegos ya arranca el worker). **Migración de juegos existentes**: poner
   `QUEUE_CONNECTION=database` en `api/.env`.
->>>>>>> claude/choique-disable-language-abgt8x
+
+## [0.4.7] — 2026-07-12
+
+- Sin cambios propios: versión de tren.
 
 ## [0.4.6] — 2026-07-12
 
