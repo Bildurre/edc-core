@@ -8,7 +8,7 @@ Backend Laravel reutilizable del motor. Versión de tren con `@edc-motor/ui` y
 
 - Sin cambios propios: versión de tren.
 =======
-## [Sin publicar]
+## [0.4.8] — 2026-07-13
 
 ### Añadido
 
