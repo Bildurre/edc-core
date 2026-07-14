@@ -98,6 +98,14 @@ trait HasPreviewImage
      * (guardar una entidad se colgaba en Browsershot y podía acabar en 500):
      * en ese caso se difiere a después de la respuesta — el guardado vuelve
      * al instante y un fallo de render queda en el log, no en la petición.
+     *
+     * En tests NO se difiere: dispatchAfterResponse() apunta a los
+     * terminating callbacks, que en la suite no corren al guardar fuera de
+     * una petición y no se limpian entre peticiones simuladas (renders
+     * tardíos o duplicados), y además esquiva Queue::fake(). Con dispatch()
+     * la cola 'sync' de tests ejecuta inline (determinista) y los asserts de
+     * pushes funcionan. El colgado que evita el diferido no existe en tests
+     * (el renderer es falso), así que el guard no desactiva nada real.
      */
     public function regeneratePreviews(?array $locales = null, bool $sync = false, ?array $types = null): void
     {
@@ -107,7 +115,7 @@ trait HasPreviewImage
 
         $locales ??= array_keys(config('motor.locales', []));
         $types ??= app(PreviewRegistry::class)->keysFor($this);
-        $syncQueue = config('queue.default') === 'sync';
+        $syncQueue = config('queue.default') === 'sync' && ! app()->runningUnitTests();
 
         foreach ($types as $type) {
             foreach ($locales as $locale) {

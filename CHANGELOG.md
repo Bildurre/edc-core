@@ -3,6 +3,21 @@
 Backend Laravel reutilizable del motor. Versión de tren con `@edc-motor/ui` y
 `@edc-motor/admin-kit` (tag `vX.Y.Z` en el monorepo).
 
+## [Sin publicar]
+
+### Corregido
+
+- **El diferido de previews con la cola `sync` ya no se aplica en tests**:
+  `regeneratePreviews()` solo usa `dispatchAfterResponse()` fuera de la
+  suite (guardado por `app()->runningUnitTests()`). En tests, el diferido de
+  0.4.8 apuntaba a los terminating callbacks — que no corren al guardar un
+  modelo fuera de una petición, no se limpian entre peticiones simuladas y
+  esquivan `Queue::fake()` — y hacía la suite no determinista (renders
+  tardíos, duplicados o posteriores a un borrado). Con la cola `sync` de
+  tests el despacho vuelve a ser inline, como antes de 0.4.8; en
+  instalaciones reales nada cambia (con `sync` se sigue difiriendo a después
+  de la respuesta para que guardar nunca se cuelgue).
+
 ## [0.4.10] — 2026-07-14
 
 - Sin cambios propios: versión de tren.
