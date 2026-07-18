@@ -18,6 +18,12 @@ use Spatie\Backup\Tasks\Monitor\HealthChecks\MaximumStorageInMegabytes;
  */
 class MotorBackup
 {
+    /**
+     * Flag de "copia manual en curso" (la pone el POST del admin y la limpia
+     * RunBackupJob): el listado lo expone como `pending` y la vista sondea.
+     */
+    public const PENDING_CACHE_KEY = 'motor:backup:pending';
+
     /** Aplica la config de spatie/laravel-backup a partir de motor.backup. */
     public static function applyConfig(): void
     {

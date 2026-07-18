@@ -129,9 +129,8 @@ return [
         'keep_days' => env('MOTOR_BACKUP_KEEP_DAYS', 14),
         // Incluir la carpeta de media (storage/app/public) en el zip.
         'include_media' => env('MOTOR_BACKUP_MEDIA', true),
-        // BBDD grandes (DC-16): crear la copia manual EN COLA (el admin
-        // sondea el listado) en vez de esperar al zip en la petición.
-        'queue' => env('MOTOR_BACKUP_QUEUE', false),
+        // Tamaño máximo (MB) de una copia SUBIDA desde el admin.
+        'upload_max_mb' => env('MOTOR_BACKUP_UPLOAD_MAX_MB', 500),
     ],
 
     // Auth (DC-13, DC-14).

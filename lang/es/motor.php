@@ -24,4 +24,6 @@ return [
     'password_reset_done' => 'Contraseña restablecida: ya puedes entrar.',
     'collection_token_missing' => 'Falta el token de la colección (invitado) o la sesión.',
     'users_cannot_delete_self' => 'No puedes borrar tu propio usuario.',
+    'backup_upload_invalid' => 'El archivo no es una copia de seguridad válida: debe ser un zip con la base de datos dentro (dump SQL o fichero SQLite).',
+    'backup_restore_no_database' => 'La copia no contiene ninguna base de datos restaurable.',
 ];

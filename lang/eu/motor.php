@@ -24,4 +24,6 @@ return [
     'password_reset_done' => 'Pasahitza berrezarrita: sartu zaitezke.',
     'collection_token_missing' => 'Bildumaren tokena (gonbidatua) edo saioa falta da.',
     'users_cannot_delete_self' => 'Ezin duzu zure erabiltzailea ezabatu.',
+    'backup_upload_invalid' => 'Fitxategia ez da babeskopia baliagarria: datu-basea barruan duen zip bat izan behar du (SQL dump edo SQLite fitxategia).',
+    'backup_restore_no_database' => 'Kopiak ez du datu-base leheneragarririk.',
 ];

@@ -24,4 +24,6 @@ return [
     'password_reset_done' => 'Password reset: you can log in now.',
     'collection_token_missing' => 'Missing collection token (guest) or session.',
     'users_cannot_delete_self' => 'You cannot delete your own user.',
+    'backup_upload_invalid' => 'The file is not a valid backup: it must be a zip containing the database (SQL dump or SQLite file).',
+    'backup_restore_no_database' => 'The backup does not contain any restorable database.',
 ];

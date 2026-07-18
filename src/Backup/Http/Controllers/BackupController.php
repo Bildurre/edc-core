@@ -2,22 +2,25 @@
 
 namespace Edc\Core\Backup\Http\Controllers;
 
+use Edc\Core\Backup\BackupRestorer;
 use Edc\Core\Backup\BackupSettings;
 use Edc\Core\Backup\Jobs\RunBackupJob;
+use Edc\Core\Backup\MotorBackup;
 use Illuminate\Http\Request;
 use Illuminate\Routing\Controller;
-use Illuminate\Support\Facades\Artisan;
+use Illuminate\Support\Facades\Cache;
 use Illuminate\Support\Facades\Storage;
+use Illuminate\Support\Str;
 use Illuminate\Validation\Rule;
 use Spatie\Backup\BackupDestination\Backup;
 use Spatie\Backup\BackupDestination\BackupDestination;
 
 /**
- * Gestor de copias de seguridad (doc 06): listar, crear, descargar y borrar
- * los zips que genera spatie/laravel-backup, y configurar la copia
- * AUTOMÁTICA (activada, frecuencia, hora, retención) que programa el motor.
- * Protegido por manage-web. DC-16: crear es síncrono (BBDD grandes irían en
- * cola; se documenta).
+ * Gestor de copias de seguridad (doc 06): listar, crear, subir, restaurar,
+ * descargar y borrar los zips que genera spatie/laravel-backup, y configurar
+ * la copia AUTOMÁTICA (activada, frecuencia, hora, retención) que programa
+ * el motor. Protegido por manage-web. DC-16: crear va SIEMPRE en cola (la
+ * petición no espera al zip; la vista sondea el listado con `pending`).
  */
 class BackupController extends Controller
 {
@@ -25,25 +28,96 @@ class BackupController extends Controller
 
     public function index()
     {
-        return response()->json(['data' => $this->list(), 'schedule' => $this->settings->get()]);
+        return response()->json([
+            'data' => $this->list(),
+            'schedule' => $this->settings->get(),
+            // Hay una copia manual en curso: la vista sondea hasta que acabe.
+            'pending' => Cache::has(MotorBackup::PENDING_CACHE_KEY),
+        ]);
     }
 
     public function store()
     {
-        // BBDD grandes (DC-16): en cola; la vista sondea el listado hasta
-        // que aparece la copia nueva.
-        if (config('motor.backup.queue')) {
-            RunBackupJob::dispatch();
+        // SIEMPRE en cola (DC-16): la petición vuelve al momento y el worker
+        // crea el zip. Con la cola 'sync' (instalaciones pequeñas) se difiere
+        // a después de la respuesta — mismo patrón (y mismo guard de tests)
+        // que HasPreviewImage::regeneratePreviews(): en la suite el diferido
+        // apuntaría a terminating callbacks que no corren y esquivaría
+        // Queue::fake(); con dispatch() la cola sync de tests ejecuta inline.
+        $filename = 'manual-'.now()->format('Y-m-d-H-i-s').'.zip';
 
-            return response()->json(['data' => $this->list(), 'queued' => true], 202);
-        }
+        Cache::put(MotorBackup::PENDING_CACHE_KEY, $filename, now()->addMinutes(15));
 
-        // --disable-notifications: el propio admin ya informa del resultado.
-        $exit = Artisan::call('backup:run', ['--disable-notifications' => true]);
+        $syncQueue = config('queue.default') === 'sync' && ! app()->runningUnitTests();
+        $syncQueue
+            ? RunBackupJob::dispatchAfterResponse($filename)
+            : RunBackupJob::dispatch($filename);
 
-        abort_if($exit !== 0, 500, trim(Artisan::output()) ?: 'backup:run failed');
+        return response()->json([
+            'data' => $this->list(),
+            'queued' => true,
+            'pending' => Cache::has(MotorBackup::PENDING_CACHE_KEY),
+        ], 202);
+    }
+
+    /**
+     * Sube una copia externa (zip de spatie/laravel-backup o equivalente):
+     * se valida que sea un zip con una BBDD restaurable dentro (dump SQL o
+     * fichero SQLite) y se guarda en el destino con el prefijo `upload-`
+     * (el listado la marca con origen "subida").
+     */
+    public function upload(Request $request)
+    {
+        $request->validate([
+            'file' => [
+                'required', 'file', 'extensions:zip',
+                'max:'.((int) config('motor.backup.upload_max_mb', 500)) * 1024,
+            ],
+        ]);
+
+        $upload = $request->file('file');
+
+        abort_unless(
+            app(BackupRestorer::class)->containsDatabase($upload->getRealPath()),
+            422,
+            __('motor::motor.backup_upload_invalid'),
+        );
+
+        $base = Str::slug(pathinfo($upload->getClientOriginalName(), PATHINFO_FILENAME)) ?: 'copia';
+        $name = 'upload-'.$base.'-'.now()->format('Y-m-d-H-i-s').'.zip';
+
+        Storage::disk($this->disk())->putFileAs(config('backup.backup.name'), $upload, $name);
 
         return response()->json(['data' => $this->list()], 201);
+    }
+
+    /**
+     * RESTAURA una copia: importa la BBDD del zip MACHACANDO la actual (la
+     * SPA pide doble confirmación). Solo la base de datos: los archivos de
+     * storage que pueda traer el zip no se tocan (ver BackupRestorer).
+     */
+    public function restore(string $file)
+    {
+        $backup = $this->find($file);
+
+        // El zip puede vivir en un disco remoto (S3): cópialo a un temporal
+        // local para poder abrirlo con ZipArchive.
+        $temp = tempnam(sys_get_temp_dir(), 'motor-restore-');
+        $source = Storage::disk($this->disk())->readStream($backup->path());
+        $target = fopen($temp, 'wb');
+        stream_copy_to_stream($source, $target);
+        fclose($target);
+        if (is_resource($source)) {
+            fclose($source);
+        }
+
+        try {
+            $restored = app(BackupRestorer::class)->restore($temp);
+        } finally {
+            @unlink($temp);
+        }
+
+        return response()->json(['restored' => $restored]);
     }
 
     /** Configura la copia automática (la aplica el scheduler del motor). */
@@ -82,9 +156,24 @@ class BackupController extends Controller
                 'file' => basename($backup->path()),
                 'date' => $backup->date()->toIso8601String(),
                 'size' => $backup->sizeInBytes(),
+                'origin' => $this->origin(basename($backup->path())),
             ])
             ->values()
             ->all();
+    }
+
+    /**
+     * Origen de una copia, derivado del prefijo del nombre (sin estado
+     * aparte): `manual-` las crea el botón del admin, `upload-` las subidas;
+     * el resto (nombre-fecha de spatie) son de la copia automática.
+     */
+    protected function origin(string $file): string
+    {
+        return match (true) {
+            str_starts_with($file, 'manual-') => 'manual',
+            str_starts_with($file, 'upload-') => 'upload',
+            default => 'auto',
+        };
     }
 
     protected function find(string $file): Backup

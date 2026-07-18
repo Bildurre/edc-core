@@ -163,12 +163,15 @@ Route::prefix('api')->middleware('api')->group(function () {
                 Route::post('admin/settings/fonts', [SiteSettingsController::class, 'storeFont']);
             });
 
-            // Copias de seguridad (doc 06): listar, crear, descargar, borrar
-            // y configurar la copia automática.
+            // Copias de seguridad (doc 06): listar, crear (en cola), subir,
+            // restaurar, descargar, borrar y configurar la copia automática.
             Route::prefix('admin/backups')->middleware('can:manage-web')->group(function () {
                 Route::get('/', [BackupController::class, 'index']);
                 Route::post('/', [BackupController::class, 'store']);
+                Route::post('upload', [BackupController::class, 'upload']);
                 Route::put('schedule', [BackupController::class, 'updateSchedule']);
+                Route::post('{file}/restore', [BackupController::class, 'restore'])
+                    ->where('file', '[A-Za-z0-9._\-]+');
                 Route::get('{file}/download', [BackupController::class, 'download'])
                     ->where('file', '[A-Za-z0-9._\-]+');
                 Route::delete('{file}', [BackupController::class, 'destroy'])

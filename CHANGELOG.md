@@ -3,6 +3,39 @@
 Backend Laravel reutilizable del motor. Versión de tren con `@edc-motor/ui` y
 `@edc-motor/admin-kit` (tag `vX.Y.Z` en el monorepo).
 
+## [Sin publicar]
+
+### Añadido
+
+- **Subir copias de seguridad**: `POST api/admin/backups/upload` importa un
+  zip de copia (spatie/laravel-backup o equivalente) validando extensión,
+  tamaño (nueva clave `motor.backup.upload_max_mb`, 500 MB por defecto) y
+  estructura — debe traer una BBDD dentro: dump SQL en `db-dumps/` o fichero
+  `.sqlite`. Se guarda en el destino con prefijo `upload-` y el listado la
+  marca con `origin: upload` ("subida").
+- **Restaurar una copia**: `POST api/admin/backups/{file}/restore` importa
+  la BBDD del zip MACHACANDO la actual (nuevo `BackupRestorer`; el admin
+  pide doble confirmación). Con SQLite en fichero se sustituye el fichero de
+  la BBDD tal cual (así empaqueta `MotorBackup`); con el resto de drivers se
+  vacía el esquema tabla a tabla y se ejecuta el dump (`db-dumps/*.sql` del
+  driver, o el primero). Límites documentados (también en el panel): SOLO la
+  base de datos — el storage que traiga el zip no se restaura —, dumps sin
+  comprimir, y puede invalidar los tokens de sesión vigentes. Limpia la
+  caché al acabar; 422 si el zip no trae ninguna BBDD.
+- **Origen de cada copia en el listado** (`origin`): `manual` (las del botón
+  del admin, prefijo `manual-`), `upload` (subidas) o `auto` (nombre-fecha
+  del scheduler). Derivado del nombre del fichero, sin estado aparte.
+
+### Cambiado
+
+- **Crear copia SIEMPRE en cola (DC-16)**: el POST ya no genera el zip en la
+  petición (bloqueaba la web mientras tanto) — despacha `RunBackupJob` (202
+  + `queued`) y el listado expone `pending` (flag en caché con TTL de 15 min
+  que el job limpia al acabar) para que el admin sondee sin bloquear. Con la
+  cola `sync` se difiere a después de la respuesta, con el mismo guard de
+  tests que `HasPreviewImage::regeneratePreviews()`. La clave
+  `motor.backup.queue` desaparece (ya no hay modo síncrono).
+
 ## [0.4.15] — 2026-07-17
 
 - Sin cambios propios: versión de tren.
