@@ -3,6 +3,13 @@
 Backend Laravel reutilizable del motor. Versión de tren con `@edc-motor/ui` y
 `@edc-motor/admin-kit` (tag `vX.Y.Z` en el monorepo).
 
+## [Sin publicar]
+
+### Cambiado
+
+- **`QuoteBlock`: el autor se alinea a la DERECHA por defecto**
+  (`author_align`; los bloques con valor guardado no cambian).
+
 ## [0.4.21] — 2026-07-19
 
 - Sin cambios propios: versión de tren.

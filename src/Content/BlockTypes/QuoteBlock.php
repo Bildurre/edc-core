@@ -25,7 +25,7 @@ class QuoteBlock extends BlockType
                 'left' => 'Izquierda',
                 'center' => 'Centrado',
                 'right' => 'Derecha',
-            ])->label('Alineación del autor')->default('left'),
+            ])->label('Alineación del autor')->default('right'),
             Field::image('image')->label('Imagen (retrato del autor)')->translatable(),
         ];
     }
