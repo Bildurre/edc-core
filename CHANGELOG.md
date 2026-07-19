@@ -7,6 +7,14 @@ Backend Laravel reutilizable del motor. Versión de tren con `@edc-motor/ui` y
 
 ### Añadido
 
+- **Quitar la imagen de una entidad al guardar** (`HasImage`):
+  `setImageFromRequest()` entiende `remove_image` (booleano; con clave
+  propia, `remove_{clave}`) — sin fichero en la petición y con el flag a
+  verdadero, vacía la colección `image` (el fichero desaparece del disco).
+  Así el "quitar imagen" de los formularios viaja DIFERIDO con el guardado,
+  igual que la subida (multipart en el store/update de la entidad); los
+  juegos no cambian nada en el backend: el trait lo resuelve.
+
 - **Subir copias de seguridad**: `POST api/admin/backups/upload` importa un
   zip de copia (spatie/laravel-backup o equivalente) validando extensión,
   tamaño (nueva clave `motor.backup.upload_max_mb`, 500 MB por defecto) y

@@ -34,11 +34,19 @@ trait HasImage
         return url(parse_url($url, PHP_URL_PATH));
     }
 
-    /** Sube la imagen si viene en la petición (clave 'image'). */
+    /**
+     * Aplica la imagen que viaje en la petición de guardado (clave 'image'):
+     * fichero nuevo => sustituye (la colección singleFile borra la anterior
+     * del disco); 'remove_image' verdadero sin fichero => la quita. Los
+     * formularios difieren la imagen hasta el submit, así que todo cambio
+     * (subir o quitar) llega aquí SOLO al guardar.
+     */
     public function setImageFromRequest(Request $request, string $key = 'image'): void
     {
         if ($request->hasFile($key)) {
             $this->addMediaFromRequest($key)->toMediaCollection('image');
+        } elseif ($request->boolean("remove_{$key}")) {
+            $this->clearMediaCollection('image');
         }
     }
 }
