@@ -67,6 +67,21 @@ abstract class BlockType
                 'right' => 'Derecha',
                 'justify' => 'Justificado',
             ])->label('Alineación')->default('justify'),
+            // Título y subtítulo pueden desmarcarse de la alineación del
+            // bloque; "La del bloque" (default) deja el comportamiento de
+            // siempre (con justificado se quedan a la izquierda).
+            Field::select('title_align', [
+                'inherit' => 'La del bloque',
+                'left' => 'Izquierda',
+                'center' => 'Centrado',
+                'right' => 'Derecha',
+            ])->label('Alineación del título')->default('inherit'),
+            Field::select('subtitle_align', [
+                'inherit' => 'La del bloque',
+                'left' => 'Izquierda',
+                'center' => 'Centrado',
+                'right' => 'Derecha',
+            ])->label('Alineación del subtítulo')->default('inherit'),
             // Anchura del contenido del bloque: coherencia entre bloques y
             // entre páginas. Por defecto 'wide' (~1200px).
             Field::select('width', [

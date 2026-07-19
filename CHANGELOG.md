@@ -3,6 +3,17 @@
 Backend Laravel reutilizable del motor. Versión de tren con `@edc-motor/ui` y
 `@edc-motor/admin-kit` (tag `vX.Y.Z` en el monorepo).
 
+## [Sin publicar]
+
+### Cambiado
+
+- **Alineación propia de título y subtítulo** (campos comunes
+  `title_align` / `subtitle_align`): izquierda/centrado/derecha, con "La
+  del bloque" por defecto (el comportamiento de siempre; los bloques
+  guardados no cambian).
+- **`QuoteBlock`: alineación del autor**: nuevo select `author_align`
+  (izquierda/centrado/derecha, por defecto izquierda).
+
 ## [0.4.19] — 2026-07-19
 
 ### Cambiado

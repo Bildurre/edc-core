@@ -21,6 +21,11 @@ class QuoteBlock extends BlockType
             Field::textarea('subtitle')->label('Subtítulo')->translatable(),
             Field::richtext('quote')->label('Cita')->translatable()->required(),
             Field::text('author')->label('Autor')->translatable(),
+            Field::select('author_align', [
+                'left' => 'Izquierda',
+                'center' => 'Centrado',
+                'right' => 'Derecha',
+            ])->label('Alineación del autor')->default('left'),
             Field::image('image')->label('Imagen (retrato del autor)')->translatable(),
         ];
     }
