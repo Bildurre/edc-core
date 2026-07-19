@@ -10,9 +10,11 @@ use Edc\Core\Previews\PreviewRegistry;
 
 /**
  * Rejilla de entidades relacionadas: cualquier entidad del registry de
- * previews, las N más recientes o al azar, con botón opcional al índice.
+ * previews, las más recientes o al azar, con botón opcional al índice.
  * Único bloque 'data' del motor: no sabe qué es cada entidad, solo pinta
  * ítems de catálogo (CatalogItem); los enlaces los resuelve la app.
+ * Trae SIEMPRE 6 ítems: el grid del ui decide cuántos enseña en cada ancho
+ * (4 en 2×2 → 6 en 3×2 → 4 en 4×1 → 5 en 5×1) para no dejar filas cojas.
  *
  * Ojo: resolveData se cachea con la página (TTL motor.content.cache_ttl),
  * así que 'random' rota solo al expirar la caché — aceptado.
@@ -41,7 +43,6 @@ class RelatedBlock extends BlockType
                 'latest' => 'Más recientes',
                 'random' => 'Aleatorias',
             ])->label('Modo'),
-            Field::number('count')->label('Número de elementos')->default(4)->min(1)->max(12),
             Field::boolean('with_button')->label('Con botón al índice'),
             Field::text('button_label')->label('Texto del botón')->translatable(),
         ];
@@ -64,11 +65,10 @@ class RelatedBlock extends BlockType
             ? $query->inRandomOrder()
             : $query->orderByDesc('id');
 
-        $count = min(max((int) ($settings['count'] ?? 4), 1), 12);
-
         return [
             'key' => $key,
-            'items' => $query->limit($count)->get()
+            // 6 fijos: el grid del ui recorta a 4/6/4/5 según el ancho.
+            'items' => $query->limit(6)->get()
                 ->map(fn ($model) => CatalogItem::fromModel($model, $key, $locale))
                 ->values()
                 ->all(),

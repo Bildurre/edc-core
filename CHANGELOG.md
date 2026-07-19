@@ -3,6 +3,16 @@
 Backend Laravel reutilizable del motor. Versión de tren con `@edc-motor/ui` y
 `@edc-motor/admin-kit` (tag `vX.Y.Z` en el monorepo).
 
+## [Sin publicar]
+
+### Cambiado
+
+- **`RelatedBlock` sin campo "Número de elementos"**: `resolveData` trae
+  SIEMPRE 6 ítems y es el grid del ui quien decide cuántos enseña por ancho
+  (4 en 2×2 → 6 en 3×2 → 4 en 4×1 → 5 en 5×1) para que las filas salgan
+  siempre completas. El `count` de bloques ya guardados se ignora y se
+  descarta al volver a guardar (la validación deriva del esquema).
+
 ## [0.4.17] — 2026-07-19
 
 - Sin cambios propios: versión de tren.
