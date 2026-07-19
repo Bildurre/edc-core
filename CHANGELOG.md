@@ -3,6 +3,20 @@
 Backend Laravel reutilizable del motor. Versión de tren con `@edc-motor/ui` y
 `@edc-motor/admin-kit` (tag `vX.Y.Z` en el monorepo).
 
+## [Sin publicar]
+
+### Cambiado
+
+- **El subtítulo de TODOS los bloques pasa a textarea** (`Field::textarea`):
+  admite saltos de línea (el ui los respeta con `pre-line`). Los juegos con
+  bloques propios que tengan subtítulo deberían hacer el mismo cambio.
+- **Alineación por defecto de los bloques: JUSTIFICADO** (campo común
+  `align`): los bloques guardados con una alineación explícita no cambian.
+- **`CtaBlock`: alineación y tamaño del botón**: nuevo select
+  `button_align` (izquierda/centrado/derecha, por defecto izquierda — en
+  formato estrecho el ui centra siempre) y boolean `button_large` (más
+  padding interior).
+
 ## [0.4.18] — 2026-07-19
 
 ### Cambiado

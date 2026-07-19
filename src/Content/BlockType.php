@@ -66,7 +66,7 @@ abstract class BlockType
                 'center' => 'Centrado',
                 'right' => 'Derecha',
                 'justify' => 'Justificado',
-            ])->label('Alineación')->default('left'),
+            ])->label('Alineación')->default('justify'),
             // Anchura del contenido del bloque: coherencia entre bloques y
             // entre páginas. Por defecto 'wide' (~1200px).
             Field::select('width', [

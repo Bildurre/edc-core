@@ -18,7 +18,7 @@ class QuoteBlock extends BlockType
     {
         return [
             Field::text('title')->label('Título')->translatable(),
-            Field::text('subtitle')->label('Subtítulo')->translatable(),
+            Field::textarea('subtitle')->label('Subtítulo')->translatable(),
             Field::richtext('quote')->label('Cita')->translatable()->required(),
             Field::text('author')->label('Autor')->translatable(),
             Field::image('image')->label('Imagen (retrato del autor)')->translatable(),

@@ -24,7 +24,7 @@ class IndexBlock extends BlockType
     {
         return [
             Field::text('title')->label('Título')->translatable(),
-            Field::text('subtitle')->label('Subtítulo')->translatable(),
+            Field::textarea('subtitle')->label('Subtítulo')->translatable(),
             Field::boolean('numbered')->label('Numerado'),
         ];
     }

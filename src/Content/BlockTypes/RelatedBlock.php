@@ -37,7 +37,7 @@ class RelatedBlock extends BlockType
 
         return [
             Field::text('title')->label('Título')->translatable(),
-            Field::text('subtitle')->label('Subtítulo')->translatable(),
+            Field::textarea('subtitle')->label('Subtítulo')->translatable(),
             Field::select('preview_key', $keys)->label('Entidad'),
             Field::select('mode', [
                 'latest' => 'Más recientes',

@@ -18,7 +18,7 @@ class CtaBlock extends BlockType
     {
         return [
             Field::text('title')->label('Título')->translatable(),
-            Field::text('subtitle')->label('Subtítulo')->translatable(),
+            Field::textarea('subtitle')->label('Subtítulo')->translatable(),
             Field::richtext('body')->label('Texto')->translatable(),
             Field::text('button_text')->label('Texto del botón')->translatable()->required(),
             Field::text('button_url')->label('Enlace del botón')->translatable()->required(),
@@ -26,6 +26,14 @@ class CtaBlock extends BlockType
                 'primary' => 'Normal (fondo de acento)',
                 'secondary' => 'Inverso (fondo del fondo)',
             ])->label('Estilo del botón'),
+            // En formato estrecho el botón va SIEMPRE centrado (lo hace el
+            // grid del ui): esta alineación aplica de ahí para arriba.
+            Field::select('button_align', [
+                'left' => 'Izquierda',
+                'center' => 'Centrado',
+                'right' => 'Derecha',
+            ])->label('Alineación del botón')->default('left'),
+            Field::boolean('button_large')->label('Botón grande'),
             Field::image('image')->label('Imagen')->translatable(),
             ...static::imageLayoutFields(),
         ];
