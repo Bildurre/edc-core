@@ -9,8 +9,10 @@ use Edc\Core\Content\Models\Block;
 
 /**
  * Índice automático: enlaza a los bloques POSTERIORES de la página marcados
- * como indexables. La etiqueta de cada entrada es su primer texto traducible
- * con valor (o la clave del tipo). Anclas: #block-{id} (las pone PageView).
+ * como indexables. La etiqueta de cada entrada: título del bloque >
+ * subtítulo > primer contenido con valor truncado (de un wysiwyg, solo el
+ * texto de su primera etiqueta) — o la clave del tipo si no hay nada.
+ * Anclas: #block-{id} (las pone PageView).
  */
 class IndexBlock extends BlockType
 {
@@ -45,10 +47,28 @@ class IndexBlock extends BlockType
             $type = $registry->get($other->type);
             $settings = $type->localizeSettings($other->settings, $locale);
 
-            $label = null;
-            foreach ($type->fields() as $field) {
-                if ($field->translatable && in_array($field->type, ['text', 'richtext'], true)) {
-                    $value = trim(strip_tags((string) ($settings[$field->key] ?? '')));
+            $clean = fn (mixed $value): string => trim(strip_tags((string) $value));
+
+            // Preferencia: TÍTULO del bloque > SUBTÍTULO > primer contenido
+            // traducible con valor, truncado. De un wysiwyg solo cuenta el
+            // texto de su PRIMERA etiqueta (el primer párrafo, no todo).
+            $label = $clean($settings['title'] ?? '') ?: $clean($settings['subtitle'] ?? '');
+
+            if ($label === '') {
+                foreach ($type->fields() as $field) {
+                    if (! $field->translatable
+                        || in_array($field->key, ['title', 'subtitle'], true)
+                        || ! in_array($field->type, ['text', 'textarea', 'richtext'], true)) {
+                        continue;
+                    }
+
+                    $raw = (string) ($settings[$field->key] ?? '');
+                    if ($field->type === 'richtext'
+                        && preg_match('#<([a-z][a-z0-9]*)\b[^>]*>(.*?)</\1>#is', $raw, $match)) {
+                        $raw = $match[2];
+                    }
+
+                    $value = $clean($raw);
                     if ($value !== '') {
                         $label = mb_substr($value, 0, 80);
 
@@ -57,7 +77,7 @@ class IndexBlock extends BlockType
                 }
             }
 
-            return ['id' => $other->id, 'label' => $label ?? $other->type, 'depth' => $depth];
+            return ['id' => $other->id, 'label' => $label !== '' ? $label : $other->type, 'depth' => $depth];
         };
 
         // Jerarquía de un nivel (parent_id): cada padre con sus hijos

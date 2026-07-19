@@ -3,6 +3,17 @@
 Backend Laravel reutilizable del motor. Versión de tren con `@edc-motor/ui` y
 `@edc-motor/admin-kit` (tag `vX.Y.Z` en el monorepo).
 
+## [Sin publicar]
+
+### Cambiado
+
+- **`IndexBlock`: etiqueta por título > subtítulo > contenido**: cada
+  entrada usa el TÍTULO del bloque; sin título, su subtítulo; sin ninguno,
+  el primer contenido traducible con valor, truncado a 80 — y si viene de
+  un wysiwyg, SOLO el texto de su primera etiqueta (el primer párrafo).
+  Antes valía el primer campo de texto que apareciera (y los subtítulos,
+  ya textarea, habían quedado fuera).
+
 ## [0.4.23] — 2026-07-19
 
 - Sin cambios propios: versión de tren.
