@@ -3,6 +3,13 @@
 Backend Laravel reutilizable del motor. Versión de tren con `@edc-motor/ui` y
 `@edc-motor/admin-kit` (tag `vX.Y.Z` en el monorepo).
 
+## [Sin publicar]
+
+### Cambiado
+
+- **`TextCardBlock`: alineación de la etiqueta**: nuevo select `label_align`
+  (izquierda/centrado/derecha, por defecto izquierda).
+
 ## [0.4.25] — 2026-07-20
 
 ### Cambiado

@@ -18,6 +18,11 @@ class TextCardBlock extends BlockType
     {
         return [
             Field::text('label')->label('Etiqueta')->translatable(),
+            Field::select('label_align', [
+                'left' => 'Izquierda',
+                'center' => 'Centrado',
+                'right' => 'Derecha',
+            ])->label('Alineación de la etiqueta')->default('left'),
             Field::text('title')->label('Título')->translatable(),
             Field::textarea('subtitle')->label('Subtítulo')->translatable(),
             Field::richtext('body')->label('Texto')->translatable()->required(),
