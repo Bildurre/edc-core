@@ -8,10 +8,11 @@ use Edc\Core\Menu\Models\MenuItem;
 /**
  * Mantiene los items de tipo 'page'/'route' sincronizados con las páginas del
  * CRM y con `motor.menu.routes` (doc 10 ampliado): garantiza exactamente un
- * item por cada página NO home (publicada o no) y por cada route_key
- * declarada, añade los nuevos al final de la raíz (visibles) y borra los
- * huérfanos (página borrada o convertida en home; clave que ha desaparecido
- * de la config). Los grupos son del admin: nunca los toca.
+ * item por cada página NO home (publicada o no, cualquiera que sea su
+ * `parent_id` — la jerarquía del menú se deriva de ahí, ver MenuService) y
+ * por cada route_key declarada, añade los nuevos al final de la raíz
+ * (visibles) y borra los huérfanos (página borrada o convertida en home;
+ * clave que ha desaparecido de la config).
  */
 class MenuSync
 {

@@ -80,15 +80,24 @@ class IndexBlock extends BlockType
             return ['id' => $other->id, 'label' => $label !== '' ? $label : $other->type, 'depth' => $depth];
         };
 
-        // Jerarquía de un nivel (parent_id): cada padre con sus hijos
-        // indentados justo debajo, para índices con sangría.
-        $items = [];
-        foreach ($blocks->whereNull('parent_id') as $parent) {
-            $items[] = $entry($parent, 0);
-            foreach ($blocks->where('parent_id', $parent->id) as $child) {
-                $items[] = $entry($child, 1);
+        // Jerarquía de VARIOS niveles (parent_id, sin límite): la profundidad
+        // real sube por la cadena de padres hasta encontrar uno que también
+        // esté en el índice (indexable y posterior); si la cadena sale del
+        // índice (padre no indexable, anterior…) cuenta como raíz, para no
+        // perder el bloque. `$blocks` ya viene en orden (`order`), que es un
+        // preorden del árbol (PageBlocks persiste así el drag & drop), así
+        // que basta con mapear cada uno con su profundidad, sin reordenar.
+        $byId = $blocks->keyBy('id');
+        $depthOf = function (Block $current) use (&$depthOf, $byId): int {
+            $parentId = $current->parent_id;
+            if (! $parentId || ! $byId->has($parentId)) {
+                return 0;
             }
-        }
+
+            return 1 + $depthOf($byId->get($parentId));
+        };
+
+        $items = $blocks->map(fn (Block $b) => $entry($b, $depthOf($b)))->values()->all();
 
         return ['items' => $items];
     }

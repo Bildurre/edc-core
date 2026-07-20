@@ -3,6 +3,32 @@
 Backend Laravel reutilizable del motor. Versión de tren con `@edc-motor/ui` y
 `@edc-motor/admin-kit` (tag `vX.Y.Z` en el monorepo).
 
+## [Sin publicar]
+
+### Cambiado
+
+- **El menú pierde los GRUPOS y su jerarquía pasa a ser SIEMPRE la del CRM**
+  (rediseño del menú de 0.4.24): fuera el tipo `group` y la columna `label`
+  — "si quieres un grupo, haz una página" (una página con hijas actúa de
+  desplegable). Migración `2026_07_20_000002` con guardas: en BBDD frescas
+  la tabla ya nace con el esquema final; en las que migraron la 0.4.24,
+  borra las filas de grupo y suelta la columna. El árbol deriva el anidado
+  de `pages.parent_id` (nunca se copia a `menu_items`; su `parent_id` queda
+  solo para colgar una RUTA bajo una página raíz) y es BIDIRECCIONAL:
+  escribir la jerarquía desde el menú actualiza `pages.parent_id`/`order`,
+  y cambiar la madre por el CRM se refleja al momento. API: `GET
+  /api/admin/menu` + nuevo `PUT /api/admin/menu` (el árbol ENTERO de una
+  vez — `items: [{id, parent_id, is_visible}]`, orden por posición,
+  transaccional, valida padre = página raíz); desaparecen `POST /groups`,
+  `PATCH /{item}`, `POST /reorder` y `DELETE /{item}`.
+- **Bloques anidables SIN límite de niveles**: las reglas del bloque padre
+  prohíben CICLOS (uno mismo o un descendiente propio), ya no cadenas; el
+  `IndexBlock` calcula la profundidad real subiendo la cadena de padres
+  (el orden de bloques es un preorden del árbol).
+- **Páginas: un solo nivel, validado** (`PageController`): no se puede
+  anidar una página bajo otra hija, encadenar niveles ni mover una página
+  CON hijas dentro de otra (mismo patrón que tenían los bloques).
+
 ## [0.4.24] — 2026-07-20
 
 ### Añadido

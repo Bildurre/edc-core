@@ -55,7 +55,7 @@ class PageController extends Controller
 
     public function update(Request $request, Page $page)
     {
-        $data = $this->validateData($request);
+        $data = $this->validateData($request, $page);
         $this->service->update($page, $data);
 
         return new PageResource($page->refresh()->load('blocks'));
@@ -97,7 +97,7 @@ class PageController extends Controller
         return response()->json(['ok' => true]);
     }
 
-    protected function validateData(Request $request): array
+    protected function validateData(Request $request, ?Page $page = null): array
     {
         $default = config('motor.default_locale', 'es');
         $templates = array_keys(config('motor.content.templates', ['default' => 'Default']));
@@ -109,7 +109,7 @@ class PageController extends Controller
             'description' => ['nullable', 'array'],
             'meta_title' => ['nullable', 'array'],
             'meta_description' => ['nullable', 'array'],
-            'parent_id' => ['nullable', 'integer', 'exists:pages,id'],
+            'parent_id' => ['nullable', 'integer', 'exists:pages,id', $this->parentRule($page)],
             'order' => ['nullable', 'integer'],
             'template' => ['nullable', 'string', 'in:'.implode(',', $templates)],
             'background_image' => ['nullable', 'string', 'max:2048'],
@@ -125,5 +125,37 @@ class PageController extends Controller
         }
 
         return $request->validate($rules);
+    }
+
+    /**
+     * Jerarquía de UN nivel (doc 10 ampliado: la deriva el menú): la madre
+     * no puede ser la propia página, debe ser ella misma raíz (sin madre) y
+     * una página CON hijas no puede pasar a ser hija de otra (perdería a las
+     * suyas del árbol de un nivel). Mismo patrón que BlockController.
+     */
+    protected function parentRule(?Page $page): \Closure
+    {
+        return function (string $attribute, mixed $value, callable $fail) use ($page) {
+            if ($value === null) {
+                return;
+            }
+            if ($page && (int) $value === $page->id) {
+                $fail('Una página no puede ser su propia madre.');
+
+                return;
+            }
+            $parent = Page::find($value);
+            if (! $parent) {
+                return; // ya lo cubre 'exists'
+            }
+            if ($parent->parent_id !== null) {
+                $fail('Solo se admite un nivel de anidado: la madre debe ser una página raíz.');
+
+                return;
+            }
+            if ($page && $page->children()->exists()) {
+                $fail('Una página con hijas no puede anidarse bajo otra.');
+            }
+        };
     }
 }

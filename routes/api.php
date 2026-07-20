@@ -120,8 +120,9 @@ Route::prefix('api')->middleware('api')->group(function () {
         ->where('slug', '[a-z0-9\-]+');
 
     // Menú configurable de la web (doc 10 ampliado): mezcla páginas y rutas
-    // del juego, reordenable y agrupable desde el admin. El endpoint viejo
-    // pages/nav NO se retira (retrocompatibilidad); el cascarón usa este.
+    // del juego, reordenable desde el admin (la jerarquía es la del CRM). El
+    // endpoint viejo pages/nav NO se retira (retrocompatibilidad); el
+    // cascarón usa este.
     Route::get('menu', [PublicMenuController::class, 'index']);
 
     // --- Autenticado (token Sanctum) ---
@@ -211,13 +212,11 @@ Route::prefix('api')->middleware('api')->group(function () {
             });
 
             // Menú configurable de la web (doc 10 ampliado): mismo reparto que
-            // las páginas (es "la web"). Rutas estáticas antes que {item}.
+            // las páginas (es "la web"). Sin grupos: PUT reemplaza el árbol
+            // entero (patrón "Guardar" del admin, nada se persiste antes).
             Route::prefix('admin/menu')->middleware('can:manage-web')->group(function () {
                 Route::get('/', [MenuController::class, 'index']);
-                Route::post('groups', [MenuController::class, 'storeGroup']);
-                Route::post('reorder', [MenuController::class, 'reorder']);
-                Route::patch('{item}', [MenuController::class, 'update'])->whereNumber('item');
-                Route::delete('{item}', [MenuController::class, 'destroy'])->whereNumber('item');
+                Route::put('/', [MenuController::class, 'update']);
             });
 
             // Gestor de previews PNG (estado, lotes por tipo, individuales,

@@ -73,9 +73,10 @@ class BlockController extends Controller
     }
 
     /**
-     * Reglas del bloque padre (anidado de UN nivel, para índices indentados):
-     * de la misma página, sin ser uno mismo y sin encadenar (el padre no
-     * puede tener padre a su vez).
+     * Reglas del bloque padre (anidado en VARIOS niveles, para índices
+     * indentados): cualquier bloque de la misma página, salvo uno mismo o un
+     * DESCENDIENTE de uno mismo (eso crearía un ciclo). Sin límite de
+     * niveles — solo se prohíben los ciclos, no las cadenas.
      */
     protected function parentRules(Page $page, ?Block $self = null): array
     {
@@ -88,13 +89,33 @@ class BlockController extends Controller
                 $parent = Block::query()->find($value);
                 if (! $parent || $parent->page_id !== $page->id) {
                     $fail('El bloque padre debe ser de la misma página.');
-                } elseif ($self && $parent->id === $self->id) {
-                    $fail('Un bloque no puede ser su propio padre.');
-                } elseif ($parent->parent_id !== null) {
-                    $fail('Solo se admite un nivel de anidado.');
+
+                    return;
+                }
+                if ($self && $this->isSelfOrDescendant($parent, $self)) {
+                    $fail('Un bloque no puede colgar de sí mismo ni de uno de sus propios descendientes.');
                 }
             },
         ];
+    }
+
+    /** Sube por la cadena de padres de $candidate: ¿llega a $self? (ciclo). */
+    protected function isSelfOrDescendant(Block $candidate, Block $self): bool
+    {
+        $current = $candidate;
+        $seen = [];
+        while ($current) {
+            if ($current->id === $self->id) {
+                return true;
+            }
+            if (in_array($current->id, $seen, true)) {
+                break; // ciclo ya presente en los datos: corta por si acaso
+            }
+            $seen[] = $current->id;
+            $current = $current->parent_id ? Block::query()->find($current->parent_id) : null;
+        }
+
+        return false;
     }
 
     /** El orden de los ids ES el orden de los bloques de la página. */

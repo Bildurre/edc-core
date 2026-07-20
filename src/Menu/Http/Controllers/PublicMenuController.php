@@ -9,9 +9,11 @@ use Illuminate\Support\Facades\Cache;
 
 /**
  * Menú público (doc 10 ampliado): sincroniza (páginas/rutas nuevas u
- * huérfanas) y devuelve solo lo visible — páginas además publicadas, grupos
- * sin hijos visibles fuera. Cacheado (motor.content.cache_ttl); se invalida
- * en los mismos puntos que motor.pages.nav y en cada escritura del menú.
+ * huérfanas) y devuelve solo lo visible — páginas además publicadas. La
+ * jerarquía sale de `pages.parent_id`: una página con hijas visibles y
+ * publicadas se sirve con ellas anidadas en `children`. Cacheado
+ * (motor.content.cache_ttl); se invalida en los mismos puntos que
+ * motor.pages.nav y en cada escritura del menú.
  */
 class PublicMenuController extends Controller
 {
