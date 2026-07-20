@@ -105,6 +105,15 @@ return [
         ],
     ],
 
+    // Menú configurable de la web pública (doc 10 ampliado): rutas propias
+    // del juego que MenuSync ofrece al admin junto a las páginas del CRM
+    // (índices de entidades, descargas…). Cada juego declara aquí sus claves
+    // y las mapea a ruta+etiqueta en su AppHeader/MenuView; una clave que
+    // desaparece de esta lista se retira sola del menú (MenuSync).
+    'menu' => [
+        'routes' => [],
+    ],
+
     // Configuración de la web pública (doc 10): catálogo de fuentes que
     // ofrece la página de Configuración del admin (clave => pila CSS). Son
     // pilas del sistema (sin peticiones externas); un juego puede añadir una

@@ -13,6 +13,8 @@ use Edc\Core\Content\Http\Controllers\PageController;
 use Edc\Core\Content\Http\Controllers\PublicPageController;
 use Edc\Core\Content\Http\Controllers\SitemapController;
 use Edc\Core\Icons\Http\Controllers\IconController;
+use Edc\Core\Menu\Http\Controllers\MenuController;
+use Edc\Core\Menu\Http\Controllers\PublicMenuController;
 use Edc\Core\Pdf\Http\Controllers\PdfCollectionController;
 use Edc\Core\Pdf\Http\Controllers\PdfController;
 use Edc\Core\Previews\Http\Controllers\CatalogController;
@@ -117,6 +119,11 @@ Route::prefix('api')->middleware('api')->group(function () {
     Route::get('pages/{slug}', [PublicPageController::class, 'show'])
         ->where('slug', '[a-z0-9\-]+');
 
+    // Menú configurable de la web (doc 10 ampliado): mezcla páginas y rutas
+    // del juego, reordenable y agrupable desde el admin. El endpoint viejo
+    // pages/nav NO se retira (retrocompatibilidad); el cascarón usa este.
+    Route::get('menu', [PublicMenuController::class, 'index']);
+
     // --- Autenticado (token Sanctum) ---
     Route::middleware('auth:sanctum')->group(function () {
         Route::post('auth/logout', [AuthController::class, 'logout']);
@@ -201,6 +208,16 @@ Route::prefix('api')->middleware('api')->group(function () {
             Route::middleware('can:manage-web')->group(function () {
                 Route::put('admin/blocks/{block}', [BlockController::class, 'update'])->whereNumber('block');
                 Route::delete('admin/blocks/{block}', [BlockController::class, 'destroy'])->whereNumber('block');
+            });
+
+            // Menú configurable de la web (doc 10 ampliado): mismo reparto que
+            // las páginas (es "la web"). Rutas estáticas antes que {item}.
+            Route::prefix('admin/menu')->middleware('can:manage-web')->group(function () {
+                Route::get('/', [MenuController::class, 'index']);
+                Route::post('groups', [MenuController::class, 'storeGroup']);
+                Route::post('reorder', [MenuController::class, 'reorder']);
+                Route::patch('{item}', [MenuController::class, 'update'])->whereNumber('item');
+                Route::delete('{item}', [MenuController::class, 'destroy'])->whereNumber('item');
             });
 
             // Gestor de previews PNG (estado, lotes por tipo, individuales,

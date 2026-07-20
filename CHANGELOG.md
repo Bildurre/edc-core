@@ -5,6 +5,27 @@ Backend Laravel reutilizable del motor. Versión de tren con `@edc-motor/ui` y
 
 ## [Sin publicar]
 
+### Añadido
+
+- **Menú configurable de la web pública** (doc 10 ampliado): tabla
+  `menu_items` (migración `2026_07_20_000001`), modelo `MenuItem`
+  (traducible en `label`, solo para grupos) y `Edc\Core\Menu\MenuSync`, que
+  garantiza exactamente un item por página NO home (publicada o no) y por
+  cada `route_key` de la nueva config `motor.menu.routes` — los añade AL
+  FINAL de la raíz y borra los huérfanos (página borrada o convertida en
+  home; clave retirada de la config). Los grupos son del admin: `MenuSync`
+  nunca los toca; al borrar uno, sus hijos pasan a la raíz.
+- **Endpoints del menú**: admin (`GET /api/admin/menu` sincroniza y devuelve
+  el árbol completo con la página embebida; `POST /api/admin/menu/groups`;
+  `PATCH /api/admin/menu/{item}` para visibilidad/grupo/label; `POST
+  /api/admin/menu/reorder`; `DELETE /api/admin/menu/{item}`, solo grupos —
+  mismo reparto que las páginas, `can:manage-web`) y público (`GET
+  /api/menu`: solo visibles, páginas además publicadas, grupos sin hijos
+  visibles fuera; cacheado con `motor.content.cache_ttl`, clave
+  `motor.menu.nav`, invalidada en los mismos puntos que `motor.pages.nav`
+  —`PageService::forget/setHome/reorder`— y en cada escritura del menú). El
+  endpoint viejo `pages/nav` sigue vivo (retrocompatibilidad).
+
 ### Cambiado
 
 - **`IndexBlock`: etiqueta por título > subtítulo > contenido**: cada

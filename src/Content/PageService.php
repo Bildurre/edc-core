@@ -62,6 +62,7 @@ class PageService
         Page::query()->where('is_home', true)->update(['is_home' => false]);
         $page->forceFill(['is_home' => true])->save();
         Cache::forget('motor.pages.nav');
+        Cache::forget('motor.menu.nav'); // la home sale del menú (MenuSync)
         $this->forget($page);
     }
 
@@ -72,6 +73,7 @@ class PageService
             Page::query()->whereKey($id)->update(['order' => $index]);
         }
         Cache::forget('motor.pages.nav');
+        Cache::forget('motor.menu.nav');
     }
 
     /** Invalida la caché pública de una página (todos los locales). */
@@ -83,6 +85,9 @@ class PageService
             Cache::forget("motor.page.{$pageId}.{$locale}");
         }
         Cache::forget('motor.pages.nav');
+        // El menú mezcla páginas (título/publicada) con rutas del juego: el
+        // mismo punto que invalida el nav de páginas invalida el suyo.
+        Cache::forget('motor.menu.nav');
     }
 
     protected function apply(Page $page, array $data): void
