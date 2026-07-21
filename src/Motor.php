@@ -7,5 +7,5 @@ class Motor
     /**
      * Versión del núcleo del motor.
      */
-    public const VERSION = '0.4.26';
+    public const VERSION = '0.4.27';
 }
