@@ -30,17 +30,14 @@ class PageRenderer
 
     protected function build(Page $page, string $locale): array
     {
-        $all = $page->blocks()->orderBy('order')->get();
-
-        // Anidado de un nivel: cada bloque hijo se renderiza justo después
-        // de su padre (mismo criterio que el índice y el admin).
-        $ordered = collect();
-        foreach ($all->whereNull('parent_id') as $parent) {
-            $ordered->push($parent, ...$all->where('parent_id', $parent->id));
-        }
-        $ordered = $ordered->merge($all->diff($ordered)); // huérfanos, al final
-
-        $blocks = $ordered
+        // Los bloques se pintan de ARRIBA a ABAJO en `order` tal cual —
+        // NUNCA agrupados/reordenados por parent_id: que un bloque sea hijo
+        // de otro afecta SOLO a la numeración/sangría del índice (doc 03),
+        // jamás al orden visual de la página. El reorder del admin persiste
+        // ya el preorden completo del árbol (PageBlocks::arrange, sin
+        // límite de niveles) en `order`, así que basta con esta única
+        // ordenación — mismo criterio que usa IndexBlock::resolveData.
+        $blocks = $page->blocks()->orderBy('order')->get()
             ->filter(fn (Block $block) => $this->registry->has($block->type))
             ->map(function (Block $block) use ($locale) {
                 $type = $this->registry->get($block->type);

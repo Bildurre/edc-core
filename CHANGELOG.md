@@ -3,6 +3,21 @@
 Backend Laravel reutilizable del motor. Versión de tren con `@edc-motor/ui` y
 `@edc-motor/admin-kit` (tag `vX.Y.Z` en el monorepo).
 
+## [Sin publicar]
+
+### Arreglado
+
+- **`PageRenderer`: los bloques ya NO se agrupan por nivel** — el render
+  público reordenaba los bloques (padre + sus hijos directos, código de la
+  era "un solo nivel") en vez de pintarlos tal cual vienen en `order`; con
+  el anidado multinivel de 0.4.25 eso dejaba nietos y bisnietos
+  desplazados al FINAL de la página, fuera de sitio respecto al índice.
+  Ahora `PageRenderer::build()` confía en `order` sin reordenar — mismo
+  criterio que `IndexBlock::resolveData` (el admin persiste el preorden
+  completo del árbol) —: que un bloque sea hijo de otro afecta SOLO a la
+  numeración/sangría del índice, nunca al orden visual. El PDF de página
+  no compartía el bug.
+
 ## [0.4.26] — 2026-07-21
 
 ### Cambiado
