@@ -3,6 +3,25 @@
 Backend Laravel reutilizable del motor. Versión de tren con `@edc-motor/ui` y
 `@edc-motor/admin-kit` (tag `vX.Y.Z` en el monorepo).
 
+## [Sin publicar]
+
+### Cambiado
+
+- **`HtmlSanitizer`: tablas, `h5` e imágenes con tamaño**. La lista blanca
+  gana `table`, `thead`, `tbody`, `tr` (clase), `th`/`td` (`colspan`,
+  `rowspan`, clase) — el normalizador de nodos las trata como cualquier
+  otra etiqueta permitida (recursión + filtrado de atributos), así que
+  conserva la anidación real de la tabla en vez de aplanar `tr`/`td` como
+  hacía antes con cualquier etiqueta desconocida. También `h5` (llegaba
+  hasta `h4`) y `width`/`height` en `img` (para dimensionar imágenes del
+  richtext — el `style` SIGUE fuera de la lista blanca a propósito: para
+  dimensionar imágenes en el wysiwyg se usan los atributos `width`/
+  `height`, no CSS en línea). Tests Pest nuevos
+  (`tests/Feature/HtmlSanitizerTest.php`): tabla completa con clases y
+  `colspan` sobrevive, `style` se elimina, `<script>`/`onclick` fuera,
+  una etiqueta no permitida DENTRO de una tabla se limpia sin romper su
+  estructura, `h5` permitido y listas anidadas conservadas.
+
 ## [0.4.27] — 2026-07-21
 
 ### Arreglado

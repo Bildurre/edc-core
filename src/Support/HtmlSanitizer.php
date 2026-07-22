@@ -26,14 +26,26 @@ class HtmlSanitizer
         'h2' => [],
         'h3' => [],
         'h4' => [],
+        'h5' => [],
         'ul' => [],
         'ol' => ['start'],
         'li' => [],
         'blockquote' => [],
         'a' => ['href', 'target', 'rel'],
-        // Iconos del juego insertados por el RichTextInput (<img class="rt-icon">).
-        'img' => ['src', 'alt', 'class'],
+        // Iconos del juego insertados por el RichTextInput (<img class="rt-icon">);
+        // width/height para dimensionar imágenes del richtext (sin `style`,
+        // que sigue fuera de la lista blanca).
+        'img' => ['src', 'alt', 'class', 'width', 'height'],
         'span' => ['class'],
+        // Tabla (TipTap: `table` => [], `tbody` => [], `tr` => []): el
+        // normalizador de nodos las procesa como cualquier otra etiqueta
+        // permitida, así que conserva la anidación (no las aplana).
+        'table' => [],
+        'thead' => [],
+        'tbody' => [],
+        'tr' => ['class'],
+        'th' => ['colspan', 'rowspan', 'class'],
+        'td' => ['colspan', 'rowspan', 'class'],
     ];
 
     /** Esquemas de URL admitidos en href/src. */
