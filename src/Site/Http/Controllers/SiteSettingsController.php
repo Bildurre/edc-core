@@ -62,6 +62,9 @@ class SiteSettingsController extends Controller
             'custom_fonts.*.file' => ['required', 'string', 'max:120'],
             'footer_text' => ['sometimes', 'array'],
             'footer_text.*' => ['nullable', 'string', 'max:2000'],
+            // Fondos de las vistas índice: {clave del juego: URL}.
+            'index_backgrounds' => ['sometimes', 'array', 'max:24'],
+            'index_backgrounds.*' => ['nullable', 'string', 'max:2048'],
         ]);
 
         // El pie es texto rico (wysiwyg): saneado por lista blanca, como los

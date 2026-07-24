@@ -3,6 +3,21 @@
 Backend Laravel reutilizable del motor. Versión de tren con `@edc-motor/ui` y
 `@edc-motor/admin-kit` (tag `vX.Y.Z` en el monorepo).
 
+## [Sin publicar]
+
+### Añadido
+
+- **`index_backgrounds` en los site settings: fondos para las vistas
+  índice del app pública** (`SiteSettings` + `SiteSettingsController`):
+  mapa `{clave: URL|null}` — las claves las define cada JUEGO (p. ej.
+  `cards`, `downloads`, `life-counter`…). Validación `sometimes array`
+  (máx. 24 claves) con URL de hasta 2048 caracteres por valor; por
+  defecto mapa vacío. Viaja en GET /api/site como el resto de ajustes y
+  se guarda/borra desde el admin del juego con el patrón de subida
+  diferida del favicon (uploads gestionados de `content/`). La SPA lo
+  pinta con el `PageBackground` de `@edc-motor/ui`, igual que el fondo
+  de una página del CRM.
+
 ## [0.4.29] — 2026-07-24
 
 - Sin cambios propios: versión de tren.

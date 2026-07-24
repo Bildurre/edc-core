@@ -41,6 +41,10 @@ class SiteSettings
             'font_special' => 'system',
             'custom_fonts' => [],    // [{key, name, file}] subidas por el admin
             'footer_text' => [],     // {locale: texto del pie}
+            // Fondos de las vistas índice del app pública: {clave: URL}. Las
+            // claves las define cada JUEGO (p. ej. cards, downloads…); la SPA
+            // pinta la URL con PageBackground, como el fondo de una página.
+            'index_backgrounds' => [],
         ];
     }
 
