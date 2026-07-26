@@ -3,6 +3,21 @@
 Backend Laravel reutilizable del motor. Versión de tren con `@edc-motor/ui` y
 `@edc-motor/admin-kit` (tag `vX.Y.Z` en el monorepo).
 
+## [Sin publicar]
+
+### Cambiado
+
+- **Búsqueda y orden "a lo humano": sin distinguir mayúsculas NI acentos**
+  (`SqlFold` nuevo + `HasFilters` + listado de usuarios): "CaMiON"
+  encuentra "Camión" y "nu" encuentra "Ñu". Los valores JSON traducibles
+  comparan en binario (collation utf8mb4_bin) y el lower() de SQLite solo
+  baja ASCII, así que el plegado se construye explícito en SQL (lower +
+  cadena de replace: á é í ó ú ü ñ, en ambas cajas) y se aplica a la
+  columna Y al término. `SqlFold::expression()`/`::term()` quedan públicos
+  para que los juegos plieguen igual sus propios ORDER BY alfabéticos
+  (el `SortsIndex` del juego). El listado de usuarios busca y ordena
+  plegado también. Tests en el playground.
+
 ## [0.4.32] — 2026-07-26
 
 - Sin cambios propios: versión de tren.

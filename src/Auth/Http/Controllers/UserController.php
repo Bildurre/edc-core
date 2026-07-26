@@ -3,6 +3,7 @@
 namespace Edc\Core\Auth\Http\Controllers;
 
 use Edc\Core\Auth\Http\Resources\UserResource;
+use Edc\Core\Support\SqlFold;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Http\Request;
 use Illuminate\Routing\Controller;
@@ -22,19 +23,23 @@ class UserController extends Controller
         $users = $this->model()::query()
             ->with('roles')
             ->when($request->string('search')->isNotEmpty(), function ($query) use ($request) {
-                $search = $request->string('search');
+                // Plegado a lo humano (mayúsculas y acentos): ver SqlFold.
+                $grammar = $query->getQuery()->getGrammar();
+                $term = '%'.SqlFold::term($request->string('search')).'%';
                 $query->where(fn ($q) => $q
-                    ->where('name', 'like', "%{$search}%")
-                    ->orWhere('email', 'like', "%{$search}%"));
+                    ->whereRaw(SqlFold::expression($grammar->wrap('name')).' like ?', [$term])
+                    ->orWhereRaw(SqlFold::expression($grammar->wrap('email')).' like ?', [$term]));
             })
             ->tap(function ($query) use ($request) {
                 // Contrato de `sort` de los index: alfabético (defecto: los
-                // usuarios se listan por nombre) o por id para latest/oldest.
+                // usuarios se listan por nombre, plegado como la búsqueda) o
+                // por id para latest/oldest.
+                $name = SqlFold::expression($query->getQuery()->getGrammar()->wrap('name'));
                 match ($request->string('sort')->toString()) {
-                    'name_desc' => $query->orderByDesc('name'),
+                    'name_desc' => $query->orderByRaw("{$name} desc"),
                     'latest' => $query->orderByDesc('id'),
                     'oldest' => $query->orderBy('id'),
-                    default => $query->orderBy('name'),
+                    default => $query->orderByRaw($name),
                 };
             })
             ->paginate(20);

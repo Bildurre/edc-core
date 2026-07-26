@@ -2,6 +2,7 @@
 
 namespace Edc\Core\Support\Concerns;
 
+use Edc\Core\Support\SqlFold;
 use Illuminate\Database\Eloquent\Builder;
 
 /**
@@ -19,6 +20,11 @@ trait HasFilters
             $locale = app()->getLocale();
             // Agrupado para no romper otros wheres del listado (status, etc.).
             $query->where(function (Builder $query) use ($columns, $search, $locale) {
+                // Plegado a lo humano en AMBOS lados ("CaMiON" = "camión"):
+                // los json traducibles comparan en binario y el lower() de
+                // SQLite solo baja ASCII — ver SqlFold.
+                $grammar = $query->getQuery()->getGrammar();
+                $term = '%'.SqlFold::term($search).'%';
                 foreach ($columns as $column) {
                     // Columna traducible: busca SOLO en el json del locale
                     // activo (antes el LIKE sobre el json crudo mezclaba locales).
@@ -26,7 +32,7 @@ trait HasFilters
                         && $this->isTranslatableAttribute($column)
                             ? "{$column}->{$locale}"
                             : $column;
-                    $query->orWhere($target, 'like', "%{$search}%");
+                    $query->orWhereRaw(SqlFold::expression($grammar->wrap($target)).' like ?', [$term]);
                 }
             });
         }
