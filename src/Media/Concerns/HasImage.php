@@ -2,6 +2,7 @@
 
 namespace Edc\Core\Media\Concerns;
 
+use Edc\Core\Support\PublicUrl;
 use Illuminate\Http\Request;
 use Spatie\MediaLibrary\InteractsWithMedia;
 
@@ -21,17 +22,10 @@ trait HasImage
 
     public function imageUrl(): ?string
     {
-        $url = $this->getFirstMediaUrl('image');
-        if ($url === '') {
-            return null;
-        }
-
-        // El disco 'public' construye la URL con APP_URL, que puede no coincidir
-        // con el host/puerto real por el que llega la petición (p. ej. servir en
-        // :8010 con APP_URL en :8000). Reconstruimos sobre el host de la petición
-        // para que la imagen sea siempre accesible. En CLI (PDF/preview) no hay
-        // petición y url() recae en APP_URL, que es lo correcto allí.
-        return url(parse_url($url, PHP_URL_PATH));
+        // Sobre el host de la petición (PublicUrl): el disco 'public'
+        // construye la URL con APP_URL, que puede no coincidir con el
+        // host/puerto real por el que llega la petición.
+        return PublicUrl::onRequestHost($this->getFirstMediaUrl('image'));
     }
 
     /**
