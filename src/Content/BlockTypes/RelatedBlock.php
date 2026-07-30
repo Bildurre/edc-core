@@ -38,13 +38,15 @@ class RelatedBlock extends BlockType
         return [
             Field::text('title')->label('Título')->translatable(),
             Field::textarea('subtitle')->label('Subtítulo')->translatable(),
-            Field::select('preview_key', $keys)->label('Entidad'),
+            // Pares en fila mientras quepan (Field::row): entidad+modo y
+            // botón+texto — en un modal angosto apilan.
+            Field::select('preview_key', $keys)->label('Entidad')->row('entity'),
             Field::select('mode', [
                 'latest' => 'Más recientes',
                 'random' => 'Aleatorias',
-            ])->label('Modo'),
-            Field::boolean('with_button')->label('Con botón al índice'),
-            Field::text('button_label')->label('Texto del botón')->translatable(),
+            ])->label('Modo')->row('entity'),
+            Field::boolean('with_button')->label('Con botón al índice')->row('button'),
+            Field::text('button_label')->label('Texto del botón')->translatable()->row('button'),
         ];
     }
 

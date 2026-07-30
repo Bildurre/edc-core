@@ -31,6 +31,12 @@ class Field
         public ?string $optionsUrl = null,
     ) {}
 
+    /**
+     * Fila compartida en el formulario del admin: los campos con el MISMO
+     * nombre de fila se pintan juntos (columnas iguales; en angosto apilan).
+     */
+    public ?string $row = null;
+
     public static function text(string $key): self
     {
         return new self($key, 'text');
@@ -160,6 +166,19 @@ class Field
     }
 
     /**
+     * Agrupa este campo en una fila del formulario del admin: los campos
+     * que declaren el MISMO nombre comparten fila mientras quepa (columnas
+     * iguales; en un modal angosto apilan). Solo presentación: ni la
+     * validación ni el guardado cambian.
+     */
+    public function row(string $name): self
+    {
+        $this->row = $name;
+
+        return $this;
+    }
+
+    /**
      * Subcampos de un group/repeater.
      *
      * @param  Field[]  $fields
@@ -249,6 +268,7 @@ class Field
                 ? null
                 : array_map(fn (Field $field) => $field->toArray(), $this->fields),
             'options_url' => $this->optionsUrl,
+            'row' => $this->row,
         ];
     }
 }

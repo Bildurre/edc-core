@@ -3,6 +3,26 @@
 Backend Laravel reutilizable del motor. Versión de tren con `@edc-motor/ui` y
 `@edc-motor/admin-kit` (tag `vX.Y.Z` en el monorepo).
 
+## [Sin publicar]
+
+### Añadido
+
+- **DSL de campos: `Field::row('nombre')`** — modificador encadenable de
+  PRESENTACIÓN: los campos de un bloque que declaren el mismo nombre de
+  fila se pintan juntos en el formulario del admin (columnas iguales
+  mientras quepan; apilan en angosto — lo resuelve `SchemaFields` del
+  admin-kit). Viaja en la serialización del esquema (`row`); ni la
+  validación ni el guardado cambian. Un juego puede usarlo igual en sus
+  propios bloques.
+
+### Cambiado
+
+- **`RelatedBlock` y `CtaBlock` estrenan las filas declaradas**: en
+  `related`, Entidad+Modo y Con botón+Texto del botón comparten fila; en
+  `cta`, Texto del botón+Enlace del botón van juntos y Botón
+  grande+Alineación+Estilo del botón forman la segunda fila (con ello
+  `button_align` deja de emparejarse por convención con `button_text`).
+
 ## [0.5.3] — 2026-07-30
 
 - Sin cambios propios: versión de tren.
