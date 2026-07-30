@@ -3,6 +3,21 @@
 Backend Laravel reutilizable del motor. Versión de tren con `@edc-motor/ui` y
 `@edc-motor/admin-kit` (tag `vX.Y.Z` en el monorepo).
 
+## [Sin publicar]
+
+- **Previews PNG sobre el host de la petición** (`HasPreviewImage::previewUrl`,
+  y con él `previewUrls()` y los ítems de catálogo): la URL del disco de
+  previews se construye con APP_URL, que puede no coincidir con el host/puerto
+  real por el que llega la petición, y los PNG salían inaccesibles en los
+  catálogos públicos (índices de cartas/héroes y las listas de las fichas de
+  facción/mazo, también dentro de los bloques del CRM). Ahora pasa por el
+  mismo arreglo que ya tenía `HasImage::imageUrl()`.
+- Nuevo helper `Edc\Core\Support\PublicUrl::onRequestHost(?string $url)`:
+  reconstruye cualquier URL absoluta de fichero sobre el host de la petición
+  actual (en CLI recae en APP_URL). `HasImage::imageUrl()` y
+  `HasPreviewImage::previewUrl()` lo comparten; cualquier juego puede
+  reutilizarlo para campos de imagen propios.
+
 ## [0.5.0] — 2026-07-30
 
 - Sin cambios propios: versión de tren.

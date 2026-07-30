@@ -5,6 +5,7 @@ namespace Edc\Core\Previews\Concerns;
 use Edc\Core\Previews\Jobs\GeneratePreviewJob;
 use Edc\Core\Previews\PreviewRegistry;
 use Edc\Core\Previews\PreviewService;
+use Edc\Core\Support\PublicUrl;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\SoftDeletes;
 use Illuminate\Support\Facades\Storage;
@@ -73,8 +74,15 @@ trait HasPreviewImage
     public function previewUrl(string $locale, ?string $type = null): ?string
     {
         $path = $this->previewPath($locale, $type);
+        if (! $path) {
+            return null;
+        }
 
-        return $path ? Storage::disk(config('motor.previews.disk'))->url($path) : null;
+        // Sobre el host de la petición (PublicUrl, mismo arreglo que
+        // HasImage::imageUrl): el disco construye la URL con APP_URL, que
+        // puede no coincidir con el host real de la petición, y los PNG
+        // salían inaccesibles en los catálogos públicos.
+        return PublicUrl::onRequestHost(Storage::disk(config('motor.previews.disk'))->url($path));
     }
 
     /** Mapa locale => URL de una preview (solo los generados). */
