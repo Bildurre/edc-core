@@ -3,11 +3,6 @@
 Backend Laravel reutilizable del motor. Versión de tren con `@edc-motor/ui` y
 `@edc-motor/admin-kit` (tag `vX.Y.Z` en el monorepo).
 
-<<<<<<< HEAD
-## [0.5.1] — 2026-07-30
-
-- Sin cambios propios: versión de tren.
-=======
 ## [0.5.2] — 2026-07-30
 
 - **Previews PNG sobre el host de la petición** (`HasPreviewImage::previewUrl`,
@@ -22,7 +17,10 @@ Backend Laravel reutilizable del motor. Versión de tren con `@edc-motor/ui` y
   actual (en CLI recae en APP_URL). `HasImage::imageUrl()` y
   `HasPreviewImage::previewUrl()` lo comparten; cualquier juego puede
   reutilizarlo para campos de imagen propios.
->>>>>>> origin/claude/choique-disable-language-abgt8x
+
+## [0.5.1] — 2026-07-30
+
+- Sin cambios propios: versión de tren.
 
 ## [0.5.0] — 2026-07-30
 
