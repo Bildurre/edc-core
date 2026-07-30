@@ -3,6 +3,10 @@
 Backend Laravel reutilizable del motor. Versión de tren con `@edc-motor/ui` y
 `@edc-motor/admin-kit` (tag `vX.Y.Z` en el monorepo).
 
+## [0.5.1] — 2026-07-30
+
+- Sin cambios propios: versión de tren.
+
 ## [0.5.0] — 2026-07-30
 
 - Sin cambios propios: versión de tren.
