@@ -8,7 +8,7 @@ Backend Laravel reutilizable del motor. Versión de tren con `@edc-motor/ui` y
 
 - Sin cambios propios: versión de tren.
 =======
-## [Sin publicar]
+## [0.5.2] — 2026-07-30
 
 - **Previews PNG sobre el host de la petición** (`HasPreviewImage::previewUrl`,
   y con él `previewUrls()` y los ítems de catálogo): la URL del disco de
