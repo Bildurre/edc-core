@@ -166,6 +166,22 @@ class Field
     }
 
     /**
+     * Opciones del campo (valor => etiqueta). En un color son los presets
+     * DINÁMICOS del tema: valores `token:<nombre>` que el front resuelve a
+     * la custom property `var(--<nombre>)` del tema activo (p. ej.
+     * `token:surface` => «Fondo de tarjeta»); el picker los ofrece además
+     * de su paleta de hexes y la validación los acepta junto a los hex.
+     *
+     * @param  array<string, string>  $options
+     */
+    public function options(array $options): self
+    {
+        $this->options = $options;
+
+        return $this;
+    }
+
+    /**
      * Agrupa este campo en una fila del formulario del admin: los campos
      * que declaren el MISMO nombre comparten fila mientras quepa (columnas
      * iguales; en un modal angosto apilan). Solo presentación: ni la
@@ -229,7 +245,14 @@ class Field
             ])),
             'boolean' => ['boolean'],
             'select' => ['string', 'in:'.implode(',', array_keys($this->options))],
-            'color' => ['string', 'max:32'],
+            // Color: hex libre; con presets declarados (options), además de
+            // los hex solo se admiten SUS valores (token:* conocidos).
+            'color' => $this->options === []
+                ? ['string', 'max:32']
+                : ['string', 'max:32', 'regex:/^(#[0-9a-fA-F]{3,8}|'.implode('|', array_map(
+                    fn (string $value) => preg_quote($value, '/'),
+                    array_keys($this->options),
+                )).')$/'],
             'entity' => ['integer'],
             default => ['string'],
         };

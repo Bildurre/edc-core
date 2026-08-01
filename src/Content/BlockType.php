@@ -89,7 +89,18 @@ abstract class BlockType
                 'full' => 'Ancho completo',
                 'narrow' => 'Estrecho',
             ])->label('Anchura del contenido')->default('wide'),
-            Field::color('background')->label('Color de fondo'),
+            // El color de fondo admite, además de un hex fijo, presets
+            // DINÁMICOS del tema (serializados como `token:<nombre>`): el
+            // front los resuelve a var(--<nombre>) del tema activo, así el
+            // fondo sigue al claro/oscuro. La escala de superficies + el
+            // acento; las etiquetas viajan como las de los select
+            // (blockOptions.background.* en el admin, castellano aquí).
+            Field::color('background')->options([
+                'token:surface' => 'Fondo de tarjeta',
+                'token:surface-2' => 'Superficie 2',
+                'token:surface-3' => 'Superficie 3',
+                'token:accent-500' => 'Acento',
+            ])->label('Color de fondo'),
         ];
     }
 
