@@ -3,11 +3,6 @@
 Backend Laravel reutilizable del motor. Versión de tren con `@edc-motor/ui` y
 `@edc-motor/admin-kit` (tag `vX.Y.Z` en el monorepo).
 
-<<<<<<< HEAD
-## [0.5.7] — 2026-08-01
-
-- Sin cambios propios: versión de tren.
-=======
 ## [0.5.8] — 2026-08-02
 
 ### Añadido
@@ -31,7 +26,10 @@ Backend Laravel reutilizable del motor. Versión de tren con `@edc-motor/ui` y
   valor se guarda SEMÁNTICO y estable (`token:*`, nunca el `var(...)`
   crudo); las etiquetas siguen el camino de las de un select
   (castellano aquí, `blockOptions.background.*` en el admin).
->>>>>>> origin/claude/choique-disable-language-abgt8x
+
+## [0.5.7] — 2026-08-01
+
+- Sin cambios propios: versión de tren.
 
 ## [0.5.6] — 2026-07-31
 
