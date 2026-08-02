@@ -3,9 +3,35 @@
 Backend Laravel reutilizable del motor. Versión de tren con `@edc-motor/ui` y
 `@edc-motor/admin-kit` (tag `vX.Y.Z` en el monorepo).
 
+<<<<<<< HEAD
 ## [0.5.7] — 2026-08-01
 
 - Sin cambios propios: versión de tren.
+=======
+## [Sin publicar]
+
+### Añadido
+
+- **DSL de campos: modificador `->options()`** — encadenable en cualquier
+  campo (valor => etiqueta). En un campo `color` son los presets DINÁMICOS
+  del tema: valores `token:<nombre>` que el front resuelve a la custom
+  property `var(--<nombre>)` del tema activo. Viajan en la serialización
+  del esquema (`options`, como en un select) y la validación del color se
+  amplía: con presets declarados se admite un hex (`#rgb[a]`/`#rrggbb[aa]`,
+  retrocompatible con lo ya guardado) o uno de SUS valores — un `token:*`
+  desconocido es 422. Sin options, el color valida como siempre (string
+  libre ≤ 32).
+
+### Cambiado
+
+- **El campo común `background` declara presets dinámicos del tema**
+  (`BlockType::commonFields()`): «Fondo de tarjeta» (`token:surface`),
+  «Superficie 2» (`token:surface-2`), «Superficie 3» (`token:surface-3`) y
+  «Acento» (`token:accent-500`) — la escala de superficies + el acento. El
+  valor se guarda SEMÁNTICO y estable (`token:*`, nunca el `var(...)`
+  crudo); las etiquetas siguen el camino de las de un select
+  (castellano aquí, `blockOptions.background.*` en el admin).
+>>>>>>> origin/claude/choique-disable-language-abgt8x
 
 ## [0.5.6] — 2026-07-31
 
