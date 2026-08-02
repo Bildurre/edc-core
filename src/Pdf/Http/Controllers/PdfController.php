@@ -261,6 +261,9 @@ class PdfController extends Controller
     /**
      * Descarga. Los permanentes son públicos (expositor); los temporales solo
      * para su dueño — usuario logueado o token de invitado — o un admin.
+     * Con `?inline=1` el Content-Disposition pasa a inline: el navegador
+     * ABRE el PDF en la pestaña en vez de descargarlo (botón «ver» de las
+     * descargas públicas).
      */
     public function download(Request $request, GeneratedPdf $pdf): StreamedResponse
     {
@@ -278,7 +281,11 @@ class PdfController extends Controller
             );
         }
 
-        return Storage::disk(config('motor.pdf.disk'))
-            ->download($pdf->path, "{$pdf->filename}.pdf");
+        return Storage::disk(config('motor.pdf.disk'))->response(
+            $pdf->path,
+            "{$pdf->filename}.pdf",
+            [],
+            $request->boolean('inline') ? 'inline' : 'attachment',
+        );
     }
 }

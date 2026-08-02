@@ -92,14 +92,25 @@ abstract class BlockType
             // El color de fondo admite, además de un hex fijo, presets
             // DINÁMICOS del tema (serializados como `token:<nombre>`): el
             // front los resuelve a var(--<nombre>) del tema activo, así el
-            // fondo sigue al claro/oscuro. La escala de superficies + el
-            // acento; las etiquetas viajan como las de los select
-            // (blockOptions.background.* en el admin, castellano aquí).
+            // fondo sigue al claro/oscuro. Tres GRISES translúcidos por
+            // grados de intensidad (la base neutra del tema con el grado
+            // fijado en _theme.scss por token y por tema; el medio calca al
+            // «Gris» estático de la paleta) + el acento translúcido. Los
+            // presets RETIRADOS (la escala de superficies opacas y el acento
+            // opaco de 0.5.8) ya no se ofrecen pero siguen validando y
+            // renderizando (legacyValues). Las etiquetas viajan como las de
+            // los select (blockOptions.background.* en el admin, castellano
+            // aquí).
             Field::color('background')->options([
-                'token:surface' => 'Fondo de tarjeta',
-                'token:surface-2' => 'Superficie 2',
-                'token:surface-3' => 'Superficie 3',
-                'token:accent-500' => 'Acento',
+                'token:neutral-soft' => 'Gris suave',
+                'token:neutral' => 'Gris',
+                'token:neutral-strong' => 'Gris fuerte',
+                'token:accent-soft' => 'Acento',
+            ])->legacyValues([
+                'token:surface',
+                'token:surface-2',
+                'token:surface-3',
+                'token:accent-500',
             ])->label('Color de fondo'),
         ];
     }
