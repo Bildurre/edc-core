@@ -5,6 +5,17 @@ Backend Laravel reutilizable del motor. Versión de tren con `@edc-motor/ui` y
 
 ## [0.5.13] — 2026-08-03
 
+### Añadido
+
+- **El índice de la colección expone los PDF temporales vigentes**
+  (`GET /api/pdf-collection`, `PdfCollectionController::index()`): clave
+  nueva `generated` — los `GeneratedPdf` tipo `collection` del dueño
+  actual (usuario o token de invitado) NO caducados, más recientes
+  primero, con `{id, status, filename, locale, url, size, generated_at,
+  expires_at}`. Los `ready` mantienen el enlace de descarga tras recargar
+  la página y un `pending` permite a la SPA retomar el sondeo; los
+  `failed` no salen. `data` (los items) no cambia.
+
 ### Cambiado
 
 - **Solo dos velos: 60 y 80 %** (`BlockType::commonFields()`): los presets
