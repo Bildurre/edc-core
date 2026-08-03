@@ -7,11 +7,11 @@ Backend Laravel reutilizable del motor. Versión de tren con `@edc-motor/ui` y
 
 ### Cambiado
 
-- **Los presets del campo común `background` pasan a los VELOS del fondo
-  de página** (`BlockType::commonFields()`): «Velo 15 %»
+- **Los presets del campo común `background` pasan a los VELOS de
+  superficie** (`BlockType::commonFields()`): «Velo 15 %»
   (`token:veil-15`), «Velo 30 %» (`token:veil-30`), «Velo 60 %»
   (`token:veil-60`) y «Velo 85 %» (`token:veil-85`) — el color de fondo
-  de página del tema (`--bg`) a esa opacidad (custom properties de
+  de tarjeta del tema (`--surface`) a esa opacidad (custom properties de
   `_theme.scss` en `@edc-motor/ui`): sobre la imagen de fondo ennegrecen
   en oscuro y emblanquecen en claro — más el «Acento» translúcido
   (`token:accent-soft`), que se mantiene. Los grises neutros de 0.5.10
