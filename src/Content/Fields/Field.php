@@ -37,6 +37,15 @@ class Field
      */
     public ?string $row = null;
 
+    /**
+     * Valores RETIRADOS que siguen validando (color con presets): ya no se
+     * ofrecen en el picker (no viajan en la serialización) pero lo guardado
+     * con ellos sigue pasando la validación y renderizando.
+     *
+     * @var string[]
+     */
+    public array $legacyValues = [];
+
     public static function text(string $key): self
     {
         return new self($key, 'text');
@@ -169,14 +178,28 @@ class Field
      * Opciones del campo (valor => etiqueta). En un color son los presets
      * DINÁMICOS del tema: valores `token:<nombre>` que el front resuelve a
      * la custom property `var(--<nombre>)` del tema activo (p. ej.
-     * `token:surface` => «Fondo de tarjeta»); el picker los ofrece además
-     * de su paleta de hexes y la validación los acepta junto a los hex.
+     * `token:neutral` => «Gris»); el picker los ofrece además de su paleta
+     * de hexes y la validación los acepta junto a los hex.
      *
      * @param  array<string, string>  $options
      */
     public function options(array $options): self
     {
         $this->options = $options;
+
+        return $this;
+    }
+
+    /**
+     * Presets RETIRADOS de un color: valores `token:*` que el picker ya no
+     * ofrece pero que la validación sigue aceptando — retrocompat con los
+     * bloques guardados cuando aún eran preset (p. ej. token:surface).
+     *
+     * @param  string[]  $values
+     */
+    public function legacyValues(array $values): self
+    {
+        $this->legacyValues = $values;
 
         return $this;
     }
@@ -246,12 +269,13 @@ class Field
             'boolean' => ['boolean'],
             'select' => ['string', 'in:'.implode(',', array_keys($this->options))],
             // Color: hex libre; con presets declarados (options), además de
-            // los hex solo se admiten SUS valores (token:* conocidos).
-            'color' => $this->options === []
+            // los hex solo se admiten SUS valores (token:* conocidos) y los
+            // retirados (legacyValues: ya no son preset, siguen validando).
+            'color' => $this->options === [] && $this->legacyValues === []
                 ? ['string', 'max:32']
                 : ['string', 'max:32', 'regex:/^(#[0-9a-fA-F]{3,8}|'.implode('|', array_map(
                     fn (string $value) => preg_quote($value, '/'),
-                    array_keys($this->options),
+                    [...array_keys($this->options), ...$this->legacyValues],
                 )).')$/'],
             'entity' => ['integer'],
             default => ['string'],

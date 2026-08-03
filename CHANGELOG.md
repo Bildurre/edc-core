@@ -3,9 +3,37 @@
 Backend Laravel reutilizable del motor. Versión de tren con `@edc-motor/ui` y
 `@edc-motor/admin-kit` (tag `vX.Y.Z` en el monorepo).
 
+<<<<<<< HEAD
 ## [0.5.9] — 2026-08-02
 
 - Sin cambios propios: versión de tren.
+=======
+## [Sin publicar]
+
+### Añadido
+
+- **DSL de campos: modificador `->legacyValues()`** — valores RETIRADOS de
+  un campo `color` con presets: no viajan en la serialización (el picker
+  ya no los ofrece) pero la validación los sigue aceptando, para que lo
+  guardado cuando eran preset no se rompa.
+- **Descarga de PDF en línea** — `GET /api/pdfs/{id}/download?inline=1`
+  responde `Content-Disposition: inline`: el navegador abre el PDF en la
+  pestaña en vez de descargarlo. Sin el flag, `attachment` como siempre;
+  mismas reglas de acceso (permanentes públicos, temporales solo dueño/
+  admin).
+
+### Cambiado
+
+- **Los presets del campo común `background` pasan a los grises
+  translúcidos por grados** (`BlockType::commonFields()`): «Gris suave»
+  (`token:neutral-soft`), «Gris» (`token:neutral`), «Gris fuerte»
+  (`token:neutral-strong`) y «Acento» (`token:accent-soft`) — custom
+  properties translúcidas del tema (`_theme.scss` de `@edc-motor/ui`) con
+  grado fijo por token y por tema; el medio calca al «Gris» estático de la
+  paleta. Los presets opacos de 0.5.8 (`token:surface`, `token:surface-2`,
+  `token:surface-3`, `token:accent-500`) se retiran del picker pero siguen
+  validando (`->legacyValues()`) y renderizando.
+>>>>>>> origin/claude/choique-disable-language-abgt8x
 
 ## [0.5.8] — 2026-08-02
 
