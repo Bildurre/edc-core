@@ -3,12 +3,7 @@
 Backend Laravel reutilizable del motor. Versión de tren con `@edc-motor/ui` y
 `@edc-motor/admin-kit` (tag `vX.Y.Z` en el monorepo).
 
-<<<<<<< HEAD
-## [0.5.9] — 2026-08-02
-
-- Sin cambios propios: versión de tren.
-=======
-## [0.5.10] — 2026-08-03
+## [Sin publicar]
 
 ### Cambiado
 
@@ -24,10 +19,7 @@ Backend Laravel reutilizable del motor. Versión de tren con `@edc-motor/ui` y
   retiran del picker pero siguen validando (`->legacyValues()`, junto a
   los `token:surface*`/`token:accent-500` de 0.5.8) y renderizando.
 
-<!-- Sección de abajo: entradas ya publicadas en 0.5.10 (working tree por
-     detrás de main; recolocar en el rebase). -->
-
-## [Sin publicar — ya salió en 0.5.10]
+## [0.5.10] — 2026-08-03
 
 ### Añadido
 
@@ -52,7 +44,10 @@ Backend Laravel reutilizable del motor. Versión de tren con `@edc-motor/ui` y
   paleta. Los presets opacos de 0.5.8 (`token:surface`, `token:surface-2`,
   `token:surface-3`, `token:accent-500`) se retiran del picker pero siguen
   validando (`->legacyValues()`) y renderizando.
->>>>>>> origin/claude/choique-disable-language-abgt8x
+
+## [0.5.9] — 2026-08-02
+
+- Sin cambios propios: versión de tren.
 
 ## [0.5.8] — 2026-08-02
 
