@@ -103,10 +103,8 @@ abstract class BlockType
             // etiquetas viajan como las de los select
             // (blockOptions.background.* en el admin, castellano aquí).
             Field::color('background')->options([
-                'token:veil-15' => 'Velo 15 %',
-                'token:veil-30' => 'Velo 30 %',
                 'token:veil-60' => 'Velo 60 %',
-                'token:veil-85' => 'Velo 85 %',
+                'token:veil-80' => 'Velo 80 %',
                 'token:accent-soft' => 'Acento',
             ])->legacyValues([
                 'token:surface',
@@ -116,6 +114,9 @@ abstract class BlockType
                 'token:neutral-soft',
                 'token:neutral',
                 'token:neutral-strong',
+                'token:veil-15',
+                'token:veil-30',
+                'token:veil-85',
             ])->label('Color de fondo'),
         ];
     }
