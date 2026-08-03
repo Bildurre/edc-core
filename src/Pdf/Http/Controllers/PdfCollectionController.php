@@ -12,6 +12,7 @@ use Illuminate\Foundation\Auth\User;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Http\Request;
 use Illuminate\Routing\Controller;
+use Illuminate\Support\Facades\Storage;
 use Illuminate\Validation\Rule;
 
 /**
@@ -49,7 +50,40 @@ class PdfCollectionController extends Controller
                 ];
             });
 
-        return response()->json(['data' => $items]);
+        return response()->json(['data' => $items, 'generated' => $this->generated($request)]);
+    }
+
+    /**
+     * PDFs temporales de la colección del dueño actual aún VIGENTES (no
+     * caducados), más recientes primero: los 'ready' mantienen el enlace de
+     * descarga disponible tras recargar la página y un 'pending' permite a
+     * la SPA retomar el sondeo. Los 'failed' no salen (su aviso ya se dio
+     * al generar).
+     *
+     * @return array<int, array<string, mixed>>
+     */
+    protected function generated(Request $request): array
+    {
+        $disk = Storage::disk(config('motor.pdf.disk'));
+
+        return $this->scope($request, GeneratedPdf::query(), 'owner_id')
+            ->where('type', PdfService::COLLECTION_TYPE)
+            ->whereIn('status', [GeneratedPdf::STATUS_PENDING, GeneratedPdf::STATUS_READY])
+            ->where(fn (Builder $query) => $query->whereNull('expires_at')->orWhere('expires_at', '>', now()))
+            ->orderByDesc('id')
+            ->get()
+            ->map(fn (GeneratedPdf $pdf) => [
+                'id' => $pdf->id,
+                'status' => $pdf->status,
+                'filename' => $pdf->filename,
+                'locale' => $pdf->locale,
+                'url' => $pdf->url(),
+                'size' => $pdf->path && $disk->exists($pdf->path) ? $disk->size($pdf->path) : null,
+                'generated_at' => $pdf->generated_at?->toIso8601String(),
+                'expires_at' => $pdf->expires_at?->toIso8601String(),
+            ])
+            ->values()
+            ->all();
     }
 
     /** Añade una entidad (o actualiza sus copias si ya estaba). */
