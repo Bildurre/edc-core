@@ -10,6 +10,25 @@ Backend Laravel reutilizable del motor. Versión de tren con `@edc-motor/ui` y
 =======
 ## [0.5.10] — 2026-08-03
 
+### Cambiado
+
+- **Los presets del campo común `background` pasan a los VELOS del fondo
+  de página** (`BlockType::commonFields()`): «Velo 15 %»
+  (`token:veil-15`), «Velo 30 %» (`token:veil-30`), «Velo 60 %»
+  (`token:veil-60`) y «Velo 85 %» (`token:veil-85`) — el color de fondo
+  de página del tema (`--bg`) a esa opacidad (custom properties de
+  `_theme.scss` en `@edc-motor/ui`): sobre la imagen de fondo ennegrecen
+  en oscuro y emblanquecen en claro — más el «Acento» translúcido
+  (`token:accent-soft`), que se mantiene. Los grises neutros de 0.5.10
+  (`token:neutral-soft`, `token:neutral`, `token:neutral-strong`) se
+  retiran del picker pero siguen validando (`->legacyValues()`, junto a
+  los `token:surface*`/`token:accent-500` de 0.5.8) y renderizando.
+
+<!-- Sección de abajo: entradas ya publicadas en 0.5.10 (working tree por
+     detrás de main; recolocar en el rebase). -->
+
+## [Sin publicar — ya salió en 0.5.10]
+
 ### Añadido
 
 - **DSL de campos: modificador `->legacyValues()`** — valores RETIRADOS de

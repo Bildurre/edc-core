@@ -92,25 +92,30 @@ abstract class BlockType
             // El color de fondo admite, además de un hex fijo, presets
             // DINÁMICOS del tema (serializados como `token:<nombre>`): el
             // front los resuelve a var(--<nombre>) del tema activo, así el
-            // fondo sigue al claro/oscuro. Tres GRISES translúcidos por
-            // grados de intensidad (la base neutra del tema con el grado
-            // fijado en _theme.scss por token y por tema; el medio calca al
-            // «Gris» estático de la paleta) + el acento translúcido. Los
-            // presets RETIRADOS (la escala de superficies opacas y el acento
-            // opaco de 0.5.8) ya no se ofrecen pero siguen validando y
-            // renderizando (legacyValues). Las etiquetas viajan como las de
-            // los select (blockOptions.background.* en el admin, castellano
-            // aquí).
+            // fondo sigue al claro/oscuro. Cuatro VELOS del color de fondo
+            // de página del tema (--bg al 15/30/60/85 %, _theme.scss de
+            // @edc-motor/ui: sobre la imagen de fondo ennegrecen en oscuro
+            // y emblanquecen en claro, y el número del token es su
+            // opacidad) + el acento translúcido. Los presets RETIRADOS (la
+            // escala de superficies opacas y el acento opaco de 0.5.8, y
+            // los grises neutros translúcidos de 0.5.10) ya no se ofrecen
+            // pero siguen validando y renderizando (legacyValues). Las
+            // etiquetas viajan como las de los select
+            // (blockOptions.background.* en el admin, castellano aquí).
             Field::color('background')->options([
-                'token:neutral-soft' => 'Gris suave',
-                'token:neutral' => 'Gris',
-                'token:neutral-strong' => 'Gris fuerte',
+                'token:veil-15' => 'Velo 15 %',
+                'token:veil-30' => 'Velo 30 %',
+                'token:veil-60' => 'Velo 60 %',
+                'token:veil-85' => 'Velo 85 %',
                 'token:accent-soft' => 'Acento',
             ])->legacyValues([
                 'token:surface',
                 'token:surface-2',
                 'token:surface-3',
                 'token:accent-500',
+                'token:neutral-soft',
+                'token:neutral',
+                'token:neutral-strong',
             ])->label('Color de fondo'),
         ];
     }

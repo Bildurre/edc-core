@@ -178,7 +178,7 @@ class Field
      * Opciones del campo (valor => etiqueta). En un color son los presets
      * DINÁMICOS del tema: valores `token:<nombre>` que el front resuelve a
      * la custom property `var(--<nombre>)` del tema activo (p. ej.
-     * `token:neutral` => «Gris»); el picker los ofrece además de su paleta
+     * `token:veil-30` => «Velo 30 %»); el picker los ofrece además de su paleta
      * de hexes y la validación los acepta junto a los hex.
      *
      * @param  array<string, string>  $options
