@@ -99,9 +99,14 @@ return [
         // cubre los cambios en entidades que consultan los bloques-con-datos.
         'cache_ttl' => env('MOTOR_CONTENT_CACHE_TTL', 300),
         // Plantillas de página disponibles (clave => etiqueta). Cada juego
-        // añade las suyas; la SPA decide qué hace con cada clave.
+        // añade las suyas; la SPA decide qué hace con cada clave. Las del
+        // motor: 'default' (nada especial) y 'compact-blocks', que solo
+        // cambia el PDF imprimible (bloques enteros sin partir entre páginas
+        // y escala tipográfica/espaciados compactos; en la web se renderiza
+        // como la de por defecto).
         'templates' => [
             'default' => 'Por defecto',
+            'compact-blocks' => 'Bloques compactos',
         ],
     ],
 
