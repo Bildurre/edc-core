@@ -3,6 +3,8 @@
 namespace Edc\Core\Pdf\Models;
 
 use App\Models\User;
+use Edc\Core\Pdf\PdfExportRegistry;
+use Edc\Core\Pdf\PdfService;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
 use Illuminate\Database\Eloquent\Relations\MorphTo;
@@ -57,6 +59,23 @@ class GeneratedPdf extends Model
     public function isExpired(): bool
     {
         return $this->expires_at !== null && $this->expires_at->isPast();
+    }
+
+    /**
+     * Nombre LEGIBLE del PDF en su locale (lo resuelve el export vía
+     * displayName): card de Descargas y nombre de fichero/pestaña al
+     * descargar. Los PDF de USUARIO (colecciones temporales) y los de un
+     * export ya desregistrado conservan su filename de siempre.
+     */
+    public function displayName(): string
+    {
+        $registry = app(PdfExportRegistry::class);
+
+        if ($this->type === PdfService::COLLECTION_TYPE || ! $registry->has($this->type)) {
+            return $this->filename;
+        }
+
+        return $registry->get($this->type)->displayName($this->source, $this->locale);
     }
 
     /** URL pública del PDF (null si aún no está generado). */

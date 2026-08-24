@@ -210,6 +210,127 @@ class PdfPageAssets
     }
 
     /**
+     * HTML de wysiwyg listo para el papel: imágenes embebidas (inlineImages)
+     * y tablas normalizadas (normalizeTables). Es lo que usa la plantilla
+     * motor::pdf.page para cualquier campo de contenido enriquecido.
+     */
+    public function printableHtml(?string $html): string
+    {
+        return $this->normalizeTables($this->inlineImages($html));
+    }
+
+    /**
+     * Mueve la primera fila de <th> de cada tabla a un <thead> real: el
+     * wysiwyg (TipTap) emite la fila de cabeceras dentro del tbody y DomPDF
+     * solo REPITE en cada página las filas de un <thead> cuando la tabla
+     * cruza de página. Tablas sin fila de cabeceras (o con thead propio) se
+     * quedan como están.
+     */
+    public function normalizeTables(string $html): string
+    {
+        if (trim($html) === '' || stripos($html, '<table') === false) {
+            return $html;
+        }
+
+        $doc = new DOMDocument;
+        $loaded = @$doc->loadHTML(
+            '<?xml encoding="utf-8"?><div id="__root">'.$html.'</div>',
+            LIBXML_NOERROR | LIBXML_NONET,
+        );
+        $root = $loaded ? $doc->getElementById('__root') : null;
+        if ($root === null) {
+            return $html;
+        }
+
+        foreach (iterator_to_array($doc->getElementsByTagName('table')) as $table) {
+            if ($table->getElementsByTagName('thead')->length > 0) {
+                continue;
+            }
+
+            $firstRow = $table->getElementsByTagName('tr')->item(0);
+            if ($firstRow === null) {
+                continue;
+            }
+
+            // Solo si TODA la primera fila son <th> (cabeceras de verdad).
+            $cells = array_filter(
+                iterator_to_array($firstRow->childNodes),
+                fn ($node) => $node->nodeType === XML_ELEMENT_NODE,
+            );
+            $ths = array_filter($cells, fn ($cell) => strtolower($cell->nodeName) === 'th');
+            if ($cells === [] || count($ths) !== count($cells)) {
+                continue;
+            }
+
+            $thead = $doc->createElement('thead');
+            $table->insertBefore($thead, $table->firstChild);
+            $thead->appendChild($firstRow);
+        }
+
+        $out = '';
+        foreach ($root->childNodes as $node) {
+            $out .= $doc->saveHTML($node);
+        }
+
+        return $out;
+    }
+
+    /**
+     * Separa el PRIMER elemento de un HTML de wysiwyg del resto del
+     * contenido: la plantilla del PDF agrupa el título/subtítulo del bloque
+     * con ese arranque en un contenedor que no se parte de página
+     * (page-break-inside: avoid), para que un título nunca quede huérfano
+     * al final de una página con su contenido en la siguiente.
+     *
+     * Un primer elemento potencialmente ALTO (tabla, lista, pre) no se
+     * agrupa — metería media página en el contenedor indivisible y DomPDF
+     * lo saltaría entero a la siguiente dejando un hueco; para esos el
+     * título se protege con el page-break-after: avoid del propio lead.
+     *
+     * @return array{0: string, 1: string} [primer elemento, resto]
+     */
+    public function splitFirstElement(?string $html): array
+    {
+        if ($html === null || trim($html) === '') {
+            return ['', ''];
+        }
+
+        $doc = new DOMDocument;
+        $loaded = @$doc->loadHTML(
+            '<?xml encoding="utf-8"?><div id="__root">'.$html.'</div>',
+            LIBXML_NOERROR | LIBXML_NONET,
+        );
+        $root = $loaded ? $doc->getElementById('__root') : null;
+        if ($root === null) {
+            return [$html, ''];
+        }
+
+        $first = '';
+        $rest = '';
+        $taken = false;
+        foreach ($root->childNodes as $node) {
+            $isElement = $node->nodeType === XML_ELEMENT_NODE;
+            // Un arranque alto no se agrupa: todo queda como resto.
+            if (! $taken && $first === '' && $isElement
+                && in_array(strtolower($node->nodeName), ['table', 'ul', 'ol', 'pre'], true)
+            ) {
+                return ['', $html];
+            }
+            // El primer elemento (y cualquier texto suelto que lo preceda)
+            // forma el arranque; desde el siguiente elemento, todo es resto.
+            if (! $taken) {
+                $first .= $doc->saveHTML($node);
+                $taken = $isElement;
+
+                continue;
+            }
+            $rest .= $doc->saveHTML($node);
+        }
+
+        return [$first, $rest];
+    }
+
+    /**
      * Embebe las imágenes de un HTML de wysiwyg (iconos rt-icon incluidos);
      * las que no se resuelven a fichero local se eliminan del marcado.
      */

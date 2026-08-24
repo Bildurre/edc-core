@@ -52,6 +52,20 @@ abstract class BlockType
     }
 
     /**
+     * Vista Blade con la que este bloque se imprime en el PDF de páginas
+     * (motor::pdf.page). null = tratamiento genérico del motor: los bloques
+     * de presentación imprimen su cuerpo completo y los de datos solo su
+     * parte textual. Un bloque de datos con impresión propia (p. ej. la
+     * lista de contadores de CDL) devuelve aquí su parcial; la vista recibe
+     * $s (settings localizados), $data (resolveData, como el render
+     * público), $locale, $assets (PdfPageAssets) y $hTitle/$hSubtitle.
+     */
+    public function pdfView(): ?string
+    {
+        return null;
+    }
+
+    /**
      * Campos comunes a TODOS los bloques (los aplica el envoltorio genérico
      * del render): alineación del texto, anchura del contenido y color de
      * fondo.

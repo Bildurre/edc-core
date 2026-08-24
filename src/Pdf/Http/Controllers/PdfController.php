@@ -236,6 +236,7 @@ class PdfController extends Controller
         $disk = Storage::disk(config('motor.pdf.disk'));
 
         $groups = GeneratedPdf::query()
+            ->with('source') // displayName resuelve el nombre traducible de la entidad dueña
             ->where('is_permanent', true)
             ->where('status', GeneratedPdf::STATUS_READY)
             ->orderBy('filename')
@@ -247,6 +248,10 @@ class PdfController extends Controller
                 'items' => $pdfs->map(fn (GeneratedPdf $pdf) => [
                     'id' => $pdf->id,
                     'filename' => $pdf->filename,
+                    // Nombre legible en el locale del PDF (título de página,
+                    // nombre de facción/mazo, etiqueta del export...): el que
+                    // pinta la card de la SPA.
+                    'title' => $pdf->displayName(),
                     'locale' => $pdf->locale,
                     'url' => url("/api/pdfs/{$pdf->id}/download"),
                     'size' => $pdf->path && $disk->exists($pdf->path) ? $disk->size($pdf->path) : null,
@@ -281,9 +286,16 @@ class PdfController extends Controller
             );
         }
 
+        // Nombre de fichero LEGIBLE (displayName; los de usuario conservan su
+        // filename): titula la pestaña al abrir inline y nombra la descarga.
+        // Laravel/Symfony emiten el Content-Disposition con `filename*`
+        // UTF-8 (RFC 5987) y fallback ASCII transliterado; las barras no
+        // caben en una cabecera de disposición.
+        $name = str_replace(['/', '\\'], '-', $pdf->displayName());
+
         return Storage::disk(config('motor.pdf.disk'))->response(
             $pdf->path,
-            "{$pdf->filename}.pdf",
+            "{$name}.pdf",
             [],
             $request->boolean('inline') ? 'inline' : 'attachment',
         );

@@ -36,6 +36,16 @@ interface PdfExportContract
     public function filename(?Model $source, string $locale): string;
 
     /**
+     * Nombre LEGIBLE del PDF en el idioma pedido: el que ve el visitante en
+     * la card de Descargas y el que titula la pestaña del navegador
+     * (Content-Disposition). No es el filename de la BD (ese sigue siendo un
+     * slug): para exports con entidad dueña sale de su nombre/título
+     * traducible; para los globales, de las etiquetas por locale que declare
+     * el export; y si no hay nada, del filename embellecido.
+     */
+    public function displayName(?Model $source, string $locale): string;
+
+    /**
      * Vista Blade del PDF. null = la rejilla genérica del motor
      * ('motor::pdf.grid'). Un juego puede apuntar a una vista propia para
      * layouts especiales (portadas, reglas, etc.).

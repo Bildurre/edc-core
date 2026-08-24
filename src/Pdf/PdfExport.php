@@ -34,6 +34,44 @@ abstract class PdfExport implements PdfExportContract
         return implode('-', $parts) ?: $locale;
     }
 
+    /**
+     * Nombre legible del PDF en el locale pedido (card de Descargas y
+     * Content-Disposition): con entidad dueña, su nombre/título traducible;
+     * sin ella, la etiqueta por locale que declare el export (labels()) o,
+     * como última bala, el filename embellecido (guiones → espacios,
+     * mayúscula inicial, sin el sufijo de idioma).
+     */
+    public function displayName(?Model $source, string $locale): string
+    {
+        if ($source !== null) {
+            return $this->sourceLabel($source, $locale);
+        }
+
+        return $this->labels()[$locale]
+            ?? $this->prettifyFilename($this->filename($source, $locale), $locale);
+    }
+
+    /**
+     * Etiquetas por locale para exports SIN entidad dueña (catálogos,
+     * contadores...): ['es' => 'Contadores recortables', 'en' => '...'].
+     * Cada juego las declara en su export; un locale sin etiqueta cae al
+     * filename embellecido.
+     *
+     * @return array<string, string>
+     */
+    protected function labels(): array
+    {
+        return [];
+    }
+
+    /** Filename embellecido: sin sufijo de idioma, guiones a espacios, mayúscula inicial. */
+    protected function prettifyFilename(string $filename, string $locale): string
+    {
+        $base = preg_replace('/[-_]'.preg_quote($locale, '/').'$/', '', $filename) ?: $filename;
+
+        return Str::ucfirst(trim(str_replace(['-', '_'], ' ', $base)));
+    }
+
     /** Nombre legible del elemento dueño (para el fichero). */
     protected function sourceLabel(Model $source, string $locale): string
     {

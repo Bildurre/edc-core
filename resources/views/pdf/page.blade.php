@@ -73,12 +73,20 @@
         $type = $registry->get($block->type);
         $depth = min($depthOf($block), 3);
 
+        // Impresión propia del bloque (BlockType::pdfView, p. ej. la lista
+        // de contadores de CDL): su parcial recibe los mismos datos que el
+        // render público (resolveData).
+        $pdfView = $type->pdfView();
+
         return [
             'type' => $block->type,
             'category' => $type->category,
             's' => $type->localizeSettings($block->settings, $locale),
             'hTitle' => 'h'.min(2 + $depth, 5),
             'hSubtitle' => 'h'.min(3 + $depth, 6),
+            'pdfView' => $pdfView,
+            'data' => $pdfView !== null ? $type->resolveData($block, $locale) : [],
+            'block' => $block,
         ];
     });
 @endphp
@@ -146,6 +154,14 @@
 
         p { margin-bottom: 1em; }
 
+        {{-- El título/subtítulo de un bloque nunca quedan huérfanos al final
+             de una página: viajan con el ARRANQUE de su contenido (primer
+             elemento) en este contenedor, que DomPDF no parte — los
+             page-break-after: avoid de los títulos solos no bastan. El
+             after: avoid añade la segunda barrera para los arranques que no
+             se agrupan (tabla/lista como primer elemento). --}}
+        .block__lead { page-break-inside: avoid; page-break-after: avoid; }
+
         ul, ol { list-style-position: outside; margin-left: 2em; margin-bottom: 1em; }
         ol { list-style-type: decimal; }
         ul { list-style-type: disc; }
@@ -155,13 +171,23 @@
         li { margin-bottom: 0.3em; }
         li:last-child { margin-bottom: 0; }
 
-        {{-- Tablas del wysiwyg, como las pintaba el viejo. --}}
+        {{-- Tablas del wysiwyg, como las pintaba el viejo (celdas con menos
+             aire VERTICAL). La fila de cabeceras viaja en un <thead> real
+             (normalizeTables): DomPDF la repite en cada página si la tabla
+             cruza de página. --}}
         table { width: 100%; border-collapse: collapse; margin-bottom: 1em; }
-        td, th { text-align: center; border-bottom: 1px solid grey; vertical-align: middle; padding: 1mm; }
+        td, th { text-align: center; border-bottom: 1px solid grey; vertical-align: middle; padding: 0.3mm 1mm; }
+        thead th { border-bottom: 1.5px solid #000; }
         table img { display: inline-block; margin: 0; float: none; width: 11pt; height: 11pt; }
 
-        {{-- Citas: la del BLOQUE cita, en la fuente especial del sitio,
+        {{-- Citas: el BLOQUE cita va sobre una banda de fondo gris muy claro
+             (suave, imprimible), y su texto en la fuente especial del sitio,
              cursiva y centrada (como la web)... --}}
+        .block--quote {
+            background-color: #f2f2f2;
+            padding: 0.8em 1em 0.1em;
+            page-break-inside: avoid;
+        }
         .block--quote blockquote {
             font-family: 'pdf-special', {!! $fonts['special']['fallback'] !!};
             font-style: italic;
@@ -189,7 +215,20 @@
         img.rt-icon { width: 11pt !important; height: 11pt !important; display: inline-block; vertical-align: middle; }
 
         .block { margin-bottom: 2em; }
-        .block--header { margin-bottom: 2em; padding-bottom: 1em; border-bottom: 2px solid #000; }
+        {{-- Cabecera y bloques de datos (solo su parte textual): cortos,
+             enteros de una pieza — su título tampoco se queda huérfano. --}}
+        .block--header { margin-bottom: 2em; padding-bottom: 1em; border-bottom: 2px solid #000; page-break-inside: avoid; }
+        .block--data { page-break-inside: avoid; }
+
+        {{-- Tarjeta de texto: recuadro con borde, levemente más estrecha que
+             la columna del cuerpo (margen lateral extra) y con aire interior
+             para que el texto no toque el filete. --}}
+        .block--text-card {
+            border: 1pt solid #666;
+            padding: 1em 1.2em 0.2em;
+            margin-left: 1.2em;
+            margin-right: 1.2em;
+        }
 
         {{-- Imagen del bloque: flotada (el texto la rodea; ancho inline según
              la posición configurada) o a todo el ancho arriba/abajo. --}}
@@ -226,7 +265,23 @@
     @foreach ($items as $item)
         @php $s = $item['s']; @endphp
 
-        @if ($item['type'] === 'header')
+        @if ($item['pdfView'] !== null)
+            {{-- Impresión PROPIA del bloque (BlockType::pdfView): el juego
+                 manda — el parcial recibe lo mismo que su render público. --}}
+            @include($item['pdfView'], [
+                'block' => $item['block'],
+                's' => $s,
+                'data' => $item['data'],
+                'locale' => $locale,
+                'assets' => $assets,
+                'hTitle' => $item['hTitle'],
+                'hSubtitle' => $item['hSubtitle'],
+                'styleAttr' => $styleAttr,
+                'headingAlign' => $headingAlign,
+                'bodyAlign' => $bodyAlign,
+            ])
+
+        @elseif ($item['type'] === 'header')
             @continue(blank($s['title'] ?? null) && blank($s['subtitle'] ?? null))
             <div class="block block--header">
                 @if (! blank($s['title'] ?? null))
@@ -246,7 +301,7 @@
                     <{{ $item['hSubtitle'] }}{!! $styleAttr($headingAlign($s, 'subtitle_align')) !!}>{{ $s['subtitle'] }}</{{ $item['hSubtitle'] }}>
                 @endif
                 @if (! blank($s['quote'] ?? null))
-                    <blockquote>{!! $assets->inlineImages($s['quote']) !!}</blockquote>
+                    <blockquote>{!! $assets->printableHtml($s['quote']) !!}</blockquote>
                 @endif
                 @if (! blank($s['author'] ?? null))
                     <div class="quote-author" style="text-align: {{ in_array($s['author_align'] ?? 'right', ['left', 'center', 'right'], true) ? $s['author_align'] : 'right' }};">— {{ $s['author'] }}</div>
@@ -254,21 +309,39 @@
             </div>
 
         @elseif ($item['type'] === 'faq')
+            {{-- El título/subtítulo viajan con la PRIMERA pregunta-respuesta
+                 (block__lead): nunca huérfanos al final de página. --}}
             <div class="block block--faq">
-                @if (! blank($s['title'] ?? null))
-                    <{{ $item['hTitle'] }}{!! $styleAttr($headingAlign($s, 'title_align')) !!}>{{ $s['title'] }}</{{ $item['hTitle'] }}>
-                @endif
-                @if (! blank($s['subtitle'] ?? null))
-                    <{{ $item['hSubtitle'] }}{!! $styleAttr($headingAlign($s, 'subtitle_align')) !!}>{{ $s['subtitle'] }}</{{ $item['hSubtitle'] }}>
-                @endif
                 @foreach ($s['items'] ?? [] as $faq)
+                    @if ($loop->first)
+                        <div class="block__lead">
+                        @if (! blank($s['title'] ?? null))
+                            <{{ $item['hTitle'] }}{!! $styleAttr($headingAlign($s, 'title_align')) !!}>{{ $s['title'] }}</{{ $item['hTitle'] }}>
+                        @endif
+                        @if (! blank($s['subtitle'] ?? null))
+                            <{{ $item['hSubtitle'] }}{!! $styleAttr($headingAlign($s, 'subtitle_align')) !!}>{{ $s['subtitle'] }}</{{ $item['hSubtitle'] }}>
+                        @endif
+                    @endif
                     @if (! blank($faq['question'] ?? null))
                         <div class="faq-question">{{ $faq['question'] }}</div>
                     @endif
                     @if (! blank($faq['answer'] ?? null))
-                        <div{!! $styleAttr($bodyAlign($s)) !!}>{!! $assets->inlineImages($faq['answer']) !!}</div>
+                        <div{!! $styleAttr($bodyAlign($s)) !!}>{!! $assets->printableHtml($faq['answer']) !!}</div>
+                    @endif
+                    @if ($loop->first)
+                        </div>
                     @endif
                 @endforeach
+                @if (($s['items'] ?? []) === [])
+                    <div class="block__lead">
+                        @if (! blank($s['title'] ?? null))
+                            <{{ $item['hTitle'] }}{!! $styleAttr($headingAlign($s, 'title_align')) !!}>{{ $s['title'] }}</{{ $item['hTitle'] }}>
+                        @endif
+                        @if (! blank($s['subtitle'] ?? null))
+                            <{{ $item['hSubtitle'] }}{!! $styleAttr($headingAlign($s, 'subtitle_align')) !!}>{{ $s['subtitle'] }}</{{ $item['hSubtitle'] }}>
+                        @endif
+                    </div>
+                @endif
             </div>
 
         @elseif (in_array($item['type'], ['text', 'text-card', 'cta'], true) || $item['category'] !== 'data')
@@ -276,34 +349,44 @@
                  acción y cualquier tipo de presentación de un juego que siga
                  el contrato title/subtitle/body(+image). --}}
             @php
-                $body = $assets->inlineImages(is_string($s['body'] ?? null) ? $s['body'] : '');
+                $body = $assets->printableHtml(is_string($s['body'] ?? null) ? $s['body'] : '');
                 [$leading, $rest] = $assets->splitLeadingHeadings($body);
+                // El ARRANQUE del cuerpo (primer elemento) viaja con el
+                // título en block__lead (nunca huérfanos); el resto fluye.
+                [$firstChunk, $tail] = $assets->splitFirstElement($rest);
                 $image = $assets->imageDataUri($s['image'] ?? null);
                 $float = $image ? $floatFor($s) : null;
                 $position = $s['image_position'] ?? 'top';
             @endphp
             @continue(blank($s['title'] ?? null) && blank($s['subtitle'] ?? null) && trim($body) === '' && ! $image && blank($s['button_text'] ?? null))
             <div class="block block--{{ $item['type'] }}">
-                @if (! blank($s['label'] ?? null))
-                    <div class="label"{!! $styleAttr(in_array($s['label_align'] ?? 'left', ['center', 'right'], true) ? $s['label_align'] : null) !!}>{{ $s['label'] }}</div>
-                @endif
-                @if (! blank($s['title'] ?? null))
-                    <{{ $item['hTitle'] }}{!! $styleAttr($headingAlign($s, 'title_align')) !!}>{{ $s['title'] }}</{{ $item['hTitle'] }}>
-                @endif
-                @if (! blank($s['subtitle'] ?? null))
-                    <{{ $item['hSubtitle'] }}{!! $styleAttr($headingAlign($s, 'subtitle_align')) !!}>{{ $s['subtitle'] }}</{{ $item['hSubtitle'] }}>
-                @endif
-                {{-- Títulos iniciales del wysiwyg, ANTES de flotar la imagen:
-                     a todo el ancho, sin empujarla (portado del viejo). --}}
-                {!! $leading !!}
-                <div class="block__content">
-                    @if ($image && $float)
-                        <img class="block__image block__image--{{ $float[0] }}" style="width: {{ $float[1] }}%;" src="{{ $image }}" alt="">
-                    @elseif ($image && $position !== 'bottom')
-                        <img class="block__image block__image--full" src="{{ $image }}" alt="">
+                <div class="block__lead">
+                    @if (! blank($s['label'] ?? null))
+                        <div class="label"{!! $styleAttr(in_array($s['label_align'] ?? 'left', ['center', 'right'], true) ? $s['label_align'] : null) !!}>{{ $s['label'] }}</div>
                     @endif
-                    @if (trim($rest) !== '')
-                        <div{!! $styleAttr($bodyAlign($s)) !!}>{!! $rest !!}</div>
+                    @if (! blank($s['title'] ?? null))
+                        <{{ $item['hTitle'] }}{!! $styleAttr($headingAlign($s, 'title_align')) !!}>{{ $s['title'] }}</{{ $item['hTitle'] }}>
+                    @endif
+                    @if (! blank($s['subtitle'] ?? null))
+                        <{{ $item['hSubtitle'] }}{!! $styleAttr($headingAlign($s, 'subtitle_align')) !!}>{{ $s['subtitle'] }}</{{ $item['hSubtitle'] }}>
+                    @endif
+                    {{-- Títulos iniciales del wysiwyg, ANTES de flotar la
+                         imagen: a todo el ancho, sin empujarla (del viejo). --}}
+                    {!! $leading !!}
+                    <div class="block__content">
+                        @if ($image && $float)
+                            <img class="block__image block__image--{{ $float[0] }}" style="width: {{ $float[1] }}%;" src="{{ $image }}" alt="">
+                        @elseif ($image && $position !== 'bottom')
+                            <img class="block__image block__image--full" src="{{ $image }}" alt="">
+                        @endif
+                        @if (trim($firstChunk) !== '')
+                            <div{!! $styleAttr($bodyAlign($s)) !!}>{!! $firstChunk !!}</div>
+                        @endif
+                    </div>
+                </div>
+                <div class="block__content">
+                    @if (trim($tail) !== '')
+                        <div{!! $styleAttr($bodyAlign($s)) !!}>{!! $tail !!}</div>
                     @endif
                     @if ($image && ! $float && $position === 'bottom')
                         <img class="block__image block__image--full" src="{{ $image }}" alt="">
@@ -325,7 +408,7 @@
             {{-- Bloques con DATOS del juego (counters-list, related, índices,
                  descargas…): al papel va solo su parte textual — el listado es
                  de la web (el viejo hacía lo propio: omitía estos bloques). --}}
-            @php $intro = $assets->inlineImages(is_string($s['intro'] ?? null) ? $s['intro'] : ''); @endphp
+            @php $intro = $assets->printableHtml(is_string($s['intro'] ?? null) ? $s['intro'] : ''); @endphp
             @continue(blank($s['title'] ?? null) && blank($s['subtitle'] ?? null) && trim($intro) === '')
             <div class="block block--data">
                 @if (! blank($s['title'] ?? null))

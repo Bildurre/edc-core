@@ -3,6 +3,56 @@
 Backend Laravel reutilizable del motor. Versión de tren con `@edc-motor/ui` y
 `@edc-motor/admin-kit` (tag `vX.Y.Z` en el monorepo).
 
+## [Sin publicar]
+
+### Añadido
+
+- **Nombre LEGIBLE de los PDF generados** (`PdfExportContract::displayName`,
+  con implementación por defecto en `PdfExport`): para exports con
+  entidad dueña sale de su nombre/título traducible en el locale del
+  PDF; los exports globales declaran etiquetas por idioma con el nuevo
+  gancho protegido `labels()` (`['es' => 'Contadores recortables', ...]`);
+  y sin nada de eso cae al filename embellecido (sin sufijo de idioma,
+  guiones a espacios, mayúscula inicial). `GeneratedPdf::displayName()`
+  lo resuelve desde el registro; los PDF de usuario (type `collection`)
+  y los de exports desregistrados conservan su `filename`.
+  `GET /api/downloads` añade la clave `title` a cada ítem (el `filename`
+  de la BD no cambia) y `PdfController::download` emite el
+  `Content-Disposition` (inline y attachment) con ese nombre + `.pdf`:
+  `filename*` UTF-8 (RFC 5987) y fallback ASCII transliterado, así la
+  pestaña del navegador se titula «Catálogo de héroes.pdf». Las
+  descargas de las colecciones temporales de usuario no cambian.
+- **Impresión propia por bloque en el PDF de páginas**
+  (`BlockType::pdfView()`, opcional): un bloque de datos puede aportar
+  su parcial Blade de PDF; `motor::pdf.page` lo incluye con los mismos
+  datos que el render público (`resolveData`), los settings localizados,
+  el locale, `PdfPageAssets` y los helpers de la plantilla. Sin
+  declararlo, todo sigue igual (los bloques de datos imprimen solo su
+  parte textual).
+- `PdfPageAssets::printableHtml()` (imágenes embebidas + tablas
+  normalizadas), `normalizeTables()` y `splitFirstElement()` para la
+  plantilla del PDF de páginas.
+
+### Cambiado
+
+- **El PDF de páginas del CRM no deja títulos huérfanos**: el
+  título/subtítulo de cada bloque viaja con el ARRANQUE de su contenido
+  (primer elemento del cuerpo; la primera pregunta-respuesta en el FAQ)
+  en un contenedor `page-break-inside: avoid` (`.block__lead`, con
+  `page-break-after: avoid` de segunda barrera para arranques altos —
+  tabla/lista — que no se agrupan); cabecera, cita y bloques de datos
+  van enteros de una pieza. Verificado con DomPDF real en el corte de
+  página: título y arranque saltan juntos.
+- **Cita y tarjeta de texto en el papel**: el bloque `quote` se imprime
+  sobre una banda de fondo gris muy claro (`#f2f2f2`) y el
+  `text-card` como recuadro con borde (`1pt #666`) levemente más
+  estrecho que la columna del cuerpo.
+- **Tablas del wysiwyg**: menos aire VERTICAL en las celdas
+  (`padding: 0.3mm 1mm`) y la primera fila de `<th>` se mueve a un
+  `<thead>` real al componer (TipTap la emite dentro del tbody): DomPDF
+  repite las cabeceras en cada página cuando la tabla cruza de página
+  (con su filete inferior más marcado).
+
 ## [0.5.16] — 2026-08-24
 
 - Sin cambios propios: versión de tren.
