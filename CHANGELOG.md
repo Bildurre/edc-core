@@ -22,6 +22,26 @@ Backend Laravel reutilizable del motor. Versión de tren con `@edc-motor/ui` y
 
 ### Cambiado
 
+- **El PDF de páginas del CRM estrena el estilo maquetado del viejo CDL**
+  (`motor::pdf.page` + `PdfPageAssets`, nuevo): cuerpo 11pt justificado
+  con márgenes de 2cm, jerarquía de títulos 21/19/17/15/13pt sin saltos
+  de página tras un título (las cabeceras de bloque, un punto más
+  grandes y con su filete inferior), imágenes de bloque flotadas con el
+  texto rodeándolas según `image_position` (en columnas, el ancho sale
+  del reparto configurado; los títulos iniciales del wysiwyg se extraen
+  antes del float para que queden a todo el ancho), la cita del bloque
+  `quote` en cursiva y centrada con la fuente ESPECIAL, listas, tablas e
+  iconos `rt-icon` del wysiwyg al tamaño de la línea. Las TRES fuentes
+  configuradas del sitio (títulos/cuerpo/especial, doc 10) viajan
+  embebidas en base64: DomPDF no traga WOFF2, así que por cada fichero
+  configurado se busca un hermano `.ttf/.otf/.woff` con el mismo nombre
+  (en `public/fonts` del API o en `fonts/` del disco del motor; a las
+  familias sin negrita o cursiva propias se les alian las caras que
+  falten) y, si no hay ninguno utilizable, la familia cae con elegancia
+  a serif/sans del sistema. Los títulos de bloques ANIDADOS bajan un
+  nivel por profundidad (h2 → h3 → …), los bloques con DATOS del juego
+  imprimen solo su parte textual (título/subtítulo/introducción) y el
+  bloque índice sigue fuera del papel.
 - **Solo dos velos: 60 y 80 %** (`BlockType::commonFields()`): los presets
   del campo `background` quedan en `token:veil-60`, `token:veil-80`
   (nuevo) y `token:accent-soft`; `token:veil-15/-30/-85` pasan a
