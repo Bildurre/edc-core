@@ -9,25 +9,6 @@ Backend Laravel reutilizable del motor. Versión de tren con `@edc-motor/ui` y
 
 ## [0.5.15] — 2026-08-24
 
-- Sin cambios propios: versión de tren.
-
-## [0.5.14] — 2026-08-03
-
-- Sin cambios propios: versión de tren.
-
-## [0.5.13] — 2026-08-03
-
-### Añadido
-
-- **El índice de la colección expone los PDF temporales vigentes**
-  (`GET /api/pdf-collection`, `PdfCollectionController::index()`): clave
-  nueva `generated` — los `GeneratedPdf` tipo `collection` del dueño
-  actual (usuario o token de invitado) NO caducados, más recientes
-  primero, con `{id, status, filename, locale, url, size, generated_at,
-  expires_at}`. Los `ready` mantienen el enlace de descarga tras recargar
-  la página y un `pending` permite a la SPA retomar el sondeo; los
-  `failed` no salen. `data` (los items) no cambia.
-
 ### Cambiado
 
 - **El PDF de páginas del CRM estrena el estilo maquetado del viejo CDL**
@@ -50,6 +31,24 @@ Backend Laravel reutilizable del motor. Versión de tren con `@edc-motor/ui` y
   nivel por profundidad (h2 → h3 → …), los bloques con DATOS del juego
   imprimen solo su parte textual (título/subtítulo/introducción) y el
   bloque índice sigue fuera del papel.
+
+## [0.5.14] — 2026-08-03
+
+### Añadido
+
+- **El índice de la colección expone los PDF temporales vigentes**
+  (`GET /api/pdf-collection`, `PdfCollectionController::index()`): clave
+  nueva `generated` — los `GeneratedPdf` tipo `collection` del dueño
+  actual (usuario o token de invitado) NO caducados, más recientes
+  primero, con `{id, status, filename, locale, url, size, generated_at,
+  expires_at}`. Los `ready` mantienen el enlace de descarga tras recargar
+  la página y un `pending` permite a la SPA retomar el sondeo; los
+  `failed` no salen. `data` (los items) no cambia.
+
+## [0.5.13] — 2026-08-03
+
+### Cambiado
+
 - **Solo dos velos: 60 y 80 %** (`BlockType::commonFields()`): los presets
   del campo `background` quedan en `token:veil-60`, `token:veil-80`
   (nuevo) y `token:accent-soft`; `token:veil-15/-30/-85` pasan a
