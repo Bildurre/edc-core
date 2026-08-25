@@ -15,6 +15,11 @@
     /** @var \Edc\Core\Pdf\Models\GeneratedPdf $pdf */
     $page = $pdf->source;
     $locale = $pdf->locale;
+    // La plantilla de la página viaja como clase del body (tpl-{clave}): las
+    // del motor con efecto en papel definen aquí sus reglas (compact-blocks);
+    // un juego con plantillas propias puede engancharse publicando la vista
+    // (resources/views/vendor/motor/pdf/page.blade.php) y estilando su clase.
+    $template = $page->template ?: 'default';
     $registry = app(\Edc\Core\Content\BlockTypeRegistry::class);
     $assets = app(\Edc\Core\Pdf\PdfPageAssets::class);
     $fonts = $assets->fonts();
@@ -211,8 +216,14 @@
             font-style: italic;
         }
 
-        {{-- Iconos del juego insertados en el texto: al tamaño de la línea. --}}
-        img.rt-icon { width: 11pt !important; height: 11pt !important; display: inline-block; vertical-align: middle; }
+        {{-- Iconos del juego insertados en el texto: al tamaño de la línea y
+             CENTRADOS con ella, como en la web (img.rt-icon a 1.2em con
+             vertical-align -0.24em). DomPDF trata 'middle' como 'baseline'
+             (el icono queda apoyado en la línea base, o sea desplazado hacia
+             arriba), pero sí respeta desplazamientos en pt: -2pt baja un
+             icono de 11pt hasta dejar su centro ~0.36em sobre la línea base,
+             la misma geometría que el render web (medido sobre el PDF). --}}
+        img.rt-icon { width: 11pt !important; height: 11pt !important; display: inline-block; vertical-align: -2pt; }
 
         .block { margin-bottom: 2em; }
         {{-- Cabecera y bloques de datos (solo su parte textual): cortos,
@@ -256,9 +267,50 @@
         .cta-button { margin-bottom: 1em; font-weight: bold; }
 
         .clear { clear: both; }
+
+        {{-- Plantilla «Bloques compactos» (motor.content.templates:
+             compact-blocks): en papel, cada bloque viaja ENTERO — si no cabe
+             en lo que queda de página salta completo a la siguiente (un
+             bloque más largo que una página entera DomPDF lo parte
+             igualmente: no hay dónde meterlo de una pieza) — y toda la
+             escala se encoge un punto: cuerpo 10pt, títulos un escalón menos,
+             interlineado 1.15 y menos aire entre párrafos, items y bloques.
+             En la web esta plantilla no cambia nada (la SPA cae al layout por
+             defecto si su registro no la conoce). --}}
+        body.tpl-compact-blocks { font-size: 10pt; line-height: 1.15; }
+        .tpl-compact-blocks h1 { font-size: 18pt; margin-bottom: 1em; }
+        .tpl-compact-blocks h2 { font-size: 16.5pt; margin: 0.7em 0 0.3em; }
+        .tpl-compact-blocks h3 { font-size: 15pt; margin: 0.6em 0 0.3em; }
+        .tpl-compact-blocks h4 { font-size: 13.5pt; margin: 0.6em 0 0.3em; }
+        .tpl-compact-blocks h5 { font-size: 12pt; margin: 0.6em 0 0.3em; }
+        .tpl-compact-blocks h6 { font-size: 11pt; margin: 0.6em 0 0.3em; }
+        .tpl-compact-blocks .block--header h2 { font-size: 18pt; }
+        .tpl-compact-blocks .block--header h3 { font-size: 16.5pt; }
+        .tpl-compact-blocks .block--header h4 { font-size: 15pt; }
+        .tpl-compact-blocks .block--header h5 { font-size: 13.5pt; }
+        .tpl-compact-blocks p { margin-bottom: 0.6em; }
+        .tpl-compact-blocks ul, .tpl-compact-blocks ol { margin-bottom: 0.6em; }
+        .tpl-compact-blocks li { margin-bottom: 0.15em; }
+        .tpl-compact-blocks table { margin-bottom: 0.6em; }
+        .tpl-compact-blocks .block--quote blockquote { font-size: 13pt; line-height: 1.25; margin: 0.4em 1.5em 0.7em; }
+        .tpl-compact-blocks .block--quote .quote-author { font-size: 11.5pt; margin: -0.4em 1.5em 0.7em; }
+        .tpl-compact-blocks .block__content blockquote { margin: 0.4em 1.5em 0.7em; }
+        .tpl-compact-blocks .faq-question { font-size: 11.5pt; margin: 0.6em 0 0.2em; }
+        .tpl-compact-blocks .label { font-size: 8pt; margin-bottom: 0.35em; }
+        .tpl-compact-blocks .cta-button { margin-bottom: 0.6em; }
+        .tpl-compact-blocks .block--text-card { padding: 0.7em 0.9em 0.1em; }
+        {{-- Iconos y miniaturas de tabla, al nuevo cuerpo de 10pt (el
+             desplazamiento baja en proporción). --}}
+        .tpl-compact-blocks img.rt-icon { width: 10pt !important; height: 10pt !important; vertical-align: -1.8pt; }
+        .tpl-compact-blocks table img { width: 10pt; height: 10pt; }
+        {{-- El corazón de la plantilla: el bloque NO se parte entre páginas
+             (los pdfView propios de un juego quedan fuera: imprimen su propio
+             marcado). Menos aire también entre bloques. --}}
+        .tpl-compact-blocks .block { margin-bottom: 1.2em; page-break-inside: avoid; }
+        .tpl-compact-blocks .block--header { margin-bottom: 1.2em; padding-bottom: 0.6em; }
     </style>
 </head>
-<body>
+<body class="tpl-{{ $template }}">
     {{-- El título de la página, de portada: centrado, con la fuente de títulos. --}}
     <h1>{{ $page->getTranslation('title', $locale) }}</h1>
 

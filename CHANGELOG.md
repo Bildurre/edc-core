@@ -7,6 +7,23 @@ Backend Laravel reutilizable del motor. Versión de tren con `@edc-motor/ui` y
 
 ### Añadido
 
+- **Plantilla de página «Bloques compactos»** (`compact-blocks` en
+  `motor.content.templates`): pensada para imprimir. En el PDF de páginas
+  cada bloque viaja ENTERO (`page-break-inside: avoid` por bloque: el que
+  no cabe en lo que queda de página salta completo a la siguiente; un
+  bloque más largo que una página entera DomPDF lo parte igualmente) y
+  toda la escala tipográfica se encoge: cuerpo 10pt (antes 11pt), títulos
+  un escalón menos (18/16.5/15/13.5/12/11pt), interlineado 1.15 y menos
+  aire entre párrafos (0.6em), items de lista (0.15em) y bloques (1.2em).
+  En la web no cambia nada: sin entrada en el `templateRegistry` de la
+  SPA cae al layout por defecto. La clave de la plantilla viaja ahora
+  como clase del `body` del PDF (`tpl-{clave}`) para CUALQUIER plantilla:
+  un juego con plantillas propias puede publicar la vista
+  (`resources/views/vendor/motor/pdf/page.blade.php`) y estilar su clase.
+  OJO: un config `motor.php` publicado que redefina `content.templates`
+  pisa el catálogo del paquete — debe listar también las plantillas del
+  motor que quiera ofrecer.
+
 - **Nombre LEGIBLE de los PDF generados** (`PdfExportContract::displayName`,
   con implementación por defecto en `PdfExport`): para exports con
   entidad dueña sale de su nombre/título traducible en el locale del
@@ -32,6 +49,16 @@ Backend Laravel reutilizable del motor. Versión de tren con `@edc-motor/ui` y
 - `PdfPageAssets::printableHtml()` (imágenes embebidas + tablas
   normalizadas), `normalizeTables()` y `splitFirstElement()` para la
   plantilla del PDF de páginas.
+
+### Arreglado
+
+- **Los iconos del wysiwyg salen centrados con la línea en el PDF de
+  páginas**: DomPDF trata `vertical-align: middle` como `baseline` (el
+  icono quedaba apoyado en la línea base y sobresalía por arriba); ahora
+  `img.rt-icon` baja con `vertical-align: -2pt` (−1.8pt en la plantilla
+  compacta, icono de 10pt), que deja su centro ~0.36em sobre la línea
+  base — la misma geometría que el render web (1.2em con
+  `vertical-align: -0.24em`), medido sobre el PDF rasterizado.
 
 ### Cambiado
 
