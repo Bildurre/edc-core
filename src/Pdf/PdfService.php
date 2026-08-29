@@ -150,19 +150,34 @@ class PdfService
     {
         $items = $this->itemsFor($pdf);
 
-        $slots = $this->composer->expand($items, fn (PrintableItem $item) => $this->resolveImage($item, $pdf->locale));
-
         $layout = PrintLayout::fromConfig($pdf->layout);
+
+        // Las imágenes van a DomPDF reescaladas a la resolución de impresión
+        // y aplanadas a JPEG (ver PrintImageOptimizer): la ruta del alfa de
+        // los PNG grandes ponía cada PDF recortable en ~5 minutos.
+        $optimizer = new PrintImageOptimizer($layout, (int) config('motor.pdf.print_dpi', 300));
+
+        $slots = $this->composer->expand(
+            $items,
+            fn (PrintableItem $item) => $optimizer->optimize($this->resolveImage($item, $pdf->locale)),
+        );
+
         $view = $pdf->type === self::COLLECTION_TYPE ? null : $this->exports->get($pdf->type)->view();
 
         // La rejilla genérica necesita ítems; una vista propia puede
         // renderizar sin ellos (p. ej. el PDF de una página del CRM).
         if ($slots === [] && $view === null) {
+            $optimizer->cleanup();
+
             throw new PdfCompositionException(__('motor::motor.pdf_no_items'));
         }
 
         $previous = $pdf->path;
-        $path = $this->composer->compose($pdf, $slots, $layout, $view);
+        try {
+            $path = $this->composer->compose($pdf, $slots, $layout, $view);
+        } finally {
+            $optimizer->cleanup();
+        }
 
         $pdf->update([
             'path' => $path,

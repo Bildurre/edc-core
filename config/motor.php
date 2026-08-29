@@ -62,6 +62,11 @@ return [
         'temporary_ttl' => env('MOTOR_PDF_TTL', 24),
         // Layout por defecto si el export no declara uno.
         'default_layout' => 'card',
+        // Resolución de impresión de las imágenes de la rejilla: antes de
+        // DomPDF se reescalan a estos dpi y se aplanan a JPEG (la ruta del
+        // alfa de los PNG grandes multiplicaba x100 el tiempo de render).
+        // 300 = estándar de imprenta; 0 = desactivar (imágenes tal cual).
+        'print_dpi' => env('MOTOR_PDF_PRINT_DPI', 300),
         // Presets de impresión (DC-07). Cada juego puede añadir o ajustar
         // (medidas en mm) publicando esta config o con Pdfs::layout() en el
         // boot de su AppServiceProvider. Columnas/filas se calculan del papel.

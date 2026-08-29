@@ -3,6 +3,21 @@
 Backend Laravel reutilizable del motor. Versión de tren con `@edc-motor/ui` y
 `@edc-motor/admin-kit` (tag `vX.Y.Z` en el monorepo).
 
+## [Sin publicar]
+
+### Cambiado
+
+- **Las imágenes de la rejilla van a DomPDF a resolución de impresión**
+  (`PrintImageOptimizer`, nuevo): antes de componer, cada imagen local se
+  reescala a `motor.pdf.print_dpi` (300 por defecto, el estándar de
+  imprenta; 0 desactiva) y se aplana a JPEG sobre blanco (el papel). La
+  ruta del canal alfa de los PNG en DomPDF se procesa píxel a píxel en
+  PHP: una página 3x3 de previews de carta (PNG alfa a 1500x2100) tardaba
+  ~11,5 s — con JPEG a 300 dpi, ~0,1 s (x100). Era lo que ponía los PDF
+  recortables en ~5 minutos por documento (y contra el timeout del job).
+  Nunca se amplía, los data-URIs/URLs pasan tal cual y cualquier fallo
+  devuelve la imagen original.
+
 ## [0.5.23] — 2026-08-29
 
 ### Cambiado
