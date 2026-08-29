@@ -3,6 +3,17 @@
 Backend Laravel reutilizable del motor. Versión de tren con `@edc-motor/ui` y
 `@edc-motor/admin-kit` (tag `vX.Y.Z` en el monorepo).
 
+## [Sin publicar]
+
+### Cambiado
+
+- **Rejilla de impresión (`pdf/grid.blade.php`): marcas de corte
+  conscientes del hueco** — cuando el `gap` del layout es menor que la
+  marca (piezas casi pegadas, p. ej. ~1px para cortar por la línea
+  compartida), una marca hacia la pieza vecina se pintaría ENCIMA de su
+  imagen: ahora solo se dibujan las que caen en espacio libre (bordes de
+  página o hueco sin vecino). Con hueco holgado, todas las de siempre.
+
 ## [0.5.22] — 2026-08-29
 
 - Sin cambios propios: versión de tren.

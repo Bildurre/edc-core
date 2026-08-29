@@ -38,23 +38,53 @@
             @php
                 $x = $offset + ($i % $cols) * $stepX;
                 $y = $offset + intdiv($i, $cols) * $stepY;
+                // Con el hueco entre piezas menor que la marca (piezas casi
+                // pegadas, p. ej. gap de ~1px), una marca hacia un vecino se
+                // pintaría ENCIMA de su imagen: solo se dibujan las que caen
+                // en espacio libre (bordes de página o hueco sin vecino) —
+                // el corte interior va por la línea compartida, guiado por
+                // las marcas del perímetro. Con hueco holgado (gap >= marca),
+                // todas las marcas de siempre.
+                $count = count($slots);
+                $col = $i % $cols;
+                $tight = $layout->gap < $mark;
+                $canL = ! ($tight && $col > 0);
+                $canR = ! ($tight && $col < $cols - 1 && $i + 1 < $count);
+                $canU = ! ($tight && $i >= $cols);
+                $canD = ! ($tight && $i + $cols < $count);
             @endphp
             <div class="slot" style="left: {{ $x }}mm; top: {{ $y }}mm;">
                 <img src="{{ $slot['image'] }}" alt="">
             </div>
             @if ($mark > 0)
                 {{-- superior izquierda --}}
-                <div class="mark" style="left: {{ $x - $mark }}mm; top: {{ $y }}mm; width: {{ $mark }}mm; height: {{ $t }}mm;"></div>
-                <div class="mark" style="left: {{ $x }}mm; top: {{ $y - $mark }}mm; width: {{ $t }}mm; height: {{ $mark }}mm;"></div>
+                @if ($canL)
+                    <div class="mark" style="left: {{ $x - $mark }}mm; top: {{ $y }}mm; width: {{ $mark }}mm; height: {{ $t }}mm;"></div>
+                @endif
+                @if ($canU)
+                    <div class="mark" style="left: {{ $x }}mm; top: {{ $y - $mark }}mm; width: {{ $t }}mm; height: {{ $mark }}mm;"></div>
+                @endif
                 {{-- superior derecha --}}
-                <div class="mark" style="left: {{ $x + $w }}mm; top: {{ $y }}mm; width: {{ $mark }}mm; height: {{ $t }}mm;"></div>
-                <div class="mark" style="left: {{ $x + $w - $t }}mm; top: {{ $y - $mark }}mm; width: {{ $t }}mm; height: {{ $mark }}mm;"></div>
+                @if ($canR)
+                    <div class="mark" style="left: {{ $x + $w }}mm; top: {{ $y }}mm; width: {{ $mark }}mm; height: {{ $t }}mm;"></div>
+                @endif
+                @if ($canU)
+                    <div class="mark" style="left: {{ $x + $w - $t }}mm; top: {{ $y - $mark }}mm; width: {{ $t }}mm; height: {{ $mark }}mm;"></div>
+                @endif
                 {{-- inferior izquierda --}}
-                <div class="mark" style="left: {{ $x - $mark }}mm; top: {{ $y + $h - $t }}mm; width: {{ $mark }}mm; height: {{ $t }}mm;"></div>
-                <div class="mark" style="left: {{ $x }}mm; top: {{ $y + $h }}mm; width: {{ $t }}mm; height: {{ $mark }}mm;"></div>
+                @if ($canL)
+                    <div class="mark" style="left: {{ $x - $mark }}mm; top: {{ $y + $h - $t }}mm; width: {{ $mark }}mm; height: {{ $t }}mm;"></div>
+                @endif
+                @if ($canD)
+                    <div class="mark" style="left: {{ $x }}mm; top: {{ $y + $h }}mm; width: {{ $t }}mm; height: {{ $mark }}mm;"></div>
+                @endif
                 {{-- inferior derecha --}}
-                <div class="mark" style="left: {{ $x + $w }}mm; top: {{ $y + $h - $t }}mm; width: {{ $mark }}mm; height: {{ $t }}mm;"></div>
-                <div class="mark" style="left: {{ $x + $w - $t }}mm; top: {{ $y + $h }}mm; width: {{ $t }}mm; height: {{ $mark }}mm;"></div>
+                @if ($canR)
+                    <div class="mark" style="left: {{ $x + $w }}mm; top: {{ $y + $h - $t }}mm; width: {{ $mark }}mm; height: {{ $t }}mm;"></div>
+                @endif
+                @if ($canD)
+                    <div class="mark" style="left: {{ $x + $w - $t }}mm; top: {{ $y + $h }}mm; width: {{ $t }}mm; height: {{ $mark }}mm;"></div>
+                @endif
             @endif
         @endforeach
     </div>
