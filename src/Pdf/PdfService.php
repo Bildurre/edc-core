@@ -173,6 +173,7 @@ class PdfService
         }
 
         $previous = $pdf->path;
+
         try {
             $path = $this->composer->compose($pdf, $slots, $layout, $view);
         } finally {
