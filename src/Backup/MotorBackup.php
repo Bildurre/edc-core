@@ -24,8 +24,16 @@ class MotorBackup
      */
     public const PENDING_CACHE_KEY = 'motor:backup:pending';
 
-    /** Aplica la config de spatie/laravel-backup a partir de motor.backup. */
-    public static function applyConfig(): void
+    /**
+     * Aplica la config de spatie/laravel-backup a partir de motor.backup.
+     *
+     * $includeMedia mete storage/app/public en el zip SOLO para esa
+     * ejecución (la copia manual con la opción marcada): las automáticas
+     * van siempre sin storage — pesa demasiado para copiarlo a diario y
+     * para subirlo al restaurar — salvo que el juego fuerce
+     * motor.backup.include_media por env.
+     */
+    public static function applyConfig(?bool $includeMedia = null): void
     {
         $disk = config('motor.backup.disk', 'backups');
 
@@ -52,7 +60,7 @@ class MotorBackup
             }
         }
 
-        if (config('motor.backup.include_media') && is_dir(storage_path('app/public'))) {
+        if (($includeMedia ?? config('motor.backup.include_media')) && is_dir(storage_path('app/public'))) {
             $include[] = storage_path('app/public');
         }
 

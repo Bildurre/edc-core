@@ -146,8 +146,10 @@ return [
         'disk' => env('MOTOR_BACKUP_DISK', 'backups'),
         // Retención: días que se conservan todas las copias (backup:clean).
         'keep_days' => env('MOTOR_BACKUP_KEEP_DAYS', 14),
-        // Incluir la carpeta de media (storage/app/public) en el zip.
-        'include_media' => env('MOTOR_BACKUP_MEDIA', true),
+        // Incluir la carpeta de media (storage/app/public) en TODOS los zips
+        // (también los automáticos). Por defecto NO: el storage pesa
+        // demasiado; la copia manual del admin puede pedirlo puntualmente.
+        'include_media' => env('MOTOR_BACKUP_MEDIA', false),
         // Tamaño máximo (MB) de una copia SUBIDA desde el admin.
         'upload_max_mb' => env('MOTOR_BACKUP_UPLOAD_MAX_MB', 500),
     ],

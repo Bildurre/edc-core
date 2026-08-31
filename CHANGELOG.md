@@ -3,6 +3,18 @@
 Backend Laravel reutilizable del motor. Versión de tren con `@edc-motor/ui` y
 `@edc-motor/admin-kit` (tag `vX.Y.Z` en el monorepo).
 
+## [Sin publicar]
+
+### Cambiado
+
+- **Las copias de seguridad van SOLO con la base de datos por defecto**
+  (`motor.backup.include_media` pasa a `false`): el storage pesa demasiado
+  para copiarlo en cada automática y para subirlo al restaurar. La copia
+  MANUAL puede pedirlo puntualmente: `POST /admin/backups` acepta
+  `include_media` y `RunBackupJob` reaplica la config de spatie con el
+  storage solo para esa ejecución (olvidando el `Config` *scoped* de
+  spatie v10, que congela `config('backup')` en su primera resolución).
+
 ## [0.5.27] — 2026-08-31
 
 - Sin cambios propios: versión de tren.

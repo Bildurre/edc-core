@@ -36,7 +36,7 @@ class BackupController extends Controller
         ]);
     }
 
-    public function store()
+    public function store(Request $request)
     {
         // SIEMPRE en cola (DC-16): la petición vuelve al momento y el worker
         // crea el zip. Con la cola 'sync' (instalaciones pequeñas) se difiere
@@ -44,14 +44,17 @@ class BackupController extends Controller
         // que HasPreviewImage::regeneratePreviews(): en la suite el diferido
         // apuntaría a terminating callbacks que no corren y esquivaría
         // Queue::fake(); con dispatch() la cola sync de tests ejecuta inline.
+        // include_media SOLO existe en la manual: las automáticas van
+        // siempre sin storage (pesa demasiado).
+        $includeMedia = $request->boolean('include_media');
         $filename = 'manual-'.now()->format('Y-m-d-H-i-s').'.zip';
 
         Cache::put(MotorBackup::PENDING_CACHE_KEY, $filename, now()->addMinutes(15));
 
         $syncQueue = config('queue.default') === 'sync' && ! app()->runningUnitTests();
         $syncQueue
-            ? RunBackupJob::dispatchAfterResponse($filename)
-            : RunBackupJob::dispatch($filename);
+            ? RunBackupJob::dispatchAfterResponse($filename, $includeMedia)
+            : RunBackupJob::dispatch($filename, $includeMedia);
 
         return response()->json([
             'data' => $this->list(),
