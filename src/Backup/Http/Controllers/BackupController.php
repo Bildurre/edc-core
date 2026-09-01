@@ -34,7 +34,7 @@ class BackupController extends Controller
             // Hay una copia manual en curso: la vista sondea hasta que acabe.
             'pending' => Cache::has(MotorBackup::PENDING_CACHE_KEY),
             // Tope de subida (MB): la vista lo valida antes de mandar el zip.
-            'upload_max_mb' => (int) config('motor.backup.upload_max_mb', 4096),
+            'upload_max_mb' => (int) config('motor.backup.upload_max_mb', 1024),
         ]);
     }
 
@@ -76,7 +76,7 @@ class BackupController extends Controller
         $request->validate([
             'file' => [
                 'required', 'file', 'extensions:zip',
-                'max:'.((int) config('motor.backup.upload_max_mb', 4096)) * 1024,
+                'max:'.((int) config('motor.backup.upload_max_mb', 1024)) * 1024,
             ],
         ]);
 
@@ -98,8 +98,8 @@ class BackupController extends Controller
 
     /**
      * RESTAURA una copia: importa la BBDD del zip MACHACANDO la actual (la
-     * SPA pide doble confirmación). Solo la base de datos: los archivos de
-     * storage que pueda traer el zip no se tocan (ver BackupRestorer).
+     * SPA pide doble confirmación) y, si el zip trae el storage (originales),
+     * lo devuelve a su sitio (ver BackupRestorer).
      */
     public function restore(string $file)
     {
@@ -116,13 +116,19 @@ class BackupController extends Controller
             fclose($source);
         }
 
+        $restorer = app(BackupRestorer::class);
+
         try {
-            $restored = app(BackupRestorer::class)->restore($temp);
+            $restored = $restorer->restore($temp);
         } finally {
             @unlink($temp);
         }
 
-        return response()->json(['restored' => $restored]);
+        return response()->json([
+            'restored' => $restored,
+            // Ficheros de storage devueltos a su sitio (0 si el zip no lo traía).
+            'restored_files' => $restorer->restoredFiles,
+        ]);
     }
 
     /** Configura la copia automática (la aplica el scheduler del motor). */

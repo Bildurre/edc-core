@@ -5,6 +5,7 @@ namespace Edc\Core\Backup;
 use Illuminate\Support\Facades\Cache;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Schema;
+use Illuminate\Support\Facades\Storage;
 use ZipArchive;
 
 /**
@@ -13,9 +14,12 @@ use ZipArchive;
  * fichero .sqlite tal cual (así la incluye MotorBackup cuando el juego usa
  * SQLite). Restaurar = importar esa BBDD MACHACANDO la actual.
  *
+ * Si el zip trae el storage (copia con «incluir imágenes y archivos»: los
+ * originales bajo storage/app/public, sin previews ni PDF), esos ficheros
+ * se devuelven a su sitio en el disco público del motor, pisando los que
+ * haya; las previews y los PDF se regeneran después desde el admin.
+ *
  * Límites (documentados también en el panel del admin):
- * - SOLO la base de datos: los archivos de storage que pueda traer el zip
- *   (media, fuentes…) no se restauran.
  * - Dumps SQL: se cargan enteros en memoria y se ejecutan con unprepared();
  *   para BBDD enormes, mejor restaurar por consola. Dumps comprimidos
  *   (.sql.gz) no soportados.
@@ -24,6 +28,12 @@ use ZipArchive;
  */
 class BackupRestorer
 {
+    /** Marcador de las entradas de storage del zip (relative_path = base_path). */
+    protected const STORAGE_MARKER = 'storage/app/public/';
+
+    /** Ficheros de storage devueltos a su sitio en la última restauración. */
+    public int $restoredFiles = 0;
+
     /** ¿El zip contiene una BBDD restaurable (dump SQL o fichero SQLite)? */
     public function containsDatabase(string $zipPath): bool
     {
@@ -63,15 +73,18 @@ class BackupRestorer
             // SQLite en fichero: el zip trae la BBDD tal cual (MotorBackup);
             // sustituir el fichero es la restauración completa.
             if ($sqlites !== [] && is_string($databaseFile) && $databaseFile !== ':memory:') {
-                return $this->finish($this->replaceSqliteFile($zip, $sqlites, $connection, $databaseFile));
+                $entry = $this->replaceSqliteFile($zip, $sqlites, $connection, $databaseFile);
+            } elseif ($dumps !== []) {
+                // Resto de drivers (o zips de otra instalación): importar el dump.
+                $entry = $this->importDump($zip, $dumps, $connection, $driver);
+            } else {
+                abort(422, __('motor::motor.backup_restore_no_database'));
             }
 
-            // Resto de drivers (o zips de otra instalación): importar el dump.
-            if ($dumps !== []) {
-                return $this->finish($this->importDump($zip, $dumps, $connection, $driver));
-            }
+            // Y el storage, si la copia lo trae (originales; nunca previews/PDF).
+            $this->restoredFiles = $this->restoreStorage($zip);
 
-            abort(422, __('motor::motor.backup_restore_no_database'));
+            return $this->finish($entry);
         } finally {
             $zip->close();
         }
@@ -161,6 +174,44 @@ class BackupRestorer
         DB::connection($connection)->unprepared($sql);
 
         return $entry;
+    }
+
+    /**
+     * Devuelve a su sitio los ficheros de storage/app/public que traiga el
+     * zip (entradas relativas al proyecto, o absolutas de copias viejas: se
+     * localiza el marcador). Escribe en el disco público del motor, pisando
+     * lo que haya; las rutas se normalizan (nada de `..`). Devuelve cuántos.
+     */
+    protected function restoreStorage(ZipArchive $zip): int
+    {
+        $disk = Storage::disk(config('motor.disk', 'public'));
+        $count = 0;
+
+        for ($i = 0; $i < $zip->numFiles; $i++) {
+            $name = (string) $zip->getNameIndex($i);
+            $at = strpos($name, self::STORAGE_MARKER);
+            if ($at === false || str_ends_with($name, '/')) {
+                continue;
+            }
+
+            $relative = substr($name, $at + strlen(self::STORAGE_MARKER));
+            if ($relative === '' || str_contains($relative, '..')) {
+                continue;
+            }
+
+            $stream = $zip->getStream($name);
+            if ($stream === false) {
+                continue;
+            }
+
+            $disk->put($relative, $stream);
+            if (is_resource($stream)) {
+                fclose($stream);
+            }
+            $count++;
+        }
+
+        return $count;
     }
 
     /** Tras restaurar: fuera cachés (settings, contenido, permisos rancios). */
