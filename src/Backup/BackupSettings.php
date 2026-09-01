@@ -7,7 +7,8 @@ use Illuminate\Support\Facades\Cache;
 
 /**
  * Configuración de la copia automática (doc 06), editable desde el admin:
- * activada, frecuencia (diaria/semanal), hora, día y retención. Se guarda
+ * activada, frecuencia (diaria/semanal), hora, día, retención y si lleva el
+ * storage. Se guarda
  * como un JSON bajo la clave 'backup' (misma tabla settings que la
  * configuración de la web) y la lee el scheduler del motor
  * (MotorBackup::schedule) en cada schedule:run.
@@ -25,6 +26,9 @@ class BackupSettings
             'time' => '03:00',
             'weekday' => 1,         // 1 = lunes … 7 = domingo (solo semanal)
             'keep_days' => (int) config('motor.backup.keep_days', 14),
+            // Meter storage/app/public en las automáticas (pesa mucho; la
+            // manual lo elige en cada copia). Base: motor.backup.include_media.
+            'include_media' => (bool) config('motor.backup.include_media', false),
         ];
     }
 

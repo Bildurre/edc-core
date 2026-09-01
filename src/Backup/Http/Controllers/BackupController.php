@@ -18,8 +18,8 @@ use Spatie\Backup\BackupDestination\BackupDestination;
 /**
  * Gestor de copias de seguridad (doc 06): listar, crear, subir, restaurar,
  * descargar y borrar los zips que genera spatie/laravel-backup, y configurar
- * la copia AUTOMÁTICA (activada, frecuencia, hora, retención) que programa
- * el motor. Protegido por manage-web. DC-16: crear va SIEMPRE en cola (la
+ * la copia AUTOMÁTICA (activada, frecuencia, hora, retención, con o sin
+ * storage) que programa el motor. Protegido por manage-web. DC-16: crear va SIEMPRE en cola (la
  * petición no espera al zip; la vista sondea el listado con `pending`).
  */
 class BackupController extends Controller
@@ -33,6 +33,8 @@ class BackupController extends Controller
             'schedule' => $this->settings->get(),
             // Hay una copia manual en curso: la vista sondea hasta que acabe.
             'pending' => Cache::has(MotorBackup::PENDING_CACHE_KEY),
+            // Tope de subida (MB): la vista lo valida antes de mandar el zip.
+            'upload_max_mb' => (int) config('motor.backup.upload_max_mb', 4096),
         ]);
     }
 
@@ -44,8 +46,8 @@ class BackupController extends Controller
         // que HasPreviewImage::regeneratePreviews(): en la suite el diferido
         // apuntaría a terminating callbacks que no corren y esquivaría
         // Queue::fake(); con dispatch() la cola sync de tests ejecuta inline.
-        // include_media SOLO existe en la manual: las automáticas van
-        // siempre sin storage (pesa demasiado).
+        // include_media decide si ESTA copia manual lleva el storage (la
+        // automática tiene su propio ajuste en la configuración).
         $includeMedia = $request->boolean('include_media');
         $filename = 'manual-'.now()->format('Y-m-d-H-i-s').'.zip';
 
@@ -74,7 +76,7 @@ class BackupController extends Controller
         $request->validate([
             'file' => [
                 'required', 'file', 'extensions:zip',
-                'max:'.((int) config('motor.backup.upload_max_mb', 500)) * 1024,
+                'max:'.((int) config('motor.backup.upload_max_mb', 4096)) * 1024,
             ],
         ]);
 
@@ -132,6 +134,8 @@ class BackupController extends Controller
             'time' => ['required', 'date_format:H:i'],
             'weekday' => ['required', 'integer', 'min:1', 'max:7'],
             'keep_days' => ['required', 'integer', 'min:1', 'max:365'],
+            // Storage en las automáticas (opcional: los clientes viejos no lo mandan).
+            'include_media' => ['sometimes', 'boolean'],
         ]);
 
         return response()->json(['schedule' => $this->settings->update($data)]);

@@ -13,7 +13,7 @@ use Spatie\Backup\Tasks\Monitor\HealthChecks\MaximumStorageInMegabytes;
  * deriva su config de motor.backup para que el juego no tenga que publicar
  * config/backup.php (puede hacerlo si quiere afinar; lo puesto aquí solo
  * pisa las claves que gobierna el motor). La copia automática (frecuencia,
- * hora, retención) se edita desde el admin (BackupSettings) y la programa
+ * hora, retención, storage) se edita desde el admin (BackupSettings) y la programa
  * schedule(): el juego solo necesita el cron de `schedule:run`.
  */
 class MotorBackup
@@ -27,11 +27,11 @@ class MotorBackup
     /**
      * Aplica la config de spatie/laravel-backup a partir de motor.backup.
      *
-     * $includeMedia mete storage/app/public en el zip SOLO para esa
-     * ejecución (la copia manual con la opción marcada): las automáticas
-     * van siempre sin storage — pesa demasiado para copiarlo a diario y
-     * para subirlo al restaurar — salvo que el juego fuerce
-     * motor.backup.include_media por env.
+     * $includeMedia decide si storage/app/public entra en el zip de ESTA
+     * ejecución (la copia manual lo pasa explícito, con o sin); sin él
+     * manda el ajuste de la copia automática del admin (BackupSettings
+     * `include_media`, con motor.backup.include_media de base) — así el
+     * backup:run del scheduler lleva el storage solo si se ha activado.
      */
     public static function applyConfig(?bool $includeMedia = null): void
     {
@@ -60,12 +60,13 @@ class MotorBackup
             }
         }
 
-        if (($includeMedia ?? config('motor.backup.include_media')) && is_dir(storage_path('app/public'))) {
-            $include[] = storage_path('app/public');
-        }
-
         $name = Str::slug(config('app.name', 'motor'));
         $settings = app(BackupSettings::class)->get();
+
+        $withMedia = $includeMedia ?? (bool) ($settings['include_media'] ?? config('motor.backup.include_media'));
+        if ($withMedia && is_dir(storage_path('app/public'))) {
+            $include[] = storage_path('app/public');
+        }
 
         // Salud del monitor acorde a la copia automática configurada: con
         // frecuencia semanal, una copia de 3 días es normal; desactivada,

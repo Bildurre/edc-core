@@ -146,12 +146,14 @@ return [
         'disk' => env('MOTOR_BACKUP_DISK', 'backups'),
         // Retención: días que se conservan todas las copias (backup:clean).
         'keep_days' => env('MOTOR_BACKUP_KEEP_DAYS', 14),
-        // Incluir la carpeta de media (storage/app/public) en TODOS los zips
-        // (también los automáticos). Por defecto NO: el storage pesa
-        // demasiado; la copia manual del admin puede pedirlo puntualmente.
+        // Default de «incluir storage/app/public» en la copia AUTOMÁTICA
+        // (editable desde el admin, BackupSettings); la manual lo elige en
+        // cada copia. Por defecto NO: el storage pesa mucho.
         'include_media' => env('MOTOR_BACKUP_MEDIA', false),
-        // Tamaño máximo (MB) de una copia SUBIDA desde el admin.
-        'upload_max_mb' => env('MOTOR_BACKUP_UPLOAD_MAX_MB', 500),
+        // Tamaño máximo (MB) de una copia SUBIDA desde el admin. Con el
+        // storage dentro un zip pasa del GB: nginx (client_max_body_size) y
+        // PHP (upload_max_filesize/post_max_size) tienen que ir a la par.
+        'upload_max_mb' => env('MOTOR_BACKUP_UPLOAD_MAX_MB', 4096),
     ],
 
     // Auth (DC-13, DC-14).

@@ -2,6 +2,7 @@
 
 namespace Edc\Core\Backup\Jobs;
 
+use Edc\Core\Backup\BackupSettings;
 use Edc\Core\Backup\MotorBackup;
 use Illuminate\Bus\Queueable;
 use Illuminate\Contracts\Queue\ShouldQueue;
@@ -23,8 +24,8 @@ class RunBackupJob implements ShouldQueue
     use InteractsWithQueue;
     use Queueable;
 
-    /** El zip puede tardar: margen holgado antes de matar el job. */
-    public int $timeout = 900;
+    /** El zip puede tardar (con el storage, GBs): margen holgado antes de matar el job. */
+    public int $timeout = 3600;
 
     public function __construct(
         public ?string $filename = null,
@@ -35,12 +36,16 @@ class RunBackupJob implements ShouldQueue
     public function handle(): void
     {
         try {
-            // La config de spatie se aplica en el boot SIN media; si esta
-            // copia manual lo pide, se reaplica incluyéndolo solo aquí.
-            // isset: un job encolado con una versión anterior (sin la
-            // propiedad) se deserializa con ella sin inicializar.
-            if (isset($this->includeMedia) && $this->includeMedia) {
-                MotorBackup::applyConfig(includeMedia: true);
+            // La config de spatie se aplica en el boot con el ajuste de la
+            // AUTOMÁTICA (BackupSettings include_media); la manual decide
+            // por sí misma: si su elección difiere, se reaplica con ella
+            // (con o sin storage). isset: un job encolado con una versión
+            // anterior (sin la propiedad) se deserializa sin inicializar.
+            $withMedia = isset($this->includeMedia) && $this->includeMedia;
+            $autoWithMedia = (bool) (app(BackupSettings::class)->get()['include_media'] ?? false);
+
+            if ($withMedia !== $autoWithMedia) {
+                MotorBackup::applyConfig(includeMedia: $withMedia);
 
                 // spatie/laravel-backup v10 congela config('backup') en un
                 // Config `scoped` en su primera resolución: hay que olvidarlo

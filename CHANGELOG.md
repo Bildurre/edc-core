@@ -3,6 +3,23 @@
 Backend Laravel reutilizable del motor. Versión de tren con `@edc-motor/ui` y
 `@edc-motor/admin-kit` (tag `vX.Y.Z` en el monorepo).
 
+## [Sin publicar]
+
+### Cambiado
+
+- **El storage en la copia AUTOMÁTICA es un ajuste del admin**:
+  `BackupSettings` gana `include_media` (base: `motor.backup.include_media`),
+  `PUT /admin/backups/schedule` lo acepta y `MotorBackup::applyConfig()` sin
+  argumento lo lee de ahí (es la config que usa el `backup:run` del
+  scheduler). La copia MANUAL decide por su cuenta en cada copia:
+  `RunBackupJob` reaplica la config con su `include_media` explícito cuando
+  difiere del de la automática (antes solo reaplicaba al pedir storage, y
+  una automática con storage lo colaba en la manual sin marcar).
+- **Copias grandes**: `motor.backup.upload_max_mb` pasa de 500 a 4096 (un
+  zip con el storage dentro pasa del GB; nginx y PHP tienen que ir a la
+  par), `GET /admin/backups` expone `upload_max_mb` para que la vista valide
+  con el tope real, y el timeout de `RunBackupJob` sube a una hora.
+
 ## [0.5.29] — 2026-09-01
 
 - Sin cambios propios: versión de tren.
