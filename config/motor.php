@@ -151,9 +151,9 @@ return [
         // cada copia. Por defecto NO: el storage pesa mucho.
         'include_media' => env('MOTOR_BACKUP_MEDIA', false),
         // Tamaño máximo (MB) de una copia SUBIDA desde el admin. Con el
-        // storage dentro un zip pasa del GB: nginx (client_max_body_size) y
+        // storage dentro (originales) ronda los cientos de MB: nginx (client_max_body_size) y
         // PHP (upload_max_filesize/post_max_size) tienen que ir a la par.
-        'upload_max_mb' => env('MOTOR_BACKUP_UPLOAD_MAX_MB', 4096),
+        'upload_max_mb' => env('MOTOR_BACKUP_UPLOAD_MAX_MB', 1024),
     ],
 
     // Auth (DC-13, DC-14).

@@ -27,8 +27,9 @@ class MotorBackup
     /**
      * Aplica la config de spatie/laravel-backup a partir de motor.backup.
      *
-     * $includeMedia decide si storage/app/public entra en el zip de ESTA
-     * ejecución (la copia manual lo pasa explícito, con o sin); sin él
+     * $includeMedia decide si storage/app/public (solo originales: sin las
+     * previews ni los PDF generados) entra en el zip de ESTA ejecución (la
+     * copia manual lo pasa explícito, con o sin); sin él
      * manda el ajuste de la copia automática del admin (BackupSettings
      * `include_media`, con motor.backup.include_media de base) — así el
      * backup:run del scheduler lleva el storage solo si se ha activado.
@@ -63,9 +64,17 @@ class MotorBackup
         $name = Str::slug(config('app.name', 'motor'));
         $settings = app(BackupSettings::class)->get();
 
+        // Con storage van SOLO los originales (arte, iconos, fuentes, imágenes
+        // del CRM): las previews PNG y los PDF generados se regeneran desde el
+        // admin y son el 90 % del peso.
         $withMedia = $includeMedia ?? (bool) ($settings['include_media'] ?? config('motor.backup.include_media'));
+        $exclude = [];
         if ($withMedia && is_dir(storage_path('app/public'))) {
             $include[] = storage_path('app/public');
+            $exclude = [
+                storage_path('app/public/'.trim(config('motor.previews.path', 'previews'), '/')),
+                storage_path('app/public/'.trim(config('motor.pdf.path', 'pdfs'), '/')),
+            ];
         }
 
         // Salud del monitor acorde a la copia automática configurada: con
@@ -78,6 +87,11 @@ class MotorBackup
         config([
             'backup.backup.name' => $name,
             'backup.backup.source.files.include' => $include,
+            'backup.backup.source.files.exclude' => $exclude,
+            // Entradas del zip relativas al proyecto (storage/app/public/…):
+            // así BackupRestorer las devuelve a su sitio en cualquier
+            // instalación, sin depender de la ruta absoluta del servidor.
+            'backup.backup.source.files.relative_path' => base_path(),
             'backup.backup.source.databases' => $databases,
             'backup.backup.destination.disks' => [$disk],
             // Retención: la gobierna el admin (con motor.backup.keep_days de base).
