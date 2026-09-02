@@ -15,6 +15,10 @@ Backend Laravel reutilizable del motor. Versión de tren con `@edc-motor/ui` y
 - **Fondo de bloque:** preset `token:accent-2-soft` («Acento 2») junto al
   del acento 1, que pasa a llamarse «Acento 1».
 
+## [0.5.34] — 2026-09-02
+
+- Sin cambios propios: versión de tren.
+
 ## [0.5.33] — 2026-09-02
 
 - Sin cambios propios: versión de tren.
