@@ -49,10 +49,9 @@ class SiteSettingsController extends Controller
             'logo' => ['sometimes', 'nullable', 'array'],
             'logo.*' => ['nullable', 'string', 'max:2048'],
             'favicon' => ['sometimes', 'nullable', 'string', 'max:2048'],
-            'accent_mode' => ['sometimes', 'in:fixed,random'],
+            // Acento 1 (marca) y acento 2 (acción).
             'accent_color' => ['sometimes', 'string', $hex],
-            'accent_colors' => ['sometimes', 'array', 'max:12'],
-            'accent_colors.*' => ['string', $hex],
+            'accent_2_color' => ['sometimes', 'string', $hex],
             'font_headings' => ['sometimes', 'in:'.$fontKeys],
             'font_body' => ['sometimes', 'in:'.$fontKeys],
             'font_special' => ['sometimes', 'in:'.$fontKeys],

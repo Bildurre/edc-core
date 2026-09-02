@@ -3,6 +3,18 @@
 Backend Laravel reutilizable del motor. Versión de tren con `@edc-motor/ui` y
 `@edc-motor/admin-kit` (tag `vX.Y.Z` en el monorepo).
 
+## [Sin publicar]
+
+### Cambiado
+
+- **Configuración del sitio: dos acentos fijos.** `accent_color` (acento 1,
+  marca) y nuevo `accent_2_color` (acento 2, acción), ambos hex; por defecto
+  el violeta y el naranja de la paleta del tema del ui (`#955dcd`, `#b26900`).
+  Desaparecen el modo aleatorio y sus claves (`accent_mode`, `accent_colors`):
+  la validación ya no las acepta y `update()` las retira de lo guardado.
+- **Fondo de bloque:** preset `token:accent-2-soft` («Acento 2») junto al
+  del acento 1, que pasa a llamarse «Acento 1».
+
 ## [0.5.33] — 2026-09-02
 
 - Sin cambios propios: versión de tren.
