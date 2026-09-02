@@ -3,7 +3,7 @@
 Backend Laravel reutilizable del motor. Versión de tren con `@edc-motor/ui` y
 `@edc-motor/admin-kit` (tag `vX.Y.Z` en el monorepo).
 
-## [Sin publicar]
+## [0.5.36] — 2026-09-02
 
 ### Revertido
 
@@ -11,7 +11,8 @@ Backend Laravel reutilizable del motor. Versión de tren con `@edc-motor/ui` y
   (`accent_mode`, `accent_color`, `accent_colors`); desaparece
   `accent_2_color` y el preset de fondo `token:accent-2-soft` (lo guardado
   con él deja de validar; el preset del acento vuelve a llamarse «Acento»).
-  Se revierte la paleta de 18 tonos de 0.5.35.
+  Se revierten la paleta de 18 tonos de 0.5.35 y el color del juego
+  (`game_color`) de 0.5.36.
 
 ## [0.5.35] — 2026-09-02
 
