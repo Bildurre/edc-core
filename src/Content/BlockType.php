@@ -119,8 +119,9 @@ abstract class BlockType
             Field::color('background')->options([
                 'token:veil-60' => 'Velo 60 %',
                 'token:veil-80' => 'Velo 80 %',
-                'token:accent-soft' => 'Acento 1',
-                'token:accent-2-soft' => 'Acento 2',
+                'token:accent-soft' => 'Marca',
+                'token:accent-2-soft' => 'Acción',
+                'token:accent-3-soft' => 'Juego',
             ])->legacyValues([
                 'token:surface',
                 'token:surface-2',

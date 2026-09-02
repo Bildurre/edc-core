@@ -3,6 +3,17 @@
 Backend Laravel reutilizable del motor. Versión de tren con `@edc-motor/ui` y
 `@edc-motor/admin-kit` (tag `vX.Y.Z` en el monorepo).
 
+## [Sin publicar]
+
+### Cambiado
+
+- **Configuración del sitio: un solo color, el del juego.** `game_color`
+  (acento 3, por defecto `#0b936b`) sustituye a `accent_color` y
+  `accent_2_color`: marca (índigo) y acción (coral) son fijos de la IP en el
+  tema del ui. Las claves antiguas se ignoran y `update()` las retira.
+- **Fondo de bloque:** presets «Marca», «Acción» y nuevo «Juego»
+  (`token:accent-3-soft`).
+
 ## [0.5.35] — 2026-09-02
 
 ### Cambiado
