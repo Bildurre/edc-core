@@ -10,8 +10,8 @@ use Illuminate\Support\Str;
 
 /**
  * Configuración de la web pública (doc 10): título, logo, favicon, fuentes,
- * el color del juego (acento 3 del tema del ui; los acentos de marca y de
- * acción son fijos de la IP) y pie. Se guarda como un JSON bajo la
+ * acento (fijo o ALEATORIO estilo CDL: una lista de colores de la que la SPA
+ * sortea uno al cargar y al navegar) y pie. Se guarda como un JSON bajo la
  * clave 'site' y la SPA lo consume de GET /api/site.
  *
  * Fuentes: el catálogo vive en config `motor.site.fonts` (el juego añade las
@@ -32,12 +32,9 @@ class SiteSettings
             'description' => [],     // {locale: meta description por defecto}
             'logo' => null,          // URL (SVG/PNG)
             'favicon' => null,       // URL (PNG/SVG)
-            // Color del juego (acento 3): un nodo de la paleta de 18 tonos del
-            // tema del ui; por defecto la esmeralda, tercer vértice de la triada
-            // índigo/coral de la IP. Los acentos de marca y acción son fijos del
-            // tema. Las claves antiguas (accent_mode, accent_colors,
-            // accent_color, accent_2_color) que sigan guardadas se ignoran.
-            'game_color' => '#0b936b',
+            'accent_mode' => 'fixed',
+            'accent_color' => '#6c5ce7',
+            'accent_colors' => [],   // candidatos del modo aleatorio
             'font_headings' => 'system',
             'font_body' => 'system',
             // Fuente "especial": acentos puntuales (por ahora, el bloque cita).
@@ -65,7 +62,7 @@ class SiteSettings
     public function update(array $data): array
     {
         $value = [...$this->get(), ...$data];
-        unset($value['fonts'], $value['logo_inline'], $value['accent_mode'], $value['accent_colors'], $value['accent_color'], $value['accent_2_color']);
+        unset($value['fonts'], $value['logo_inline']);
 
         Setting::query()->updateOrCreate(['key' => 'site'], ['value' => $value]);
         Cache::forget(self::CACHE_KEY);
@@ -163,9 +160,9 @@ class SiteSettings
 
     /**
      * Contenido de cada logo que sea un SVG del disco del motor, por locale:
-     * la SPA lo inlinea y currentColor hereda el acento de marca. Un fichero
-     * cross-origin no serviría (fetch/mask exigen CORS); por eso viaja
-     * dentro del payload.
+     * la SPA lo inlinea y currentColor hereda el acento (el modo aleatorio
+     * lo recolorea, como los logo-path de CDL). Un fichero cross-origin no
+     * serviría (fetch/mask exigen CORS); por eso viaja dentro del payload.
      */
     protected function logoInlineMap(): array
     {

@@ -5,14 +5,13 @@ Backend Laravel reutilizable del motor. Versión de tren con `@edc-motor/ui` y
 
 ## [Sin publicar]
 
-### Cambiado
+### Revertido
 
-- **Configuración del sitio: un solo color, el del juego.** `game_color`
-  (acento 3, por defecto `#0b936b`) sustituye a `accent_color` y
-  `accent_2_color`: marca (índigo) y acción (coral) son fijos de la IP en el
-  tema del ui. Las claves antiguas se ignoran y `update()` las retira.
-- **Fondo de bloque:** presets «Marca», «Acción» y nuevo «Juego»
-  (`token:accent-3-soft`).
+- **Configuración del sitio: vuelve el acento fijo o ALEATORIO de 0.5.34**
+  (`accent_mode`, `accent_color`, `accent_colors`); desaparece
+  `accent_2_color` y el preset de fondo `token:accent-2-soft` (lo guardado
+  con él deja de validar; el preset del acento vuelve a llamarse «Acento»).
+  Se revierte la paleta de 18 tonos de 0.5.35.
 
 ## [0.5.35] — 2026-09-02
 
