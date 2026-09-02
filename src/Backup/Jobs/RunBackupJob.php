@@ -8,9 +8,7 @@ use Illuminate\Bus\Queueable;
 use Illuminate\Contracts\Queue\ShouldQueue;
 use Illuminate\Foundation\Bus\Dispatchable;
 use Illuminate\Queue\InteractsWithQueue;
-use Illuminate\Support\Facades\Artisan;
 use Illuminate\Support\Facades\Cache;
-use Spatie\Backup\Config\Config;
 
 /**
  * Copia de seguridad en cola (doc 06, DC-16): el POST del admin no espera al
@@ -46,23 +44,13 @@ class RunBackupJob implements ShouldQueue
 
             if ($withMedia !== $autoWithMedia) {
                 MotorBackup::applyConfig(includeMedia: $withMedia);
-
-                // spatie/laravel-backup v10 congela config('backup') en un
-                // Config `scoped` en su primera resolución: hay que olvidarlo
-                // para que backup:run se reconstruya con la config recién
-                // aplicada (si no, el include del storage no le llega).
-                app()->forgetInstance(Config::class);
             }
 
-            $options = ['--disable-notifications' => true];
-
-            // isset: un job encolado con una versión anterior (sin filename)
-            // se deserializa con la propiedad sin inicializar.
-            if (isset($this->filename) && $this->filename !== null) {
-                $options['--filename'] = $this->filename;
-            }
-
-            Artisan::call('backup:run', $options);
+            // Copia construida de la config VIGENTE (MotorBackup::run): nada
+            // de `backup:run`, cuyo Config inyectado es el del boot del
+            // worker. isset: un job encolado con una versión anterior (sin
+            // filename) se deserializa con la propiedad sin inicializar.
+            MotorBackup::run(isset($this->filename) ? $this->filename : null);
         } finally {
             // Acabe bien o mal, la vista deja de sondear (si el worker muere
             // sin llegar aquí, el TTL del flag lo limpia solo).

@@ -28,6 +28,14 @@ Backend Laravel reutilizable del motor. Versión de tren con `@edc-motor/ui` y
   `BackupRestorer` los escribe en el disco público del motor pisando lo que
   haya (rutas normalizadas, nada de `..`); la respuesta del restore expone
   `restored_files`. Las previews y los PDF se regeneran después.
+- **La copia manual con storage ya lleva el storage también en el
+  worker**: `RunBackupJob` (y el scheduler) ejecutan la copia con
+  `MotorBackup::run()`, que construye el job de spatie de un `Config`
+  fresco a partir de `config('backup')`. `backup:run` recibe su `Config`
+  inyectado al construirse el comando — en el boot del kernel de consola —
+  así que en un worker de cola de larga vida ignoraba la config reaplicada
+  por el job y la manual «con storage» salía solo con el dump (en la
+  suite, con cola sync, pasaba porque el comando se construía después).
 - **Copias grandes**: `motor.backup.upload_max_mb` pasa de 500 a 1024 (con
   los originales del storage dentro una copia ronda los cientos de MB;
   nginx y PHP tienen que ir a la par), `GET /admin/backups` expone `upload_max_mb` para que la vista valide

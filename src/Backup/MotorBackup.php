@@ -5,6 +5,9 @@ namespace Edc\Core\Backup;
 use Illuminate\Console\Scheduling\Schedule;
 use Illuminate\Support\Facades\Artisan;
 use Illuminate\Support\Str;
+use Spatie\Backup\Config\Config;
+use Spatie\Backup\Notifications\EventHandler;
+use Spatie\Backup\Tasks\Backup\BackupJobFactory;
 use Spatie\Backup\Tasks\Monitor\HealthChecks\MaximumAgeInDays;
 use Spatie\Backup\Tasks\Monitor\HealthChecks\MaximumStorageInMegabytes;
 
@@ -111,6 +114,32 @@ class MotorBackup
     }
 
     /**
+     * Ejecuta UNA copia con la config de spatie vigente en este momento
+     * (config('backup'), recién aplicada por applyConfig). A propósito no
+     * pasa por `backup:run`: el comando recibe su Config INYECTADO al
+     * construirse, y el kernel de consola construye todos los comandos al
+     * arrancar — en un worker de cola (o un scheduler) de larga vida eso es
+     * la config del boot, y una copia manual «con storage» salía solo con
+     * el dump aunque el job reaplicara la config. Construir el job de spatie
+     * aquí, de un Config fresco, no depende de nada cacheado.
+     */
+    public static function run(?string $filename = null): void
+    {
+        // Sin notificaciones por correo: el gestor del admin ya avisa.
+        EventHandler::disable();
+
+        $job = BackupJobFactory::createFromConfig(Config::fromArray(config('backup')));
+        // Fuera de un comando de consola no hay señales que atender.
+        $job->disableSignals();
+
+        if ($filename !== null) {
+            $job->setFilename($filename);
+        }
+
+        $job->run();
+    }
+
+    /**
      * Programa la copia automática según lo configurado en el admin. La lee
      * en cada schedule:run (los ajustes se aplican sin redeploy). Se ejecuta
      * en el MISMO proceso (call + Artisan::call) para que la retención de
@@ -125,7 +154,10 @@ class MotorBackup
         }
 
         $event = $schedule->call(function () {
-            Artisan::call('backup:run', ['--disable-notifications' => true]);
+            // La automática lleva (o no) el storage según el ajuste del
+            // admin: applyConfig sin argumento lo lee de BackupSettings.
+            self::applyConfig();
+            self::run();
             Artisan::call('backup:clean', ['--disable-notifications' => true]);
         })->name('motor:backup')->withoutOverlapping();
 
