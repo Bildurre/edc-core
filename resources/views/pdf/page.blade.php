@@ -39,6 +39,24 @@
         return $parentId && $byId->has($parentId) ? 1 + $depthOf($byId->get($parentId)) : 0;
     };
 
+    // Pestañas: los hijos de un bloque `tabs` se imprimen en secuencia tras
+    // él, cada uno precedido por el NOMBRE de su pestaña (el hijo n.º N es
+    // la pestaña N, contando TODOS los hijos de la página aunque alguno no
+    // se imprima) y con sus propios títulos un nivel más abajo.
+    $allBlocks = $page->blocks()->orderBy('order')->get();
+    $tabLabelOf = function ($block) use ($allBlocks, $registry, $locale): ?string {
+        $parent = $block->parent_id ? $allBlocks->firstWhere('id', $block->parent_id) : null;
+        if (! $parent || $parent->type !== 'tabs' || ! $registry->has('tabs')) {
+            return null;
+        }
+        $index = $allBlocks->where('parent_id', $parent->id)->values()
+            ->search(fn ($sibling) => $sibling->id === $block->id);
+        $tabs = $registry->get('tabs')->localizeSettings($parent->settings, $locale)['tabs'] ?? [];
+        $label = $tabs[$index]['label'] ?? null;
+
+        return is_string($label) && trim($label) !== '' ? $label : null;
+    };
+
     // Alineaciones (campos comunes): el cuerpo hereda la del bloque (justify
     // por defecto, como el viejo); título/subtítulo con 'inherit' siguen al
     // bloque salvo justificado, que los deja a la izquierda (como la web).
@@ -74,9 +92,11 @@
         return [$position, (int) min(60, max(25, round($share * 100)))];
     };
 
-    $items = $blocks->map(function ($block) use ($registry, $locale, $depthOf) {
+    $items = $blocks->map(function ($block) use ($registry, $locale, $depthOf, $tabLabelOf) {
         $type = $registry->get($block->type);
-        $depth = min($depthOf($block), 3);
+        $tabLabel = $tabLabelOf($block);
+        $tabDepth = min($depthOf($block), 3);
+        $depth = min($depthOf($block) + ($tabLabel !== null ? 1 : 0), 3);
 
         // Impresión propia del bloque (BlockType::pdfView, p. ej. la lista
         // de contadores de CDL): su parcial recibe los mismos datos que el
@@ -89,6 +109,8 @@
             's' => $type->localizeSettings($block->settings, $locale),
             'hTitle' => 'h'.min(2 + $depth, 5),
             'hSubtitle' => 'h'.min(3 + $depth, 6),
+            'tabLabel' => $tabLabel,
+            'hTab' => 'h'.min(2 + $tabDepth, 5),
             'pdfView' => $pdfView,
             'data' => $pdfView !== null ? $type->resolveData($block, $locale) : [],
             'block' => $block,
@@ -230,6 +252,9 @@
              enteros de una pieza — su título tampoco se queda huérfano. --}}
         .block--header { margin-bottom: 2em; padding-bottom: 1em; border-bottom: 2px solid #000; page-break-inside: avoid; }
         .block--data { page-break-inside: avoid; }
+        {{-- Nombre de la pestaña (contenedor `tabs`) que precede a cada hijo:
+             pegado al bloque que titula, nunca huérfano al pie. --}}
+        .block--tab-label { margin-bottom: 0.4em; page-break-after: avoid; }
 
         {{-- Tarjeta de texto: recuadro con borde, levemente más estrecha que
              la columna del cuerpo (margen lateral extra) y con aire interior
@@ -316,6 +341,14 @@
 
     @foreach ($items as $item)
         @php $s = $item['s']; @endphp
+
+        @if ($item['tabLabel'] !== null)
+            {{-- Nombre de la pestaña que contiene este bloque (contenedor
+                 `tabs`): en papel las pestañas van en secuencia. --}}
+            <div class="block block--tab-label">
+                <{{ $item['hTab'] }}>{{ $item['tabLabel'] }}</{{ $item['hTab'] }}>
+            </div>
+        @endif
 
         @if ($item['pdfView'] !== null)
             {{-- Impresión PROPIA del bloque (BlockType::pdfView): el juego

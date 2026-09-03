@@ -3,6 +3,33 @@
 Backend Laravel reutilizable del motor. Versión de tren con `@edc-motor/ui` y
 `@edc-motor/admin-kit` (tag `vX.Y.Z` en el monorepo).
 
+## [Sin publicar]
+
+### Añadido
+
+- **Bloque «Pestañas»** (`tabs`), el primer bloque CONTENEDOR del motor:
+  título, subtítulo y un repetidor de pestañas (texto traducible, icono de
+  la biblioteca del juego y ancla opcional para enlazar). Su contenido son
+  sus bloques HIJOS (`parent_id`): el hijo n.º N es la pestaña N, con sus
+  propios descendientes dentro; vale cualquier bloque, también los de datos
+  del juego (un índice de entidad por pestaña).
+- **Campo `icon` del DSL** (`Field::make('icon', 'icon')`): el admin lo
+  elige por nombre entre los iconos del juego y guarda su URL.
+- **`parent_id` en el payload público** de cada bloque (`GET /pages/{slug}`):
+  el front agrupa en los contenedores a sus descendientes; el resto sigue en
+  flujo.
+
+### Cambiado
+
+- **PDF de página con pestañas**: los hijos de un bloque `tabs` se imprimen
+  en secuencia tras él, cada uno precedido por el nombre de su pestaña y con
+  sus propios títulos un nivel más abajo.
+
+**Migración del cascarón**: la página pública pinta sus bloques con
+`BlockFlow` de `@edc-motor/ui` (ver su CHANGELOG) y el single de página del
+admin pasa las etiquetas `tab` / `tabsMissing` / `tabsExtra` a `PageBlocks`
+(claves i18n `pages.blocks.*`; ver `plantilla/`).
+
 ## [0.5.40] — 2026-09-03
 
 - Sin cambios propios: versión de tren.

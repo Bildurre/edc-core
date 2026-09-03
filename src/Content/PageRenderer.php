@@ -44,6 +44,10 @@ class PageRenderer
 
                 return [
                     'id' => $block->id,
+                    // El padre viaja para los bloques CONTENEDORES (pestañas):
+                    // el front agrupa en ellos a sus descendientes; el resto
+                    // sigue pintándose en flujo.
+                    'parent_id' => $block->parent_id,
                     'type' => $block->type,
                     'component' => $type->component(),
                     'settings' => $type->localizeSettings($block->settings, $locale),
