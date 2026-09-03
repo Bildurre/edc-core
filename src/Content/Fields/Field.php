@@ -46,6 +46,15 @@ class Field
      */
     public array $legacyValues = [];
 
+    /**
+     * Visibilidad CONDICIONAL en el formulario del admin: el campo solo se
+     * pinta cuando otro campo del mismo esquema vale alguno de estos
+     * valores. Solo presentación: la validación y el guardado no cambian.
+     *
+     * @var array{field: string, values: string[]}|null
+     */
+    public ?array $visibleWhen = null;
+
     public static function text(string $key): self
     {
         return new self($key, 'text');
@@ -218,6 +227,20 @@ class Field
     }
 
     /**
+     * Muestra este campo solo cuando `$field` (otro campo del mismo esquema)
+     * vale alguno de `$values` — p. ej. «Origen» solo con entidad = mazos.
+     * El admin lo oculta (SchemaFields); validar y guardar siguen igual.
+     *
+     * @param  string|string[]  $values
+     */
+    public function visibleWhen(string $field, string|array $values): self
+    {
+        $this->visibleWhen = ['field' => $field, 'values' => array_values((array) $values)];
+
+        return $this;
+    }
+
+    /**
      * Subcampos de un group/repeater.
      *
      * @param  Field[]  $fields
@@ -316,6 +339,7 @@ class Field
                 : array_map(fn (Field $field) => $field->toArray(), $this->fields),
             'options_url' => $this->optionsUrl,
             'row' => $this->row,
+            'visible_when' => $this->visibleWhen,
         ];
     }
 }

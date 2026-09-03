@@ -7,7 +7,7 @@ use Edc\Core\Content\Fields\Field;
 
 /**
  * Pestañas (doc 03): el único bloque CONTENEDOR del motor. Declara sus
- * pestañas en un repetidor (texto, icono del juego y ancla opcional) y su
+ * pestañas en un repetidor (texto, icono lucide y ancla opcional) y su
  * contenido son sus bloques HIJOS (parent_id): el hijo n.º N es el
  * contenido de la pestaña N, en el orden del gestor; los descendientes de
  * ese hijo van con él en la misma pestaña. Un hijo puede ser cualquier
@@ -36,12 +36,13 @@ class TabsBlock extends BlockType
             Field::textarea('subtitle')->label('Subtítulo')->translatable(),
             Field::repeater('tabs')->label('Pestañas')->min(1)->fields([
                 Field::text('label')->label('Texto')->translatable()->required()->row('tab'),
-                // Icono de la biblioteca del juego (se guarda su URL, como
-                // los iconos insertados en el texto rico).
-                Field::make('icon', 'icon')->label('Icono')->row('tab'),
                 // Ancla de la URL para enlazar la pestaña (#ancla); sin ella
                 // el front usa tab-{id}-{n}.
                 Field::text('anchor')->label('Ancla (para enlazar)')->row('tab'),
+                // Icono lucide: el admin lo elige en el catálogo curado del
+                // motor (IconPicker del ui, a todo el ancho de la fila) y se
+                // guarda su nombre kebab-case.
+                Field::make('icon', 'icon')->label('Icono'),
             ]),
         ];
     }

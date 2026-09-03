@@ -3,6 +3,22 @@
 Backend Laravel reutilizable del motor. Versión de tren con `@edc-motor/ui` y
 `@edc-motor/admin-kit` (tag `vX.Y.Z` en el monorepo).
 
+## [Sin publicar]
+
+### Añadido
+
+- **`Field::visibleWhen($campo, $valores)`**: visibilidad condicional en el
+  formulario del admin (p. ej. «Origen» solo con entidad = mazos). Viaja en
+  el esquema como `visible_when: {field, values}`; validar y guardar siguen
+  igual.
+
+### Cambiado
+
+- **El campo `icon` del DSL guarda un icono lucide** (nombre kebab-case,
+  p. ej. `layout-grid`) del catálogo curado del motor, en vez de la URL de
+  un icono del juego. Las pestañas (`tabs`) lo usan así; el icono va ahora a
+  todo el ancho de su fila del repetidor.
+
 ## [0.5.42] — 2026-09-03
 
 ### Añadido
