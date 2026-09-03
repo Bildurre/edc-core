@@ -30,6 +30,10 @@ Backend Laravel reutilizable del motor. Versión de tren con `@edc-motor/ui` y
 admin pasa las etiquetas `tab` / `tabsMissing` / `tabsExtra` a `PageBlocks`
 (claves i18n `pages.blocks.*`; ver `plantilla/`).
 
+## [0.5.41] — 2026-09-03
+
+- Sin cambios propios: versión de tren.
+
 ## [0.5.40] — 2026-09-03
 
 - Sin cambios propios: versión de tren.
