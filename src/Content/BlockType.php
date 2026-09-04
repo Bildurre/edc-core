@@ -5,6 +5,7 @@ namespace Edc\Core\Content;
 use Edc\Core\Content\Fields\Field;
 use Edc\Core\Content\Models\Block;
 use Edc\Core\Support\HtmlSanitizer;
+use Edc\Core\Support\PublicUrl;
 
 /**
  * La pieza central del CRM (doc 03): un tipo de bloque se declara UNA vez y
@@ -207,7 +208,7 @@ abstract class BlockType
         return $rules;
     }
 
-    /** Sanea los campos richtext (DC-09) antes de guardar, anidados incluidos. */
+    /** Sanea los campos richtext (DC-09) y relativiza las URL propias antes de guardar, anidados incluidos. */
     public function sanitizeSettings(array $settings): array
     {
         return $this->sanitizeFields($this->allFields(), $settings);
@@ -240,6 +241,10 @@ abstract class BlockType
             }
 
             if ($field->type !== 'richtext') {
+                // Imágenes, enlaces y demás strings: las URL absolutas al
+                // propio motor se guardan relativas a la raíz (ver PublicUrl).
+                $settings[$field->key] = PublicUrl::relativizeDeep($value);
+
                 continue;
             }
             if ($field->translatable && is_array($value)) {

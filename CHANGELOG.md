@@ -9,9 +9,24 @@ Backend Laravel reutilizable del motor. Versión de tren con `@edc-motor/ui` y
 
 - **`php artisan motor:rewrite-urls {from} {to} [--dry-run]`**: sustituye un
   origen de URL por otro en TODO el contenido de la base de datos (texto,
-  bloques y configuración; JSON plano y con barras escapadas). Para después
-  de importar la BD de otro entorno, cuyas imágenes e iconos quedan con las
-  URL absolutas del origen (p. ej. `http://localhost:8010/storage/...`).
+  bloques y configuración; JSON plano y con barras escapadas). Con `to` =
+  `/` las deja relativas a la raíz. Para después de importar la BD de otro
+  entorno, cuyas imágenes e iconos quedan con las URL absolutas del origen
+  (p. ej. `http://localhost:8010/storage/...`).
+
+### Cambiado
+
+- **El contenido guarda las URL propias RELATIVAS a la raíz**
+  (`/storage/...`): al guardar texto rico (`HtmlSanitizer`), ajustes de
+  bloques y ajustes del sitio, toda URL absoluta cuyo origen sea el de
+  `APP_URL` o el de la petición pasa a ruta relativa (`PublicUrl::relativize`).
+  Así el contenido deja de estar atado al dominio donde se escribió y una
+  BD importada de local funciona en producción tal cual. **Cascarón**: las
+  SPA necesitan en desarrollo el proxy de Vite `'/storage' → origen de la
+  API` (ya en `plantilla/` y en el playground: `server.proxy`); en
+  producción no hace falta (misma web que la API). Para el contenido
+  antiguo: `php artisan motor:rewrite-urls http://localhost:8010 /` (y el
+  dominio de producción, si lo hubo).
 
 ## [0.5.45] — 2026-09-04
 
