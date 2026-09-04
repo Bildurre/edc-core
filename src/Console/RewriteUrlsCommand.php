@@ -16,14 +16,15 @@ use Illuminate\Support\Facades\Schema;
  * columnas de texto/JSON y sustituye tanto la forma plana como la escapada
  * de JSON (http:\/\/...). Sin barra final en los orígenes.
  *
- *   php artisan motor:rewrite-urls http://localhost:8010 https://mi-dominio.com
- *   php artisan motor:rewrite-urls http://localhost:8010 https://mi-dominio.com --dry-run
+ *   php artisan motor:rewrite-urls http://localhost:8010 /                        # relativas (lo normal)
+ *   php artisan motor:rewrite-urls http://localhost:8010 https://mi-dominio.com  # a otro origen
+ *   php artisan motor:rewrite-urls http://localhost:8010 / --dry-run
  */
 class RewriteUrlsCommand extends Command
 {
     protected $signature = 'motor:rewrite-urls
         {from : Origen a sustituir (p. ej. http://localhost:8010)}
-        {to : Origen nuevo (p. ej. https://mi-dominio.com)}
+        {to : Origen nuevo (p. ej. https://mi-dominio.com), o "/" para dejarlas relativas a la raíz}
         {--dry-run : Solo cuenta las filas afectadas, sin escribir}';
 
     protected $description = 'Sustituye un origen de URL por otro en todo el contenido de la base de datos (tras importar una BD de otro entorno).';
@@ -40,9 +41,11 @@ class RewriteUrlsCommand extends Command
     public function handle(): int
     {
         $from = rtrim((string) $this->argument('from'), '/');
+        // `to` = "/" deja las URL RELATIVAS a la raíz (lo que guarda el motor
+        // desde 0.5.46): http://localhost:8010/storage/x → /storage/x.
         $to = rtrim((string) $this->argument('to'), '/');
-        if ($from === '' || $to === '' || $from === $to) {
-            $this->error('Indica dos orígenes distintos, sin barra final.');
+        if ($from === '' || ($to === '' && (string) $this->argument('to') !== '/') || $from === $to) {
+            $this->error('Indica el origen a sustituir y el nuevo (sin barra final), o "/" para dejarlas relativas.');
 
             return self::FAILURE;
         }
@@ -92,9 +95,10 @@ class RewriteUrlsCommand extends Command
             }
         }
 
+        $label = $to === '' ? 'rutas relativas' : "«{$to}»";
         $this->info($total === 0
             ? "Nada que reescribir: no hay «{$from}» en la base de datos."
-            : ($dry ? "{$total} fila(s) llevarían «{$to}» en lugar de «{$from}»." : "{$total} fila(s) reescritas: «{$from}» → «{$to}»."));
+            : ($dry ? "{$total} fila(s) llevarían {$label} en lugar de «{$from}»." : "{$total} fila(s) reescritas: «{$from}» → {$label}."));
 
         return self::SUCCESS;
     }

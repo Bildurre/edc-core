@@ -9,7 +9,9 @@ use DOMNode;
 /**
  * Sanitizador de HTML por lista blanca (DC-09): lo que produce TipTap y nada
  * más. Se aplica en servidor al guardar texto rico (bloques del CRM y campos
- * richtext de las entidades del juego). Sin dependencias externas.
+ * richtext de las entidades del juego). Sin dependencias externas. Las URL
+ * de href/src que apunten al propio motor se guardan relativas a la raíz
+ * (PublicUrl::relativize).
  */
 class HtmlSanitizer
 {
@@ -114,8 +116,16 @@ class HtmlSanitizer
 
                     continue;
                 }
-                if (in_array($name, ['href', 'src'], true) && ! $this->safeUrl($attribute->value)) {
-                    $child->removeAttribute($attribute->name);
+                if (in_array($name, ['href', 'src'], true)) {
+                    if (! $this->safeUrl($attribute->value)) {
+                        $child->removeAttribute($attribute->name);
+
+                        continue;
+                    }
+                    // Las URL absolutas al propio motor (imágenes e iconos
+                    // subidos) se guardan relativas: el contenido no queda
+                    // atado al dominio donde se escribió.
+                    $child->setAttribute($attribute->name, PublicUrl::relativize(trim($attribute->value)));
                 }
             }
 

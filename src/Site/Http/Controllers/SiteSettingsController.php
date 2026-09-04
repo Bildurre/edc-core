@@ -4,6 +4,7 @@ namespace Edc\Core\Site\Http\Controllers;
 
 use Edc\Core\Site\SiteSettings;
 use Edc\Core\Support\HtmlSanitizer;
+use Edc\Core\Support\PublicUrl;
 use Illuminate\Http\Request;
 use Illuminate\Routing\Controller;
 use Illuminate\Support\Facades\Storage;
@@ -76,6 +77,10 @@ class SiteSettingsController extends Controller
                 $data['footer_text'],
             );
         }
+
+        // Logo, favicon, fondos de los índices…: las URL absolutas al propio
+        // motor se guardan relativas a la raíz (ver PublicUrl).
+        $data = PublicUrl::relativizeDeep($data);
 
         $this->settings->update($data);
 
