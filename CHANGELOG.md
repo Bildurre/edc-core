@@ -3,6 +3,16 @@
 Backend Laravel reutilizable del motor. Versión de tren con `@edc-motor/ui` y
 `@edc-motor/admin-kit` (tag `vX.Y.Z` en el monorepo).
 
+## [Sin publicar]
+
+### Añadido
+
+- **`php artisan motor:rewrite-urls {from} {to} [--dry-run]`**: sustituye un
+  origen de URL por otro en TODO el contenido de la base de datos (texto,
+  bloques y configuración; JSON plano y con barras escapadas). Para después
+  de importar la BD de otro entorno, cuyas imágenes e iconos quedan con las
+  URL absolutas del origen (p. ej. `http://localhost:8010/storage/...`).
+
 ## [0.5.45] — 2026-09-04
 
 - Sin cambios propios: versión de tren.
