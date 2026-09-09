@@ -3,6 +3,19 @@
 Backend Laravel reutilizable del motor. Versión de tren con `@edc-motor/ui` y
 `@edc-motor/admin-kit` (tag `vX.Y.Z` en el monorepo).
 
+## [Sin publicar]
+
+### Añadido
+
+- **Exportación a JSON (doc 12)**: los modelos que implementan
+  `Edc\Core\Export\ExportableContract` (`exportFields`, `exportQuery`,
+  `exportItem`) y se registran con `Exports::register('clave', Modelo::class)`
+  se descargan desde el admin con los idiomas y campos elegidos, con las
+  relaciones desplegadas. Rutas `GET admin/export/options` y `POST
+  admin/export/{modelo}`, solo administradores (gate `export-data`, por
+  rol). `ExportLocalizer` resuelve los textos por idioma (cadena con uno,
+  mapa con varios).
+
 ## [0.5.50] — 2026-09-06
 
 - Sin cambios propios: versión de tren.

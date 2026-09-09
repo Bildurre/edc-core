@@ -21,11 +21,13 @@ use Edc\Core\Content\BlockTypes\TextCardBlock;
 use Edc\Core\Content\Models\Page;
 use Edc\Core\Content\PagePdfExport;
 use Edc\Core\Content\SitemapRegistry;
+use Edc\Core\Export\ExportRegistry;
 use Edc\Core\Pdf\PdfExportRegistry;
 use Edc\Core\Previews\PreviewRegistry;
 use Illuminate\Auth\Notifications\ResetPassword;
 use Illuminate\Console\Scheduling\Schedule;
 use Illuminate\Routing\Router;
+use Illuminate\Support\Facades\Gate;
 use Illuminate\Support\ServiceProvider;
 
 class MotorServiceProvider extends ServiceProvider
@@ -43,6 +45,10 @@ class MotorServiceProvider extends ServiceProvider
 
         // Registro de exports de PDF (doc 02): facade Pdfs.
         $this->app->singleton(PdfExportRegistry::class);
+
+        // Exportación a JSON (sección Exportación del admin): modelos que el
+        // juego marca como exportables (Exports::register).
+        $this->app->singleton(ExportRegistry::class);
 
         // Registro de URLs del sitemap (doc 10): facade Sitemap. El motor
         // aporta las páginas del CRM; cada juego añade sus entidades.
@@ -67,6 +73,10 @@ class MotorServiceProvider extends ServiceProvider
     {
         // PDF de páginas imprimibles del CRM (doc 03 + doc 02).
         $this->app->make(PdfExportRegistry::class)->register('pages', PagePdfExport::class);
+
+        // Exportación a JSON: SOLO administradores (rol, no permiso: un
+        // editor con manage-game no exporta).
+        Gate::define('export-data', fn ($user) => method_exists($user, 'isAdmin') && $user->isAdmin());
 
         // Copias de seguridad (doc 06): config de spatie derivada de motor.backup
         // y copia automática programada según lo configurado en el admin

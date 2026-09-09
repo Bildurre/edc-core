@@ -12,6 +12,7 @@ use Edc\Core\Content\Http\Controllers\ContentUploadController;
 use Edc\Core\Content\Http\Controllers\PageController;
 use Edc\Core\Content\Http\Controllers\PublicPageController;
 use Edc\Core\Content\Http\Controllers\SitemapController;
+use Edc\Core\Export\Http\Controllers\ExportController;
 use Edc\Core\Icons\Http\Controllers\IconController;
 use Edc\Core\Menu\Http\Controllers\MenuController;
 use Edc\Core\Menu\Http\Controllers\PublicMenuController;
@@ -232,6 +233,13 @@ Route::prefix('api')->middleware('api')->group(function () {
                 Route::post('{entity}/{id}/regenerate', [PreviewController::class, 'regenerate'])
                     ->whereNumber('id');
                 Route::delete('{entity}/{id}', [PreviewController::class, 'destroy'])->whereNumber('id');
+            });
+
+            // Exportación a JSON de los modelos exportables (doc 12): solo
+            // administradores (gate export-data).
+            Route::prefix('admin/export')->middleware('can:export-data')->group(function () {
+                Route::get('options', [ExportController::class, 'options']);
+                Route::post('{model}', [ExportController::class, 'export']);
             });
 
             // Gestor de PDF (doc 02): listar por export/entidad, generar,
