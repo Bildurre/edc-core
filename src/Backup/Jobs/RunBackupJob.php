@@ -2,7 +2,6 @@
 
 namespace Edc\Core\Backup\Jobs;
 
-use Edc\Core\Backup\BackupSettings;
 use Edc\Core\Backup\MotorBackup;
 use Illuminate\Bus\Queueable;
 use Illuminate\Contracts\Queue\ShouldQueue;
@@ -34,15 +33,18 @@ class RunBackupJob implements ShouldQueue
     public function handle(): void
     {
         try {
-            // La config de spatie se aplica en el boot con el ajuste de la
-            // AUTOMÁTICA (BackupSettings include_media); la manual decide
-            // por sí misma: si su elección difiere, se reaplica con ella
-            // (con o sin storage). isset: un job encolado con una versión
-            // anterior (sin la propiedad) se deserializa sin inicializar.
+            // La manual decide por sí misma si lleva el storage: si la config
+            // de spatie VIGENTE (la del último applyConfig de este proceso:
+            // el boot, con el ajuste de la automática, o un job anterior)
+            // no es la suya, se reaplica con su elección. Antes se comparaba
+            // con el ajuste de la automática, y en un worker de larga vida
+            // tras una copia con imágenes la siguiente sin ellas (automática
+            // también sin) salía con el storage dentro. isset: un job
+            // encolado con una versión anterior (sin la propiedad) se
+            // deserializa sin inicializar.
             $withMedia = isset($this->includeMedia) && $this->includeMedia;
-            $autoWithMedia = (bool) (app(BackupSettings::class)->get()['include_media'] ?? false);
 
-            if ($withMedia !== $autoWithMedia) {
+            if (MotorBackup::appliedWithMedia() !== $withMedia) {
                 MotorBackup::applyConfig(includeMedia: $withMedia);
             }
 

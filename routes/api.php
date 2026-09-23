@@ -77,6 +77,15 @@ Route::prefix('api')->middleware('api')->group(function () {
         ->middleware(['signed', 'throttle:6,1'])
         ->name('verification.verify');
 
+    // Descarga de una copia de seguridad (doc 06) por enlace FIRMADO y
+    // temporal: el admin lo pide a admin/backups/{file}/download-url y lo abre
+    // el navegador, que así muestra la descarga con su progreso (sin cabecera
+    // de auth ni blob en memoria). Sin firma válida, 403.
+    Route::get('backups/{file}/download', [BackupController::class, 'download'])
+        ->where('file', '[A-Za-z0-9._\-]+')
+        ->middleware(['signed', 'throttle:12,1'])
+        ->name('motor.backups.download');
+
     // Biblioteca de iconos (para el selector del editor WYSIWYG).
     Route::get('icons', [IconController::class, 'index']);
 
@@ -182,6 +191,10 @@ Route::prefix('api')->middleware('api')->group(function () {
                 Route::post('{file}/restore', [BackupController::class, 'restore'])
                     ->where('file', '[A-Za-z0-9._\-]+');
                 Route::get('{file}/download', [BackupController::class, 'download'])
+                    ->where('file', '[A-Za-z0-9._\-]+');
+                // Enlace firmado y temporal para que la descarga la haga el
+                // navegador (ver la ruta pública motor.backups.download).
+                Route::get('{file}/download-url', [BackupController::class, 'downloadUrl'])
                     ->where('file', '[A-Za-z0-9._\-]+');
                 Route::delete('{file}', [BackupController::class, 'destroy'])
                     ->where('file', '[A-Za-z0-9._\-]+');

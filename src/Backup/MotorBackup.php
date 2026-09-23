@@ -28,6 +28,19 @@ class MotorBackup
     public const PENDING_CACHE_KEY = 'motor:backup:pending';
 
     /**
+     * Con qué elección de storage se aplicó la config por ÚLTIMA vez en este
+     * proceso (null: nunca). En un worker de cola de larga vida la config
+     * vigente no es la del boot sino la del último job: RunBackupJob la
+     * compara con la suya para reaplicar solo si difiere.
+     */
+    protected static ?bool $appliedWithMedia = null;
+
+    public static function appliedWithMedia(): ?bool
+    {
+        return self::$appliedWithMedia;
+    }
+
+    /**
      * Aplica la config de spatie/laravel-backup a partir de motor.backup.
      *
      * $includeMedia decide si storage/app/public (solo originales: sin las
@@ -71,6 +84,7 @@ class MotorBackup
         // del CRM): las previews PNG y los PDF generados se regeneran desde el
         // admin y son el 90 % del peso.
         $withMedia = $includeMedia ?? (bool) ($settings['include_media'] ?? config('motor.backup.include_media'));
+        self::$appliedWithMedia = $withMedia;
         $exclude = [];
         if ($withMedia && is_dir(storage_path('app/public'))) {
             $include[] = storage_path('app/public');

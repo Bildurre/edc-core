@@ -3,6 +3,27 @@
 Backend Laravel reutilizable del motor. Versión de tren con `@edc-motor/ui` y
 `@edc-motor/admin-kit` (tag `vX.Y.Z` en el monorepo).
 
+## [Sin publicar]
+
+### Añadido
+
+- **Descarga de copias por enlace firmado (doc 06)**: `GET
+  admin/backups/{file}/download-url` devuelve `{ url }` firmada y temporal
+  (5 min) a la nueva ruta pública `GET backups/{file}/download`
+  (`motor.backups.download`, middleware `signed`). La vista la abre en el
+  navegador, que muestra la descarga con su progreso (por la API con token
+  había que bajar el zip a memoria y aparecía de golpe). La descarga
+  autenticada `admin/backups/{file}/download` se mantiene.
+
+### Corregido
+
+- **Copia manual sin imágenes que llevaba el storage**: `RunBackupJob`
+  reaplicaba la config de spatie solo si su elección difería del ajuste de
+  la copia automática, pero en un worker de larga vida la config vigente es
+  la del último job, no la del boot: tras una manual con imágenes, la
+  siguiente sin ellas salía con el storage dentro. Ahora compara con la
+  config realmente aplicada (`MotorBackup::appliedWithMedia()`).
+
 ## [0.5.51] — 2026-09-09
 
 ### Añadido

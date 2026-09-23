@@ -10,6 +10,7 @@ use Illuminate\Http\Request;
 use Illuminate\Routing\Controller;
 use Illuminate\Support\Facades\Cache;
 use Illuminate\Support\Facades\Storage;
+use Illuminate\Support\Facades\URL;
 use Illuminate\Support\Str;
 use Illuminate\Validation\Rule;
 use Spatie\Backup\BackupDestination\Backup;
@@ -152,6 +153,21 @@ class BackupController extends Controller
         $backup = $this->find($file);
 
         return Storage::disk($this->disk())->download($backup->path(), $file);
+    }
+
+    /**
+     * Enlace FIRMADO y temporal (5 min) a la ruta pública de descarga: el
+     * admin lo abre en el navegador, que muestra la descarga y su progreso
+     * (la descarga autenticada por la API obliga a bajar el zip a memoria
+     * como blob y aparece de golpe al final).
+     */
+    public function downloadUrl(string $file)
+    {
+        $this->find($file);
+
+        return response()->json([
+            'url' => URL::temporarySignedRoute('motor.backups.download', now()->addMinutes(5), ['file' => $file]),
+        ]);
     }
 
     public function destroy(string $file)
