@@ -5,6 +5,7 @@ namespace Edc\Core;
 use Edc\Core\Auth\Http\Middleware\EnsureCanAccessAdmin;
 use Edc\Core\Backup\MotorBackup;
 use Edc\Core\Console\InstallCommand;
+use Edc\Core\Console\MediaPruneCommand;
 use Edc\Core\Console\PdfCleanupCommand;
 use Edc\Core\Console\PreviewManageCommand;
 use Edc\Core\Console\RewriteUrlsCommand;
@@ -123,7 +124,7 @@ class MotorServiceProvider extends ServiceProvider
         // autoridad y sobrescribe los grupos en Laravel 12.
 
         if ($this->app->runningInConsole()) {
-            $this->commands([InstallCommand::class, PreviewManageCommand::class, PdfCleanupCommand::class, RewriteUrlsCommand::class]);
+            $this->commands([InstallCommand::class, PreviewManageCommand::class, PdfCleanupCommand::class, RewriteUrlsCommand::class, MediaPruneCommand::class]);
 
             $this->publishes([
                 __DIR__.'/../config/motor.php' => config_path('motor.php'),

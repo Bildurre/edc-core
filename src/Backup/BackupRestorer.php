@@ -2,6 +2,7 @@
 
 namespace Edc\Core\Backup;
 
+use Illuminate\Contracts\Filesystem\Filesystem;
 use Illuminate\Support\Facades\Cache;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Schema;
@@ -184,9 +185,8 @@ class BackupRestorer
      */
     protected function restoreStorage(ZipArchive $zip): int
     {
-        $disk = Storage::disk(config('motor.disk', 'public'));
-        $count = 0;
-
+        // Entradas de storage del zip (ruta en el zip => ruta en el disco).
+        $entries = [];
         for ($i = 0; $i < $zip->numFiles; $i++) {
             $name = (string) $zip->getNameIndex($i);
             $at = strpos($name, self::STORAGE_MARKER);
@@ -199,6 +199,19 @@ class BackupRestorer
                 continue;
             }
 
+            $entries[$name] = $relative;
+        }
+
+        // Sin storage en la copia, el disco se queda como está.
+        if ($entries === []) {
+            return 0;
+        }
+
+        $disk = Storage::disk(config('motor.disk', 'public'));
+        $this->wipeOriginals($disk);
+        $count = 0;
+
+        foreach ($entries as $name => $relative) {
             $stream = $zip->getStream($name);
             if ($stream === false) {
                 continue;
@@ -212,6 +225,29 @@ class BackupRestorer
         }
 
         return $count;
+    }
+
+    /**
+     * Vacía los ORIGINALES del disco público (carpetas de media, contenido,
+     * iconos…) antes de devolver los de la copia: así la restauración deja
+     * el storage COMO ESTABA en la copia, en vez de sumarle lo que hubiera y
+     * acumular carpetas huérfanas (imágenes sustituidas, registros que la
+     * BBDD restaurada ya no tiene). Las previews y los PDF generados no se
+     * tocan: no van en la copia y se regeneran desde el admin. Las copias
+     * del motor llevan el storage entero, así que no se pierde nada.
+     */
+    protected function wipeOriginals(Filesystem $disk): void
+    {
+        $keep = [
+            trim((string) config('motor.previews.path', 'previews'), '/'),
+            trim((string) config('motor.pdf.path', 'pdfs'), '/'),
+        ];
+
+        foreach ($disk->directories() as $directory) {
+            if (! in_array(trim($directory, '/'), $keep, true)) {
+                $disk->deleteDirectory($directory);
+            }
+        }
     }
 
     /** Tras restaurar: fuera cachés (settings, contenido, permisos rancios). */

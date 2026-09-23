@@ -3,6 +3,24 @@
 Backend Laravel reutilizable del motor. Versión de tren con `@edc-motor/ui` y
 `@edc-motor/admin-kit` (tag `vX.Y.Z` en el monorepo).
 
+## [Sin publicar]
+
+### Añadido
+
+- **`motor:media:prune [--dry-run]`** (doc 07): borra las carpetas de media
+  `{modelo}/{id}/{mediaId}` del disco público sin registro en `media`
+  (mediaId inexistente o de otro registro/modelo). Solo dentro de las
+  carpetas de los modelos con media; previews, PDF y contenido del CRM no
+  se tocan.
+
+### Cambiado
+
+- **Restaurar una copia con storage deja el disco como en la copia** (doc
+  06): `BackupRestorer` vacía los originales del disco público (todo menos
+  previews y PDF) antes de escribir los del zip. Antes sumaba ficheros y el
+  disco acumulaba carpetas huérfanas. Una copia sin storage sigue sin tocar
+  el disco.
+
 ## [0.5.53] — 2026-09-23
 
 - Sin cambios propios: versión de tren.
