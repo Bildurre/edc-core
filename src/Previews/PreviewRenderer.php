@@ -25,8 +25,12 @@ class PreviewRenderer
             ->timeout((int) config('motor.previews.timeout', 60))
             ->waitUntilNetworkIdle()
             // La vista /_render marca window.__bgmRenderReady al terminar de
-            // montar el componente con sus datos (y fuentes cargadas).
-            ->waitForFunction('window.__bgmRenderReady === true')
+            // montar el componente con sus datos (y fuentes cargadas). Y el
+            // splash de arranque del index.html (#edc-splash) tiene que haber
+            // desaparecido: la vista lo quita (removeSplash), pero si un
+            // juego lo olvidara, la captura espera igual en vez de salir con
+            // el velo a medio fundir.
+            ->waitForFunction('window.__bgmRenderReady === true && !document.getElementById("edc-splash")')
             ->noSandbox()
             ->dismissDialogs();
 

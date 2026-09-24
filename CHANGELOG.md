@@ -3,6 +3,17 @@
 Backend Laravel reutilizable del motor. Versión de tren con `@edc-motor/ui` y
 `@edc-motor/admin-kit` (tag `vX.Y.Z` en el monorepo).
 
+## [Sin publicar]
+
+### Corregido
+
+- **Previews con el splash a medio fundir** (doc 01): `PreviewRenderer`
+  exige, además de `window.__bgmRenderReady`, que `#edc-splash` no exista.
+  El velo del index.html se retiraba por reposo de red más fundido y la
+  captura (500 ms tras la última actividad de red) lo pillaba a veces a
+  medias; la vista lo quita ahora con `removeSplash()`, y esto es el
+  cinturón por si un juego lo olvida.
+
 ## [0.5.54] — 2026-09-24
 
 ### Añadido
